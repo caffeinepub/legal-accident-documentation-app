@@ -1,0 +1,53 @@
+{
+  "kind": "spec_vs_diff_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-23T22:07:42.742Z",
+  "summary": "The diff implements all major requirements for basic traffic violation detection and liability assessment. Backend types, migration logic, violation detection functions, and liability calculations are present. Frontend components (ViolationsDisplay, LiabilityDisplay) are added and integrated into ReportDetail. AccidentReportForm accepts GPS coordinates and timestamp. However, the backend violation detection logic in main.mo is truncated, making it impossible to verify complete implementation of REQ-3, REQ-4, REQ-5, and REQ-6. Partial evidence suggests implementation is underway, but truncation prevents full verification.",
+  "missing_requirements": [
+    {
+      "id": "REQ-3",
+      "requirement": "Implement backend logic to detect stop sign violations by analyzing whether a stop sign was present in detected traffic signs and if the vehicle velocity indicates the driver did not come to a complete stop",
+      "reason": "backend/main.mo is truncated. While AccidentReport includes violations array and Violation type is defined, the actual violation detection logic (checking for stop sign presence and velocity analysis) is not visible in the truncated diff. Cannot confirm implementation of stop sign violation detection function.",
+      "evidence": [
+        "backend/main.mo"
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "requirement": "Implement backend logic to detect U-turn violations by accepting GPS location data and checking if a U-turn was performed in a prohibited area based on detected 'No U-turn' traffic signs",
+      "reason": "backend/main.mo is truncated. While createReport function signature in useQueries.ts shows gpsLocation parameter being passed, the backend logic for U-turn violation detection is not visible in the truncated main.mo. Cannot confirm GPS-based U-turn violation detection is implemented.",
+      "evidence": [
+        "backend/main.mo"
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "requirement": "Implement backend logic to detect traffic signal violations by comparing the witness testimony traffic light color against the AI-detected signal state and flagging discrepancies as potential violations",
+      "reason": "backend/main.mo is truncated. While trafficSignalState field exists in AccidentReport type, the logic comparing witness testimony color to detected signal state and flagging violations is not visible in the truncated code. Cannot verify traffic signal violation detection implementation.",
+      "evidence": [
+        "backend/main.mo"
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "requirement": "Create a backend function that calculates liability percentages based on detected violations, assigning higher fault percentage to the party with more serious or multiple violations",
+      "reason": "backend/main.mo is truncated. While party1Liability and party2Liability fields are added to AccidentReport type, the actual calculation function that analyzes violations and assigns percentage splits is not visible in the truncated diff. Cannot confirm liability calculation logic exists.",
+      "evidence": [
+        "backend/main.mo"
+      ]
+    }
+  ],
+  "hallucinated_features": [],
+  "confidence": 0.65,
+  "changed_files": [
+    "backend/main.mo",
+    "backend/migration.mo",
+    "frontend-file-summaries.txt",
+    "frontend/src/components/AccidentReportForm.tsx",
+    "frontend/src/components/LiabilityDisplay.tsx",
+    "frontend/src/components/ReportDetail.tsx",
+    "frontend/src/components/ViolationsDisplay.tsx",
+    "frontend/src/hooks/useQueries.ts",
+    "project_state.json"
+  ]
+}

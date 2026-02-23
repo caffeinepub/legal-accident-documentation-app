@@ -1,0 +1,71 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Add basic traffic violation detection with liability percentages - Frontend",
+  "requirements": [
+    {
+      "id": "REQ-7",
+      "summary": "Update AccidentReportForm to accept optional GPS location coordinates and timestamp for enhanced violation detection",
+      "acceptanceCriteria": [
+        "Form includes optional GPS location input fields",
+        "Form includes timestamp field (defaults to current time)",
+        "GPS and timestamp data are submitted with the accident report"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/AccidentReportForm.tsx",
+          "operation": "modify",
+          "description": "Add optional GPS location input fields (latitude, longitude) to the form. Add a timestamp field that defaults to the current time but allows manual override. Update the form submission to include gpsLocation as a string (formatted as 'lat,lng' if provided, or empty string if not) in the createReport backend call. Ensure GPS fields are clearly labeled as optional and positioned logically within the existing form layout."
+        }
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "summary": "Create ViolationsDisplay component showing detected violations with type, description, and timestamp",
+      "acceptanceCriteria": [
+        "Component displays violations array from AccidentReport",
+        "Each violation shows type, description, and timestamp",
+        "Component handles empty violations array gracefully"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/ViolationsDisplay.tsx",
+          "operation": "create",
+          "description": "Create a new component that accepts a violations prop (array of Violation objects from backend.d.ts). Display each violation in a list format showing violationType, description, and detectedAt timestamp. Format the timestamp as a readable date/time. Use appropriate styling with icons or badges to distinguish violation types (stop sign, U-turn, traffic signal). Handle empty arrays by showing a message like 'No violations detected' with a success/checkmark styling. Use shadcn/ui components (Card, Badge) for consistent styling with the rest of the app."
+        }
+      ]
+    },
+    {
+      "id": "REQ-9",
+      "summary": "Create LiabilityDisplay component visualizing fault percentage split between parties",
+      "acceptanceCriteria": [
+        "Component displays liability percentages for each party",
+        "Visual representation clearly shows the percentage split (e.g., 70% / 30%)",
+        "Component uses color coding to indicate fault severity"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/LiabilityDisplay.tsx",
+          "operation": "create",
+          "description": "Create a component that accepts party1Liability and party2Liability props (optional bigint values from AccidentReport). Display the liability split using a horizontal progress bar or stacked bar visualization showing the percentage distribution (e.g., 70% party 1 / 30% party 2). Use color coding: higher fault percentages in more intense colors (red/orange for high liability, green for low). Include numeric percentage labels on or near each segment. Handle cases where liability data is not yet calculated by showing 'Liability analysis pending' or similar message. Use Tailwind CSS for styling and ensure the visualization is responsive."
+        }
+      ]
+    },
+    {
+      "id": "REQ-10",
+      "summary": "Update ReportDetail to display ViolationsDisplay and LiabilityDisplay components",
+      "acceptanceCriteria": [
+        "ReportDetail page includes ViolationsDisplay component",
+        "ReportDetail page includes LiabilityDisplay component",
+        "Both components are positioned logically within the report detail layout"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/ReportDetail.tsx",
+          "operation": "modify",
+          "description": "Import and integrate the ViolationsDisplay and LiabilityDisplay components into the ReportDetail component. Position ViolationsDisplay after the existing DiscrepancyAlert section and before the PhotoGallery. Position LiabilityDisplay near the top of the report detail view, after the fault status badge but before detailed report information. Pass report.violations to ViolationsDisplay and report.party1Liability, report.party2Liability to LiabilityDisplay. Ensure proper spacing and visual hierarchy using existing section styling patterns."
+        }
+      ]
+    }
+  ]
+}

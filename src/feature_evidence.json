@@ -1,0 +1,85 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-update-the-accidentreportform-component-to-accept-optional-gps-location-coordinates-latitude-longitude-and-timestamp-for-enhanced-violation-detection",
+      "featureTitle": "Update the AccidentReportForm component to accept optional GPS location coordinates (latitude, longitude) and timestamp for enhanced violation detection",
+      "files": [
+        "frontend/src/components/AccidentReportForm.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "blob-storage@4.0.0",
+        "authorization@4.0.0"
+      ],
+      "testIds": [
+        "REQ-7"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-create-a-violationsdisplay-component-that-shows-all-detected-violations-in-a-list-format-with-violation-type-description-and-timestamp-for-each-violation",
+      "featureTitle": "Create a ViolationsDisplay component that shows all detected violations in a list format with violation type, description, and timestamp for each violation",
+      "files": [
+        "frontend/src/components/ViolationsDisplay.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "blob-storage@4.0.0",
+        "authorization@4.0.0"
+      ],
+      "testIds": [
+        "REQ-8"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-create-a-liabilitydisplay-component-that-visualizes-the-fault-percentage-split-between-parties-using-a-progress-bar-or-pie-chart-style-display-showing-each-party-s-liability-percentage",
+      "featureTitle": "Create a LiabilityDisplay component that visualizes the fault percentage split between parties using a progress bar or pie chart style display showing each party's liability percentage",
+      "files": [
+        "frontend/src/components/LiabilityDisplay.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "blob-storage@4.0.0",
+        "authorization@4.0.0"
+      ],
+      "testIds": [
+        "REQ-9"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-update-the-reportdetail-component-to-display-the-violationsdisplay-and-liabilitydisplay-components-showing-detected-violations-and-calculated-fault-percentages",
+      "featureTitle": "Update the ReportDetail component to display the ViolationsDisplay and LiabilityDisplay components showing detected violations and calculated fault percentages",
+      "files": [
+        "frontend/src/components/ReportDetail.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "blob-storage@4.0.0",
+        "authorization@4.0.0"
+      ],
+      "testIds": [
+        "REQ-10"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

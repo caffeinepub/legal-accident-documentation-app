@@ -1,0 +1,113 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 3,
+  "summary": "Traffic sign detection app with enhanced fault determination - implementing basic violation detection (stop signs, U-turns, traffic signals) with liability assessment",
+  "architectural_notes": [
+    "Violation detection system analyzes photos with GPS location and timestamp data",
+    "Liability calculator generates fault percentage splits based on detected violations",
+    "UK Highway Code compliance for traffic violations (focused on stop signs, U-turns, signals)"
+  ],
+  "known_issues": [],
+  "isFixRequest": false,
+  "existing_features": [
+    {
+      "id": "feature-update-the-accidentreportform-component-to-accept-optional-gps-location-coordinates-latitude-longitude-and-timestamp-for-enhanced-violation-detection",
+      "title": "Update the AccidentReportForm component to accept optional GPS location coordinates (latitude, longitude) and timestamp for enhanced violation detection",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-violationsdisplay-component-that-shows-all-detected-violations-in-a-list-format-with-violation-type-description-and-timestamp-for-each-violation",
+      "title": "Create a ViolationsDisplay component that shows all detected violations in a list format with violation type, description, and timestamp for each violation",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-liabilitydisplay-component-that-visualizes-the-fault-percentage-split-between-parties-using-a-progress-bar-or-pie-chart-style-display-showing-each-party-s-liability-percentage",
+      "title": "Create a LiabilityDisplay component that visualizes the fault percentage split between parties using a progress bar or pie chart style display showing each party's liability percentage",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-reportdetail-component-to-display-the-violationsdisplay-and-liabilitydisplay-components-showing-detected-violations-and-calculated-fault-percentages",
+      "title": "Update the ReportDetail component to display the ViolationsDisplay and LiabilityDisplay components showing detected violations and calculated fault percentages",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Basic violation detection: stop signs, U-turns, traffic signals with GPS/timestamp integration",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Liability assessment calculator with percentage fault splits (e.g., 70%/30%)",
+      "reqIds": [
+        "AR-1"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Extend the backend AccidentReport type to include a violations array that captures detected traffic violations (stop sign violations, U-turn violations, traffic signal violations) with fields for violation type, description, and detected timestamp",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Add liability assessment fields to the backend AccidentReport type to store fault percentage splits between parties (e.g., party1Liability: 70%, party2Liability: 30%)",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Implement backend logic to detect stop sign violations by analyzing whether a stop sign was present in detected traffic signs and if the vehicle velocity indicates the driver did not come to a complete stop",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Implement backend logic to detect U-turn violations by accepting GPS location data and checking if a U-turn was performed in a prohibited area based on detected 'No U-turn' traffic signs",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "Implement backend logic to detect traffic signal violations by comparing the witness testimony traffic light color against the AI-detected signal state and flagging discrepancies as potential violations",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Create a backend function that calculates liability percentages based on detected violations, assigning higher fault percentage to the party with more serious or multiple violations",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "status": "pending"
+    }
+  ],
+  "projectName": "Traffic Fault Analyzer",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

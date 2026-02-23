@@ -1,0 +1,205 @@
+{
+  "kind": "build_request",
+  "title": "Add basic traffic violation detection with liability percentages",
+  "projectName": "Traffic Fault Analyzer",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "text": "Extend the backend AccidentReport type to include a violations array that captures detected traffic violations (stop sign violations, U-turn violations, traffic signal violations) with fields for violation type, description, and detected timestamp",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ],
+        "quotes": [
+          "Let's focus on stop signs violations, U-turn, signal lights etc."
+        ]
+      },
+      "acceptanceCriteria": [
+        "AccidentReport type includes a violations field as an array of violation records",
+        "Each violation record includes type (stop sign, U-turn, traffic signal), description, and timestamp"
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Add liability assessment fields to the backend AccidentReport type to store fault percentage splits between parties (e.g., party1Liability: 70%, party2Liability: 30%)",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ],
+        "quotes": [
+          "I think we should include liability at this stay, example 70% 30%"
+        ]
+      },
+      "acceptanceCriteria": [
+        "AccidentReport type includes liability percentage fields for each party",
+        "Liability percentages are stored as Natural numbers representing percentages",
+        "The sum of all liability percentages equals 100"
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Implement backend logic to detect stop sign violations by analyzing whether a stop sign was present in detected traffic signs and if the vehicle velocity indicates the driver did not come to a complete stop",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ],
+        "quotes": [
+          "Let's focus on stop signs violations"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Logic checks for stop sign presence in trafficSigns array",
+        "Logic evaluates velocity data to determine if vehicle stopped",
+        "Violation is recorded when stop sign detected and velocity indicates no stop"
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Implement backend logic to detect U-turn violations by accepting GPS location data and checking if a U-turn was performed in a prohibited area based on detected 'No U-turn' traffic signs",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ],
+        "quotes": [
+          "U-turn",
+          "It can accept Gps location and timestamp information"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Backend accepts GPS location data in the report submission",
+        "Logic checks for 'No U-turn' signs in detected traffic signs",
+        "Violation is recorded when no U-turn sign is present and location data suggests illegal U-turn"
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "text": "Implement backend logic to detect traffic signal violations by comparing the witness testimony traffic light color against the AI-detected signal state and flagging discrepancies as potential violations",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ],
+        "quotes": [
+          "signal lights etc"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Logic compares trafficSignalColor testimony with detected signal state",
+        "Red light violation is flagged when mismatch indicates driver ran red light",
+        "Traffic signal violation is added to violations array"
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "text": "Create a backend function that calculates liability percentages based on detected violations, assigning higher fault percentage to the party with more serious or multiple violations",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ],
+        "quotes": [
+          "I think we should include liability at this stay, example 70% 30%"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Function analyzes all detected violations for each party",
+        "Function returns percentage split totaling 100%",
+        "More violations or serious violations result in higher liability percentage",
+        "Liability percentages are stored in the AccidentReport"
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "text": "Update the AccidentReportForm component to accept optional GPS location coordinates (latitude, longitude) and timestamp for enhanced violation detection",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ],
+        "quotes": [
+          "It can accept Gps location and timestamp information"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Form includes optional GPS location input fields",
+        "Form includes timestamp field (defaults to current time)",
+        "GPS and timestamp data are submitted with the accident report"
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "text": "Create a ViolationsDisplay component that shows all detected violations in a list format with violation type, description, and timestamp for each violation",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ],
+        "quotes": [
+          "Let's focus on stop signs violations, U-turn, signal lights etc."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Component displays violations array from AccidentReport",
+        "Each violation shows type, description, and timestamp",
+        "Component handles empty violations array gracefully"
+      ]
+    },
+    {
+      "id": "REQ-9",
+      "text": "Create a LiabilityDisplay component that visualizes the fault percentage split between parties using a progress bar or pie chart style display showing each party's liability percentage",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ],
+        "quotes": [
+          "I think we should include liability at this stay, example 70% 30%"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Component displays liability percentages for each party",
+        "Visual representation clearly shows the percentage split (e.g., 70% / 30%)",
+        "Component uses color coding to indicate fault severity"
+      ]
+    },
+    {
+      "id": "REQ-10",
+      "text": "Update the ReportDetail component to display the ViolationsDisplay and LiabilityDisplay components showing detected violations and calculated fault percentages",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ]
+      },
+      "acceptanceCriteria": [
+        "ReportDetail page includes ViolationsDisplay component",
+        "ReportDetail page includes LiabilityDisplay component",
+        "Both components are positioned logically within the report detail layout"
+      ]
+    }
+  ],
+  "constraints": [
+    "Backend must remain single-actor architecture in backend/main.mo",
+    "Do not modify immutable frontend paths: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui",
+    "GPS location data is optional - system should work without it",
+    "Violation detection must be based on photo analysis combined with GPS/timestamp when available",
+    "All liability percentages must sum to 100%"
+  ],
+  "nonGoals": [
+    "Real-time GPS tracking or live location services",
+    "Integration with external mapping APIs",
+    "Comprehensive UK Highway Code violation detection (only stop signs, U-turns, traffic signals)",
+    "Multi-party accident scenarios beyond two parties",
+    "Historical violation tracking or driver scoring",
+    "Manual override of calculated liability percentages"
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}
