@@ -1,0 +1,25 @@
+{
+  "kind": "spec_vs_diff_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-24T23:52:59.126Z",
+  "summary": "All three requirements are implemented. REQ-1 is satisfied by the static data structure in frontend/src/data/legalReferences.ts with Highway Code rules including enforceable/advisory flags and visual badge distinction. REQ-2 is satisfied by RTA 1988 sections with section numbers and plain-English descriptions in the same file. REQ-3 is satisfied by the collapsible LegalReferencePanel component integrated into ReportDetail.tsx, defaulting to collapsed state with a chevron toggle, showing relevant references per violations, and handling the no-violations case.",
+  "missing_requirements": [],
+  "hallucinated_features": [
+    {
+      "description": "GENERAL_LEGAL_REFERENCES merged into all panels regardless of violations",
+      "reason": "The build request only requires showing references relevant to the violations recorded in the report. The implementation also merges a separate GENERAL_LEGAL_REFERENCES set into every panel, which was not requested.",
+      "evidence": [
+        "frontend/src/components/LegalReferencePanel.tsx",
+        "frontend/src/data/legalReferences.ts"
+      ]
+    }
+  ],
+  "confidence": 0.85,
+  "changed_files": [
+    "frontend-file-summaries.txt",
+    "frontend/src/components/LegalReferencePanel.tsx",
+    "frontend/src/components/ReportDetail.tsx",
+    "frontend/src/data/legalReferences.ts",
+    "project_state.json"
+  ]
+}

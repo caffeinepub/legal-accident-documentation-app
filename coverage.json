@@ -1,0 +1,63 @@
+{
+  "kind": "coverage_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-24T23:52:59.129Z",
+  "sources": {
+    "buildRequest": true,
+    "implementationPlan": true
+  },
+  "requirements": {
+    "total": 3,
+    "implemented": 3,
+    "items": [
+      {
+        "id": "REQ-1",
+        "summary": "Add a static data structure (frontend-side) that maps each violation type to relevant Highway Code rules, including the rule number, description, and whether the rule is legally enforceable or advisory.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/data/legalReferences.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/data/legalReferences.ts"
+        ]
+      },
+      {
+        "id": "REQ-2",
+        "summary": "Add a static data structure (frontend-side) that maps each violation type to relevant Road Traffic Act 1988 sections, including the section number and a short plain-English description of the offence.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/data/legalReferences.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/data/legalReferences.ts"
+        ]
+      },
+      {
+        "id": "REQ-3",
+        "summary": "In the ReportDetail view, add a collapsible 'Legal Reference' panel that is collapsed by default. When expanded, it shows the Highway Code Citations and Road Traffic Act 1988 References relevant to the violations recorded in that report. Users who don't need legal detail are not shown it unless they actively expand the panel.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/LegalReferencePanel.tsx",
+          "frontend/src/components/ReportDetail.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/LegalReferencePanel.tsx",
+          "frontend/src/components/ReportDetail.tsx"
+        ]
+      }
+    ]
+  },
+  "changedFiles": [
+    "build-request.json",
+    "feature_evidence.json",
+    "frontend-file-summaries.txt",
+    "frontend-implementation-plan.json",
+    "frontend/src/components/LegalReferencePanel.tsx",
+    "frontend/src/components/ReportDetail.tsx",
+    "frontend/src/data/legalReferences.ts",
+    "project_state.json",
+    "scratch/component-selection.json",
+    "spec.md",
+    "spec_vs_diff_report.json"
+  ]
+}

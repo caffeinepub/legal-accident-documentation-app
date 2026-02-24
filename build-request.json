@@ -1,0 +1,80 @@
+{
+  "kind": "build_request",
+  "title": "Add Highway Code Citations and Road Traffic Act 1988 References in collapsible Legal Reference panel",
+  "projectName": "UK Incident Reporter",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "text": "Add a static data structure (frontend-side) that maps each violation type to relevant Highway Code rules, including the rule number, description, and whether the rule is legally enforceable or advisory.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-recent"
+        ],
+        "quotes": [
+          "Highway Code Citations — specific rules flagged as enforceable vs advisory"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Each violation type maps to at least one Highway Code rule entry",
+        "Each entry includes rule number, short description, and an enforceable/advisory flag",
+        "Advisory rules are visually distinguished from enforceable ones (e.g. label or badge)"
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Add a static data structure (frontend-side) that maps each violation type to relevant Road Traffic Act 1988 sections, including the section number and a short plain-English description of the offence.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-recent"
+        ],
+        "quotes": [
+          "Road Traffic Act References — violations tagged to RTA 1988 sections"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Each violation type maps to at least one RTA 1988 section",
+        "Each entry includes section number (e.g. s.3, s.2) and a short description",
+        "Entries are accurate to common UK road traffic violation types already in the app"
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "In the ReportDetail view, add a collapsible 'Legal Reference' panel that is collapsed by default. When expanded, it shows the Highway Code Citations and Road Traffic Act 1988 References relevant to the violations recorded in that report. Users who don't need legal detail are not shown it unless they actively expand the panel.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-recent"
+        ],
+        "quotes": [
+          "All legal references will be tucked away in a collapsible / toggleable 'Legal Reference' panel so users who don't need the legal detail won't be overwhelmed"
+        ]
+      },
+      "acceptanceCriteria": [
+        "A 'Legal Reference' section is present in the ReportDetail view",
+        "The panel is collapsed by default with a visible toggle button/chevron",
+        "Expanding the panel reveals Highway Code rules and RTA 1988 sections relevant to the report's violations",
+        "If no violations are recorded, the panel shows a message indicating no legal references apply",
+        "The panel can be collapsed again after being expanded"
+      ]
+    }
+  ],
+  "constraints": [
+    "Do not modify any files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui",
+    "Legal reference data must be static frontend-side mappings — no backend schema changes required for this step",
+    "Keep the existing incident/report flow (photo upload, vehicle info, surroundings, violation type, liability split, My Reports history) fully intact"
+  ],
+  "nonGoals": [
+    "Case Law References (planned for Step 2)",
+    "Contributory Negligence Framework (planned for Step 3)",
+    "Insurer-Style Fault Matrix (planned for Step 3)",
+    "Next Steps Guidance (planned for Step 3)",
+    "Backend storage of legal reference data"
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}
