@@ -1,15 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Add a dedicated Highway Code + Case Law Fault Reference Tool page to the Road Fault Advisor app, featuring an insurer-style fault matrix and scenario selector backed by static UK legal reference data.
+**Goal:** Expand the fault matrix data and UI to include complete Party A/B fault percentage breakdowns and full scenario coverage for all common road incident types.
 
 **Planned changes:**
-- Add a new dedicated page/route for the fault reference tool, accessible from the main navigation
-- Build a plain-English scenario selector UI (card grid or button group) covering at least 7 accident types: rear-end, red light, lane change, turning, junction, roundabout, and reversing — each with a label, short description, and icon
-- Display an insurer-style fault matrix showing Party A and Party B fault percentages (as visual bars/badges and numeric values) with a plain-English rationale, with the active scenario row highlighted
-- Display a legal references panel showing relevant Highway Code rule numbers/summaries, Road Traffic Act 1988 sections, and case law precedents (case name, factual summary, legal principle) for the selected scenario
-- Selecting a scenario simultaneously updates the fault matrix, Highway Code rules, and case law panels
-- Expand `faultMatrix.ts` and `legalReferences.ts` static data files to cover all 7+ scenario types with fault splits, rationale, Highway Code rules, RTA 1988 sections, and case law entries
-- Apply a professional legal/insurance visual theme: dark navy or charcoal headers, amber/gold fault highlights, card-based panel layouts, and clear typographic hierarchy
+- Expand `faultMatrix.ts` to include entries for all seven scenario types from `scenarioReferences.ts` (rear-end, red light, lane change, and remaining unmapped types), each with Party A/B fault percentages, contributing factors, rationale, and related violation types.
+- Update `FaultMatrixPanel` to display labelled bars or numeric values for Party A and Party B fault percentages, contributing factors, and rationale for every scenario row, with the active scenario highlighted distinctly.
+- Update `FaultReferenceDisplay` on the Fault Reference page to show Party A and Party B fault percentage bars alongside existing legal references when a scenario is selected.
 
-**User-visible outcome:** Users can navigate to the fault reference tool, select their accident scenario from a plain-English selector, and immediately see the relevant fault split matrix, Highway Code rules, Road Traffic Act sections, and case law precedents — all without needing any prior legal knowledge.
+**User-visible outcome:** Users can view complete fault percentage breakdowns for all road incident scenarios in both the Fault Matrix panel and the Fault Reference page, with contributing factors, rationale, and legal references displayed together for each scenario.

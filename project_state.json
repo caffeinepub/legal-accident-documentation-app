@@ -1,77 +1,38 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "A road traffic accident reference and fault assessment app. Includes Highway Code + case law fault reference tool with insurer-style fault matrix, a bird's eye grid view where AI places cars based on uploaded photos/descriptions (with manual adjustment), and an injury photo upload section with metadata entry. Currently focused on building the first part: the Highway Code + case law fault reference tool with fault matrix.",
-  "architectural_notes": [
-    "App targets everyday users involved in road incidents — prioritise plain-English language over legal jargon",
-    "Uploaded images and sensitive data should leverage Internet Computer canister storage for decentralised privacy"
-  ],
+  "summary": "New project",
+  "architectural_notes": [],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-create-a-dedicated-standalone-page-or-section-for-the-highway-code-case-law-fault-reference-tool-accessible-from-the-main-navigation-this-page-should-allow-users-to-describe-or-select-their-accident-scenario-e-g-rear-end-red-light-lane-change-junction-and-receive-a-structured-fault-assessment-based-on-uk-highway-code-rules-and-established-case-law-precedents",
-      "title": "Create a dedicated standalone page or section for the Highway Code + case law fault reference tool, accessible from the main navigation. This page should allow users to describe or select their accident scenario (e.g. rear-end, red light, lane change, junction) and receive a structured fault assessment based on UK Highway Code rules and established case law precedents.",
+      "id": "feature-expand-the-faultmatrixpanel-component-to-display-complete-party-a-and-party-b-fault-percentage-breakdowns-for-all-scenarios-defined-in-faultmatrix-ts-including-contributing-factors-and-rationale-text-for-each-scenario-entry",
+      "title": "Expand the FaultMatrixPanel component to display complete Party A and Party B fault percentage breakdowns for all scenarios defined in faultMatrix.ts, including contributing factors and rationale text for each scenario entry.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-provide-a-plain-english-scenario-selector-ui-that-lets-users-choose-their-accident-type-from-a-list-of-common-scenarios-with-icons-or-short-descriptions-on-selection-the-fault-matrix-highway-code-rules-and-case-law-references-all-update-to-reflect-the-chosen-scenario-the-interface-must-be-usable-without-any-prior-legal-knowledge",
-      "title": "Provide a plain-English scenario selector UI that lets users choose their accident type from a list of common scenarios (with icons or short descriptions). On selection, the fault matrix, Highway Code rules, and case law references all update to reflect the chosen scenario. The interface must be usable without any prior legal knowledge.",
+      "id": "feature-expand-the-scenario-coverage-in-faultmatrix-ts-to-include-all-common-road-incident-scenario-types-already-referenced-in-scenarioreferences-ts-rear-end-red-light-lane-change-and-any-remaining-unmapped-types-ensuring-each-has-fault-percentages-contributing-factors-rationale-and-related-violation-types",
+      "title": "Expand the scenario coverage in faultMatrix.ts to include all common road incident scenario types already referenced in scenarioReferences.ts (rear-end, red light, lane change, and any remaining unmapped types), ensuring each has fault percentages, contributing factors, rationale, and related violation types.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-faultreferencedisplay-on-the-faultreferencepage-to-show-the-full-fault-percentage-breakdown-party-a-and-party-b-with-labelled-bars-alongside-legal-references-when-a-scenario-is-selected-consistent-with-the-expanded-faultmatrix-ts-data",
+      "title": "Update FaultReferenceDisplay on the FaultReferencePage to show the full fault percentage breakdown (Party A and Party B with labelled bars) alongside legal references when a scenario is selected, consistent with the expanded faultMatrix.ts data.",
       "reqIds": [
         "REQ-3"
       ],
       "version": 1
-    },
-    {
-      "id": "feature-apply-a-consistent-professional-visual-theme-to-the-fault-reference-tool-page-use-a-clean-authoritative-legal-insurance-aesthetic-dark-navy-or-charcoal-tones-for-headers-amber-or-gold-accents-for-fault-highlights-clear-typographic-hierarchy-and-card-based-layouts-for-the-matrix-and-legal-reference-panels-the-design-should-feel-trustworthy-and-easy-to-scan",
-      "title": "Apply a consistent, professional visual theme to the fault reference tool page. Use a clean, authoritative legal/insurance aesthetic — dark navy or charcoal tones for headers, amber or gold accents for fault highlights, clear typographic hierarchy, and card-based layouts for the matrix and legal reference panels. The design should feel trustworthy and easy to scan.",
-      "reqIds": [
-        "REQ-5"
-      ],
-      "version": 1
     }
   ],
-  "new_feature_requests": [
-    {
-      "id": "AR-1",
-      "summary": "Highway Code + case law fault reference tool with insurer-style fault matrix",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-2",
-      "summary": "Bird's eye grid view where AI places cars based on uploaded photos/descriptions, with manual adjustment and rotation",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-3",
-      "summary": "Injury photo upload section with metadata entry (date, time, injury description, body location) and structured injury documentation",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-5",
-      "summary": "Display an insurer-style fault matrix for the selected accident scenario, showing Party A and Party B fault percentages alongside a plain-English rationale. The matrix should highlight the active scenario row or cell based on the user's selection. Expand the existing faultMatrix.ts static data if needed to cover all common scenario types (rear-end, red light, lane change, turning, junction, roundabout, reversing).",
-      "reqIds": [
-        "REQ-2"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-7",
-      "summary": "Expand the existing legalReferences.ts and faultMatrix.ts data files to ensure comprehensive coverage of all scenario types used in the selector. Each scenario entry must include: relevant Highway Code rule numbers and summaries, applicable Road Traffic Act 1988 sections, at least one case law precedent with a factual summary and legal principle, and Party A/Party B fault split with rationale.",
-      "reqIds": [
-        "REQ-4"
-      ],
-      "status": "pending"
-    }
-  ],
-  "gameProjectType": "none",
-  "projectName": "Road Traffic Fault Assessment App",
+  "new_feature_requests": [],
+  "projectName": "Expand fault matrix Party A/B breakdowns and scenario coverage",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

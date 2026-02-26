@@ -1,157 +1,258 @@
-import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Grid3X3, Info } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { faultMatrix } from '../data/faultMatrix';
-import type { FaultMatrixEntry } from '../data/faultMatrix';
+import React, { useState } from "react";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { Badge } from "@/components/ui/badge";
+import { ChevronDown, ChevronUp, TableProperties, CheckCircle2 } from "lucide-react";
+import { faultMatrix, FaultMatrixEntry } from "../data/faultMatrix";
 
 interface FaultMatrixPanelProps {
-  activeViolationType?: string;
+  violationType?: string;
 }
 
-function FaultPercentBadge({ percent, party }: { percent: number; party: 'A' | 'B' }) {
-  const getColor = (pct: number, p: 'A' | 'B') => {
-    if (p === 'A') {
-      if (pct >= 80) return 'text-destructive font-bold';
-      if (pct >= 60) return 'text-orange-600 font-bold';
-      return 'text-yellow-600 font-semibold';
-    }
-    if (pct >= 80) return 'text-destructive font-bold';
-    if (pct >= 60) return 'text-orange-600 font-bold';
-    return 'text-blue-600 font-semibold';
-  };
-
-  return (
-    <span className={`text-sm tabular-nums ${getColor(percent, party)}`}>
-      {percent}%
-    </span>
+function getActiveScenario(violationType?: string): string | null {
+  if (!violationType) return null;
+  const entry = faultMatrix.find((e) =>
+    e.relatedViolationTypes.some(
+      (v) => v.toLowerCase() === violationType.toLowerCase()
+    )
   );
+  return entry ? entry.scenario : null;
 }
 
-function MatrixRow({ entry, isActive }: { entry: FaultMatrixEntry; isActive: boolean }) {
+function FaultBar({
+  partyAFault,
+  partyBFault,
+}: {
+  partyAFault: number;
+  partyBFault: number;
+}) {
   return (
-    <div
-      className={`p-3 rounded-lg border transition-colors ${
-        isActive
-          ? 'border-l-4 border-l-primary bg-primary/5 border-primary/30'
-          : 'bg-card border-border'
-      }`}
-    >
-      <div className="flex items-start justify-between gap-3 mb-2">
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-sm font-semibold text-foreground">{entry.scenarioTitle}</span>
-          {isActive && (
-            <Badge className="text-xs bg-primary text-primary-foreground">
-              Active Scenario
-            </Badge>
-          )}
+    <div className="space-y-2">
+      <div className="flex items-center gap-2">
+        <span className="text-xs font-medium text-muted-foreground w-16 shrink-0">
+          Party A
+        </span>
+        <div className="flex-1 bg-muted rounded-full h-3 overflow-hidden">
+          <div
+            className="h-full rounded-full transition-all duration-500"
+            style={{
+              width: `${partyAFault}%`,
+              backgroundColor:
+                partyAFault >= 70
+                  ? "oklch(0.55 0.22 25)"
+                  : partyAFault >= 50
+                  ? "oklch(0.65 0.18 55)"
+                  : "oklch(0.55 0.18 145)",
+            }}
+          />
         </div>
-        <div className="flex items-center gap-3 shrink-0">
-          <div className="text-center">
-            <p className="text-xs text-muted-foreground mb-0.5">Party A</p>
-            <FaultPercentBadge percent={entry.partyAFaultPercent} party="A" />
-          </div>
-          <div className="w-px h-8 bg-border" />
-          <div className="text-center">
-            <p className="text-xs text-muted-foreground mb-0.5">Party B</p>
-            <FaultPercentBadge percent={entry.partyBFaultPercent} party="B" />
-          </div>
+        <span
+          className="text-xs font-bold w-10 text-right"
+          style={{
+            color:
+              partyAFault >= 70
+                ? "oklch(0.55 0.22 25)"
+                : partyAFault >= 50
+                ? "oklch(0.65 0.18 55)"
+                : "oklch(0.55 0.18 145)",
+          }}
+        >
+          {partyAFault}%
+        </span>
+      </div>
+      <div className="flex items-center gap-2">
+        <span className="text-xs font-medium text-muted-foreground w-16 shrink-0">
+          Party B
+        </span>
+        <div className="flex-1 bg-muted rounded-full h-3 overflow-hidden">
+          <div
+            className="h-full rounded-full transition-all duration-500"
+            style={{
+              width: `${partyBFault}%`,
+              backgroundColor:
+                partyBFault >= 70
+                  ? "oklch(0.55 0.22 25)"
+                  : partyBFault >= 50
+                  ? "oklch(0.65 0.18 55)"
+                  : "oklch(0.55 0.18 145)",
+            }}
+          />
         </div>
+        <span
+          className="text-xs font-bold w-10 text-right"
+          style={{
+            color:
+              partyBFault >= 70
+                ? "oklch(0.55 0.22 25)"
+                : partyBFault >= 50
+                ? "oklch(0.65 0.18 55)"
+                : "oklch(0.55 0.18 145)",
+          }}
+        >
+          {partyBFault}%
+        </span>
       </div>
-
-      {/* Contributing factors */}
-      <div className="flex flex-wrap gap-1 mb-2">
-        {entry.contributingFactors.map((factor) => (
-          <span
-            key={factor}
-            className="text-xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground border"
-          >
-            {factor}
-          </span>
-        ))}
-      </div>
-
-      {/* Rationale */}
-      <p className="text-xs text-muted-foreground leading-relaxed">{entry.rationale}</p>
     </div>
   );
 }
 
-export default function FaultMatrixPanel({ activeViolationType }: FaultMatrixPanelProps) {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const isActiveEntry = (entry: FaultMatrixEntry): boolean => {
-    if (!activeViolationType) return false;
-    return (entry.relatedViolationTypes ?? []).some(
-      (vt) => vt.toLowerCase() === activeViolationType.toLowerCase()
-    );
-  };
-
-  const activeEntry = faultMatrix.find(isActiveEntry);
+function ScenarioRow({
+  entry,
+  isActive,
+}: {
+  entry: FaultMatrixEntry;
+  isActive: boolean;
+}) {
+  const [expanded, setExpanded] = useState(isActive);
 
   return (
-    <div className="rounded-xl border bg-muted/30 overflow-hidden">
-      <Button
-        variant="ghost"
-        className="w-full flex items-center justify-between px-4 py-3 h-auto rounded-none hover:bg-muted/50 transition-colors"
-        onClick={() => setIsOpen((prev) => !prev)}
-        aria-expanded={isOpen}
+    <div
+      className={`rounded-lg border transition-all duration-200 overflow-hidden ${
+        isActive
+          ? "border-primary bg-primary/5 shadow-sm"
+          : "border-border bg-card"
+      }`}
+    >
+      <button
+        onClick={() => setExpanded((v) => !v)}
+        className="w-full text-left p-4 flex items-start gap-3 hover:bg-muted/30 transition-colors"
       >
-        <div className="flex items-center gap-2">
-          <Grid3X3 className="w-4 h-4 text-primary shrink-0" />
-          <span className="text-sm font-semibold">Insurer Fault Matrix</span>
-          <Badge variant="outline" className="text-xs ml-1">
-            {faultMatrix.length} Scenarios
-          </Badge>
-          {activeEntry && (
-            <Badge className="text-xs bg-primary text-primary-foreground ml-1">
-              Match Found
-            </Badge>
+        {isActive && (
+          <div className="w-1 self-stretch rounded-full bg-primary shrink-0 -ml-4 mr-1" />
+        )}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap mb-2">
+            <span className="font-semibold text-sm text-foreground">
+              {entry.scenario}
+            </span>
+            {isActive && (
+              <Badge className="text-xs bg-primary text-primary-foreground gap-1">
+                <CheckCircle2 className="w-3 h-3" />
+                Active Scenario
+              </Badge>
+            )}
+          </div>
+          <FaultBar
+            partyAFault={entry.partyAFault}
+            partyBFault={entry.partyBFault}
+          />
+        </div>
+        <div className="shrink-0 mt-1 text-muted-foreground">
+          {expanded ? (
+            <ChevronUp className="w-4 h-4" />
+          ) : (
+            <ChevronDown className="w-4 h-4" />
           )}
         </div>
-        <div className="flex items-center gap-1.5 text-muted-foreground text-xs">
-          <span>{isOpen ? 'Hide' : 'Show'} matrix</span>
-          {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-        </div>
-      </Button>
+      </button>
 
-      {isOpen && (
-        <div className="px-4 pb-4 space-y-4">
-          <Separator />
-
-          {/* Contextual note */}
-          <div className="flex items-start gap-2 p-3 rounded-lg bg-primary/5 border border-primary/20">
-            <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              This matrix reflects typical insurer fault allocations for common road incident scenarios, based on industry practice and UK case law. Fault percentages are indicative starting points; actual determinations depend on the specific facts of each case.
-              {activeViolationType && activeEntry && (
-                <span className="block mt-1 font-medium text-primary">
-                  A scenario matching the detected violation type "{activeViolationType}" has been highlighted below.
-                </span>
-              )}
+      {expanded && (
+        <div className="px-4 pb-4 space-y-3 border-t border-border/50 pt-3">
+          <div>
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">
+              Rationale
+            </p>
+            <p className="text-sm text-foreground/80 leading-relaxed">
+              {entry.rationale}
             </p>
           </div>
-
-          {/* Matrix entries — active first, then rest */}
-          <div className="space-y-2">
-            {[
-              ...faultMatrix.filter(isActiveEntry),
-              ...faultMatrix.filter((e) => !isActiveEntry(e)),
-            ].map((entry) => (
-              <MatrixRow key={entry.id} entry={entry} isActive={isActiveEntry(entry)} />
-            ))}
-          </div>
-
-          {/* Disclaimer */}
-          <div className="flex items-start gap-2 p-3 rounded-lg bg-muted/50 border">
-            <Info className="w-3.5 h-3.5 text-muted-foreground shrink-0 mt-0.5" />
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Fault allocations shown are based on typical insurer practice and are not legally binding determinations. Final liability is determined by insurers, courts, or agreed settlement. Always seek independent legal advice for your specific circumstances.
+          <div>
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">
+              Contributing Factors
             </p>
+            <ul className="space-y-1">
+              {entry.contributingFactors.map((factor, i) => (
+                <li key={i} className="flex items-start gap-2 text-sm text-foreground/80">
+                  <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-primary/60 shrink-0" />
+                  {factor}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">
+              Related Violation Types
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {entry.relatedViolationTypes.map((vt, i) => (
+                <Badge key={i} variant="outline" className="text-xs">
+                  {vt}
+                </Badge>
+              ))}
+            </div>
           </div>
         </div>
       )}
     </div>
+  );
+}
+
+export default function FaultMatrixPanel({
+  violationType,
+}: FaultMatrixPanelProps) {
+  const [isOpen, setIsOpen] = useState(true);
+  const activeScenario = getActiveScenario(violationType);
+
+  // Sort so active scenario appears first
+  const sortedMatrix = [...faultMatrix].sort((a, b) => {
+    if (a.scenario === activeScenario) return -1;
+    if (b.scenario === activeScenario) return 1;
+    return 0;
+  });
+
+  return (
+    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+      <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+        <CollapsibleTrigger asChild>
+          <button className="w-full flex items-center justify-between p-4 bg-fault-header text-fault-header-fg hover:opacity-90 transition-opacity">
+            <div className="flex items-center gap-2">
+              <TableProperties className="w-5 h-5" />
+              <span className="font-semibold text-base">
+                Insurer Fault Matrix
+              </span>
+              <Badge
+                variant="outline"
+                className="text-xs border-fault-header-fg/40 text-fault-header-fg/80"
+              >
+                {faultMatrix.length} Scenarios
+              </Badge>
+            </div>
+            {isOpen ? (
+              <ChevronUp className="w-5 h-5" />
+            ) : (
+              <ChevronDown className="w-5 h-5" />
+            )}
+          </button>
+        </CollapsibleTrigger>
+
+        <CollapsibleContent>
+          <div className="p-4 space-y-3">
+            {activeScenario && (
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-primary/10 border border-primary/20 text-sm text-primary font-medium">
+                <CheckCircle2 className="w-4 h-4 shrink-0" />
+                <span>
+                  Active scenario detected:{" "}
+                  <strong>{activeScenario}</strong> — based on violation type &ldquo;
+                  {violationType}&rdquo;
+                </span>
+              </div>
+            )}
+
+            <div className="space-y-2">
+              {sortedMatrix.map((entry) => (
+                <ScenarioRow
+                  key={entry.scenario}
+                  entry={entry}
+                  isActive={entry.scenario === activeScenario}
+                />
+              ))}
+            </div>
+          </div>
+        </CollapsibleContent>
+      </div>
+    </Collapsible>
   );
 }

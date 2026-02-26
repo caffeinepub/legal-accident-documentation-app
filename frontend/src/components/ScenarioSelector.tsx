@@ -8,7 +8,7 @@ import {
   RefreshCw,
   CornerDownLeft,
 } from 'lucide-react';
-import { SCENARIOS, type ScenarioKey } from '../data/scenarioReferences';
+import { scenarioReferences, type ScenarioKey } from '../data/scenarioReferences';
 
 interface ScenarioSelectorProps {
   selected: ScenarioKey | null;
@@ -25,7 +25,20 @@ const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   CornerDownLeft,
 };
 
+// Icon assignment per scenario key
+const SCENARIO_ICONS: Record<ScenarioKey, string> = {
+  'rear-end': 'ArrowRight',
+  'red-light': 'CircleStop',
+  'lane-change': 'ArrowLeftRight',
+  'turning': 'CornerUpRight',
+  'junction': 'GitMerge',
+  'roundabout': 'RefreshCw',
+  'reversing': 'CornerDownLeft',
+};
+
 export default function ScenarioSelector({ selected, onChange }: ScenarioSelectorProps) {
+  const scenarios = Object.values(scenarioReferences);
+
   return (
     <div className="space-y-3">
       <div>
@@ -36,8 +49,9 @@ export default function ScenarioSelector({ selected, onChange }: ScenarioSelecto
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-        {SCENARIOS.map((scenario) => {
-          const Icon = ICON_MAP[scenario.icon];
+        {scenarios.map((scenario) => {
+          const iconName = SCENARIO_ICONS[scenario.key];
+          const Icon = ICON_MAP[iconName];
           const isSelected = selected === scenario.key;
 
           return (

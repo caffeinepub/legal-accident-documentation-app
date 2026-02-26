@@ -1,116 +1,71 @@
 {
   "kind": "build_request",
-  "title": "Highway Code + Case Law Fault Reference Tool with Insurer-Style Fault Matrix",
-  "projectName": "Road Fault Advisor",
+  "title": "Expand fault matrix Party A/B breakdowns and scenario coverage",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Create a dedicated standalone page or section for the Highway Code + case law fault reference tool, accessible from the main navigation. This page should allow users to describe or select their accident scenario (e.g. rear-end, red light, lane change, junction) and receive a structured fault assessment based on UK Highway Code rules and established case law precedents.",
+      "text": "Expand the FaultMatrixPanel component to display complete Party A and Party B fault percentage breakdowns for all scenarios defined in faultMatrix.ts, including contributing factors and rationale text for each scenario entry.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-20"
+          "msg-4"
         ],
         "quotes": [
-          "Highway Code + case law fault reference tool with the insurer-style fault matrix"
+          "flesh out the full Party A/B percentage breakdowns and expand the scenario coverage in the fault matrix"
         ]
       },
       "acceptanceCriteria": [
-        "A dedicated route or prominent section exists for the fault reference tool",
-        "Users can select or describe a common accident scenario type",
-        "The tool displays relevant Highway Code rules for the selected scenario",
-        "The tool displays relevant Road Traffic Act 1988 sections where applicable",
-        "The tool displays relevant UK case law precedents for the selected scenario"
+        "Every scenario in faultMatrix.ts has its Party A and Party B fault percentages visually displayed as labelled bars or numeric values.",
+        "Contributing factors and rationale are shown for each scenario row in the panel.",
+        "The active scenario (based on provided violation type) is highlighted distinctly from inactive ones."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Display an insurer-style fault matrix for the selected accident scenario, showing Party A and Party B fault percentages alongside a plain-English rationale. The matrix should highlight the active scenario row or cell based on the user's selection. Expand the existing faultMatrix.ts static data if needed to cover all common scenario types (rear-end, red light, lane change, turning, junction, roundabout, reversing).",
+      "text": "Expand the scenario coverage in faultMatrix.ts to include all common road incident scenario types already referenced in scenarioReferences.ts (rear-end, red light, lane change, and any remaining unmapped types), ensuring each has fault percentages, contributing factors, rationale, and related violation types.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-20"
+          "msg-4"
         ],
         "quotes": [
-          "insurer-style fault matrix"
+          "expand the scenario coverage in the fault matrix"
         ]
       },
       "acceptanceCriteria": [
-        "The fault matrix renders with Party A and Party B fault percentage columns",
-        "A rationale string is shown for the active scenario",
-        "The active scenario row or cell is visually highlighted",
-        "At least 7 common scenario types are covered in the data (rear-end, red light, lane change, turning, junction, roundabout, reversing)",
-        "Fault percentages are displayed as visual bars or badges alongside numeric values"
+        "faultMatrix.ts contains entries for all seven scenario types present in scenarioReferences.ts.",
+        "Each new scenario entry includes Party A percentage, Party B percentage, contributing factors array, rationale string, and related violation types.",
+        "FaultMatrixPanel renders all newly added scenarios without errors."
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Provide a plain-English scenario selector UI that lets users choose their accident type from a list of common scenarios (with icons or short descriptions). On selection, the fault matrix, Highway Code rules, and case law references all update to reflect the chosen scenario. The interface must be usable without any prior legal knowledge.",
+      "text": "Update FaultReferenceDisplay on the FaultReferencePage to show the full fault percentage breakdown (Party A and Party B with labelled bars) alongside legal references when a scenario is selected, consistent with the expanded faultMatrix.ts data.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-20"
+          "msg-4"
         ],
         "quotes": [
-          "users can input their accident scenario and get a fault assessment based on Highway Code rules and established precedents"
+          "full Party A/B percentage breakdowns"
         ]
       },
       "acceptanceCriteria": [
-        "A scenario selector (e.g. card grid, dropdown, or button group) is present at the top of the tool",
-        "Each scenario has a plain-English label and a short description or icon",
-        "Selecting a scenario updates the fault matrix, legal references, and case law panels simultaneously",
-        "No legal jargon is required to navigate or use the tool"
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "text": "Expand the existing legalReferences.ts and faultMatrix.ts data files to ensure comprehensive coverage of all scenario types used in the selector. Each scenario entry must include: relevant Highway Code rule numbers and summaries, applicable Road Traffic Act 1988 sections, at least one case law precedent with a factual summary and legal principle, and Party A/Party B fault split with rationale.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-20"
-        ],
-        "quotes": [
-          "fault reference tool",
-          "based on Highway Code rules and established precedents"
-        ]
-      },
-      "acceptanceCriteria": [
-        "legalReferences.ts contains entries for all scenario types covered by the selector",
-        "faultMatrix.ts contains fault split data for all scenario types covered by the selector",
-        "Each legal reference entry includes at least one Highway Code rule, one Road Traffic Act section, and one case law entry",
-        "Each case law entry includes a case name, factual summary, and legal principle"
-      ]
-    },
-    {
-      "id": "REQ-5",
-      "text": "Apply a consistent, professional visual theme to the fault reference tool page. Use a clean, authoritative legal/insurance aesthetic — dark navy or charcoal tones for headers, amber or gold accents for fault highlights, clear typographic hierarchy, and card-based layouts for the matrix and legal reference panels. The design should feel trustworthy and easy to scan.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-20"
-        ]
-      },
-      "acceptanceCriteria": [
-        "The page uses a consistent colour palette distinct from generic defaults",
-        "Headers and section labels have clear typographic hierarchy",
-        "Fault matrix and legal reference content is displayed in card or panel containers",
-        "Fault percentage highlights use a visually distinct accent colour"
+        "Selecting any scenario on the Fault Reference page displays both Party A and Party B fault percentages with visual bars.",
+        "The displayed percentages match the values in faultMatrix.ts for the selected scenario.",
+        "Legal references (Highway Code, RTA 1988, case law) continue to display alongside the fault breakdown."
       ]
     }
   ],
   "constraints": [
-    "Do not build the bird's eye grid view or the injury photo upload section in this iteration — those are explicitly deferred",
-    "All legal reference and fault matrix data must be static (no backend AI inference required for this feature)",
-    "Do not modify frontend/src/hooks/useActor.ts, frontend/src/hooks/useInternetIdentity.ts, frontend/src/main.tsx, or any files under frontend/src/components/ui"
+    "Do not modify any files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui.",
+    "All data changes must remain in static frontend data files (faultMatrix.ts, scenarioReferences.ts); no backend schema changes required."
   ],
   "nonGoals": [
-    "Bird's eye grid view with AI car placement",
-    "Injury photo upload section",
-    "AI-driven fault inference from photos or descriptions",
-    "Integration with the backend for fault matrix lookups",
-    "Real-time updates or WebSocket-based features"
+    "Adding new backend canister methods or modifying backend/main.mo.",
+    "Changing the routing structure or adding new pages.",
+    "Modifying the ContributoryNegligencePanel or negligenceData.ts."
   ],
   "imageRequirements": {
     "required": [],

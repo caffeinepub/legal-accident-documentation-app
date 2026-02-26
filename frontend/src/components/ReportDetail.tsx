@@ -111,7 +111,7 @@ export default function ReportDetail({ reportId, report }: ReportDetailProps) {
 
       <div className="space-y-4">
         <ContributoryNegligencePanel />
-        <FaultMatrixPanel activeViolationType={primaryViolationType} />
+        <FaultMatrixPanel violationType={primaryViolationType} />
         <NextStepsPanel />
       </div>
 

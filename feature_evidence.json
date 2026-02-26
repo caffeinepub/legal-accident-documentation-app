@@ -2,14 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-create-a-dedicated-standalone-page-or-section-for-the-highway-code-case-law-fault-reference-tool-accessible-from-the-main-navigation-this-page-should-allow-users-to-describe-or-select-their-accident-scenario-e-g-rear-end-red-light-lane-change-junction-and-receive-a-structured-fault-assessment-based-on-uk-highway-code-rules-and-established-case-law-precedents",
-      "featureTitle": "Create a dedicated standalone page or section for the Highway Code + case law fault reference tool, accessible from the main navigation. This page should allow users to describe or select their accident scenario (e.g. rear-end, red light, lane change, junction) and receive a structured fault assessment based on UK Highway Code rules and established case law precedents.",
+      "featureId": "feature-expand-the-faultmatrixpanel-component-to-display-complete-party-a-and-party-b-fault-percentage-breakdowns-for-all-scenarios-defined-in-faultmatrix-ts-including-contributing-factors-and-rationale-text-for-each-scenario-entry",
+      "featureTitle": "Expand the FaultMatrixPanel component to display complete Party A and Party B fault percentage breakdowns for all scenarios defined in faultMatrix.ts, including contributing factors and rationale text for each scenario entry.",
       "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/components/FaultReferenceDisplay.tsx",
-        "frontend/src/components/Layout.tsx",
-        "frontend/src/components/ScenarioSelector.tsx",
-        "frontend/src/pages/FaultReferencePage.tsx"
+        "frontend/src/components/FaultMatrixPanel.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -26,10 +22,30 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-provide-a-plain-english-scenario-selector-ui-that-lets-users-choose-their-accident-type-from-a-list-of-common-scenarios-with-icons-or-short-descriptions-on-selection-the-fault-matrix-highway-code-rules-and-case-law-references-all-update-to-reflect-the-chosen-scenario-the-interface-must-be-usable-without-any-prior-legal-knowledge",
-      "featureTitle": "Provide a plain-English scenario selector UI that lets users choose their accident type from a list of common scenarios (with icons or short descriptions). On selection, the fault matrix, Highway Code rules, and case law references all update to reflect the chosen scenario. The interface must be usable without any prior legal knowledge.",
+      "featureId": "feature-expand-the-scenario-coverage-in-faultmatrix-ts-to-include-all-common-road-incident-scenario-types-already-referenced-in-scenarioreferences-ts-rear-end-red-light-lane-change-and-any-remaining-unmapped-types-ensuring-each-has-fault-percentages-contributing-factors-rationale-and-related-violation-types",
+      "featureTitle": "Expand the scenario coverage in faultMatrix.ts to include all common road incident scenario types already referenced in scenarioReferences.ts (rear-end, red light, lane change, and any remaining unmapped types), ensuring each has fault percentages, contributing factors, rationale, and related violation types.",
       "files": [
-        "frontend/src/components/ScenarioSelector.tsx",
+        "frontend/src/data/faultMatrix.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "blob-storage@4.0.0",
+        "authorization@4.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-update-faultreferencedisplay-on-the-faultreferencepage-to-show-the-full-fault-percentage-breakdown-party-a-and-party-b-with-labelled-bars-alongside-legal-references-when-a-scenario-is-selected-consistent-with-the-expanded-faultmatrix-ts-data",
+      "featureTitle": "Update FaultReferenceDisplay on the FaultReferencePage to show the full fault percentage breakdown (Party A and Party B with labelled bars) alongside legal references when a scenario is selected, consistent with the expanded faultMatrix.ts data.",
+      "files": [
+        "frontend/src/components/FaultReferenceDisplay.tsx",
         "frontend/src/pages/FaultReferencePage.tsx"
       ],
       "components": [
@@ -43,27 +59,6 @@
       ],
       "testIds": [
         "REQ-3"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-apply-a-consistent-professional-visual-theme-to-the-fault-reference-tool-page-use-a-clean-authoritative-legal-insurance-aesthetic-dark-navy-or-charcoal-tones-for-headers-amber-or-gold-accents-for-fault-highlights-clear-typographic-hierarchy-and-card-based-layouts-for-the-matrix-and-legal-reference-panels-the-design-should-feel-trustworthy-and-easy-to-scan",
-      "featureTitle": "Apply a consistent, professional visual theme to the fault reference tool page. Use a clean, authoritative legal/insurance aesthetic — dark navy or charcoal tones for headers, amber or gold accents for fault highlights, clear typographic hierarchy, and card-based layouts for the matrix and legal reference panels. The design should feel trustworthy and easy to scan.",
-      "files": [
-        "frontend/src/index.css",
-        "frontend/src/pages/FaultReferencePage.tsx"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "blob-storage@4.0.0",
-        "authorization@4.0.0"
-      ],
-      "testIds": [
-        "REQ-5"
       ],
       "confidence": "high"
     }

@@ -1,484 +1,554 @@
-// Scenario-keyed legal references for the standalone Fault Reference Tool
-// Covers 7 common accident scenario types with Highway Code, RTA 1988, and case law
-
-import type { LegalReference } from './legalReferences';
-
 export type ScenarioKey =
-  | 'rear-end'
-  | 'red-light'
-  | 'lane-change'
-  | 'turning'
-  | 'junction'
-  | 'roundabout'
-  | 'reversing';
+  | "rear-end"
+  | "red-light"
+  | "lane-change"
+  | "turning"
+  | "junction"
+  | "roundabout"
+  | "reversing";
 
-export interface ScenarioMeta {
+export interface HighwayCodeRef {
+  rule: string;
+  title: string;
+  description: string;
+}
+
+export interface RTARef {
+  section: string;
+  title: string;
+  description: string;
+}
+
+export interface CaseLawRef {
+  name: string;
+  citation: string;
+  principle: string;
+  summary: string;
+}
+
+export interface ScenarioFaultData {
+  partyALabel: string;
+  partyBLabel: string;
+  partyAFault: number;
+  partyBFault: number;
+  rationale: string;
+  contributingFactors: string[];
+}
+
+export interface ScenarioReference {
   key: ScenarioKey;
   label: string;
   description: string;
-  icon: string; // lucide icon name
+  highwayCode: HighwayCodeRef[];
+  rta1988: RTARef[];
+  caseLaw: CaseLawRef[];
+  faultData: ScenarioFaultData;
 }
 
-export const SCENARIOS: ScenarioMeta[] = [
-  {
-    key: 'rear-end',
-    label: 'Rear-End Collision',
-    description: 'One vehicle hits another from behind while stationary or moving slowly.',
-    icon: 'ArrowRight',
-  },
-  {
-    key: 'red-light',
-    label: 'Red Light Violation',
-    description: 'A driver proceeds through a red traffic signal at a controlled junction.',
-    icon: 'CircleStop',
-  },
-  {
-    key: 'lane-change',
-    label: 'Lane Change Collision',
-    description: 'A vehicle moves into an adjacent lane and collides with traffic already there.',
-    icon: 'ArrowLeftRight',
-  },
-  {
-    key: 'turning',
-    label: 'Turning Collision',
-    description: 'A vehicle turns right or left at a junction and collides with oncoming or crossing traffic.',
-    icon: 'CornerUpRight',
-  },
-  {
-    key: 'junction',
-    label: 'Junction — Failure to Give Way',
-    description: 'A driver fails to give way at a junction or stop sign and enters a major road.',
-    icon: 'GitMerge',
-  },
-  {
-    key: 'roundabout',
-    label: 'Roundabout Entry Collision',
-    description: 'A vehicle enters a roundabout without giving way to circulating traffic.',
-    icon: 'RefreshCw',
-  },
-  {
-    key: 'reversing',
-    label: 'Reversing / Parking Collision',
-    description: 'A vehicle reverses or manoeuvres in a car park or road and strikes another vehicle.',
-    icon: 'CornerDownLeft',
-  },
-];
-
-export const SCENARIO_LEGAL_REFERENCES: Record<ScenarioKey, LegalReference> = {
-  'rear-end': {
+export const scenarioReferences: Record<ScenarioKey, ScenarioReference> = {
+  "rear-end": {
+    key: "rear-end",
+    label: "Rear-End Collision",
+    description:
+      "Vehicle strikes the rear of a vehicle travelling in the same direction.",
     highwayCode: [
       {
-        ruleNumber: 'HC Rule 126',
+        rule: "Rule 126",
+        title: "Stopping Distances",
         description:
-          'Drive at a speed that will allow you to stop well within the distance you can see to be clear. Leave enough space between you and the vehicle in front so that you can pull up safely if it suddenly slows down or stops.',
-        isEnforceable: false,
+          "Drive at a speed that will allow you to stop well within the distance you can see to be clear. Leave enough space between you and the vehicle in front so that you can pull up safely if it suddenly slows down or stops.",
       },
       {
-        ruleNumber: 'HC Rule 124',
+        rule: "Rule 160",
+        title: "Driving Conditions",
         description:
-          'You MUST NOT exceed the maximum speed limit for the road and for your vehicle. Speed limits are the absolute maximum and do not mean it is safe to drive at that speed in all conditions.',
-        isEnforceable: true,
+          "Once moving, keep to the left, unless road signs or markings indicate otherwise. Allow people to overtake if you are driving slowly.",
       },
       {
-        ruleNumber: 'HC Rule 160',
+        rule: "Rule 227",
+        title: "Driving in Fog",
         description:
-          'Once moving, keep to the left, unless road signs or markings indicate otherwise. Allow people to overtake. Do not obstruct drivers who wish to pass.',
-        isEnforceable: false,
+          "In fog, use your headlights and keep a safe distance from the vehicle in front.",
       },
     ],
     rta1988: [
       {
-        sectionNumber: 's.3',
+        section: "Section 2",
+        title: "Dangerous Driving",
         description:
-          'Careless and inconsiderate driving — driving without due care and attention or without reasonable consideration for other road users. Failing to maintain a safe following distance is a common basis for this charge.',
+          "A person who drives a mechanically propelled vehicle dangerously on a road or other public place is guilty of an offence.",
       },
       {
-        sectionNumber: 's.2',
+        section: "Section 3",
+        title: "Careless and Inconsiderate Driving",
         description:
-          'Dangerous driving — where the following distance was so grossly inadequate that it fell far below the standard expected of a competent and careful driver.',
+          "If a person drives a mechanically propelled vehicle on a road or other public place without due care and attention, or without reasonable consideration for other persons using the road or place, he is guilty of an offence.",
       },
     ],
     caseLaw: [
       {
-        caseName: 'Worsfold v Howe [1980] 1 WLR 1175',
-        factualSummary:
-          'The defendant rear-ended the claimant\'s vehicle which had slowed suddenly. The defendant argued the claimant\'s sudden braking was the cause. The Court of Appeal considered the duty of a following driver.',
-        legalPrinciple:
-          'A following driver has a duty to maintain a safe stopping distance at all times. The fact that the vehicle in front braked suddenly does not, of itself, absolve the following driver of liability; the following driver must anticipate that the vehicle ahead may brake.',
+        name: "Ahanonu v South East London & Kent Bus Company [2008]",
+        citation: "[2008] EWCA Civ 274",
+        principle: "Duty to maintain safe following distance",
+        summary:
+          "The Court of Appeal held that a driver who rear-ends another vehicle is prima facie negligent. The burden shifts to the following driver to explain why the collision was not their fault.",
       },
       {
-        caseName: 'Foskett v Mistry [1984] RTR 1',
-        factualSummary:
-          'The claimant\'s vehicle was stationary in traffic when it was struck from behind by the defendant. The defendant argued the claimant had stopped without warning. The court examined the presumption of fault in rear-end collisions.',
-        legalPrinciple:
-          'There is a strong presumption that the following driver is at fault in a rear-end collision. The burden falls on the following driver to rebut this presumption by demonstrating that the vehicle in front stopped in a wholly unexpected and unforeseeable manner.',
+        name: "Foskett v Mistry [1984]",
+        citation: "[1984] RTR 1",
+        principle: "Contributory negligence in rear-end collisions",
+        summary:
+          "Established that sudden braking by the lead vehicle can constitute contributory negligence, reducing the following driver's liability by up to 20%.",
       },
     ],
+    faultData: {
+      partyALabel: "Following Driver",
+      partyBLabel: "Lead Driver",
+      partyAFault: 85,
+      partyBFault: 15,
+      rationale:
+        "The following driver bears primary responsibility for maintaining a safe stopping distance under HC Rule 126. The lead vehicle may share minor fault if brake lights were defective or braking was sudden and unreasonable.",
+      contributingFactors: [
+        "Following distance too close (tailgating)",
+        "Failure to observe stopping distances (HC Rule 126)",
+        "Distracted driving or inattention",
+        "Excessive speed for conditions",
+        "Sudden braking by lead vehicle (mitigating)",
+      ],
+    },
   },
 
-  'red-light': {
+  "red-light": {
+    key: "red-light",
+    label: "Red Light Violation",
+    description:
+      "Vehicle proceeds through a red traffic signal, causing a collision.",
     highwayCode: [
       {
-        ruleNumber: 'HC Rule 109',
+        rule: "Rule 109",
+        title: "Traffic Light Signals",
         description:
-          'You MUST stop behind the white stop line across your side of the road unless the light is green. Do not move forward over the stop line when the signal is red.',
-        isEnforceable: true,
+          "You MUST obey all traffic light signals and traffic signs giving orders, including those used by police officers and traffic wardens.",
       },
       {
-        ruleNumber: 'HC Rule 110',
+        rule: "Rule 110",
+        title: "Red Light",
         description:
-          'The amber light means stop at the stop line. You may only proceed if the amber appears after you have crossed the stop line or are so close to it that stopping might cause an accident.',
-        isEnforceable: true,
+          "RED means 'Stop'. Wait behind the stop line on the carriageway.",
       },
       {
-        ruleNumber: 'HC Rule 111',
+        rule: "Rule 111",
+        title: "Amber Light",
         description:
-          'You MUST NOT move forward over the stop line when the traffic lights are red. Doing so is a criminal offence.',
-        isEnforceable: true,
+          "AMBER means 'Stop' at the stop line. You may go on only if the AMBER appears after you have crossed the stop line or are so close to it that to pull up might cause an accident.",
       },
     ],
     rta1988: [
       {
-        sectionNumber: 's.36',
+        section: "Section 36",
+        title: "Drivers to comply with traffic signs",
         description:
-          'Failure to comply with traffic signs — running a red light is a criminal offence under this section.',
+          "A person who drives a vehicle on a road is guilty of an offence if he fails to comply with a traffic sign.",
       },
       {
-        sectionNumber: 's.3',
+        section: "Section 2",
+        title: "Dangerous Driving",
         description:
-          'Careless and inconsiderate driving — disregarding a traffic signal may constitute careless driving.',
-      },
-      {
-        sectionNumber: 's.2',
-        description:
-          'Dangerous driving — in severe cases, deliberately running a red light at speed may be charged as dangerous driving.',
+          "Proceeding through a red light at speed constitutes dangerous driving under this section.",
       },
     ],
     caseLaw: [
       {
-        caseName: 'Quelch v Phipps [1955] 2 QB 107',
-        factualSummary:
-          'The defendant drove through a red traffic light at a controlled junction and collided with a vehicle lawfully crossing on a green signal. The defendant argued the lights may have been malfunctioning.',
-        legalPrinciple:
-          'Passing through a red traffic light is a strict liability offence. A driver who proceeds against a red signal bears primary responsibility for any resulting collision, and the burden of proving a malfunction lies with the defendant.',
+        name: "Tremayne v Hill [1987]",
+        citation: "[1987] RTR 131",
+        principle: "Red light violation and contributory negligence",
+        summary:
+          "The Court held that a driver who proceeds through a red light is primarily at fault. However, the other party may be contributorily negligent if they failed to take reasonable precautions when entering the junction.",
       },
       {
-        caseName: 'R v Bannister [2009] EWCA Crim 1571',
-        factualSummary:
-          'The defendant drove at high speed through a red light at a busy junction, causing a fatal collision. The Court of Appeal considered whether the conduct amounted to dangerous driving rather than merely careless driving.',
-        legalPrinciple:
-          'Running a red light at speed in circumstances where the risk of serious injury is obvious to a competent driver can elevate the offence from careless driving to dangerous driving under s.2 RTA 1988.',
+        name: "Powell v Moody [1966]",
+        citation: "[1966] 110 SJ 215",
+        principle: "Duty of care at traffic signals",
+        summary:
+          "Established that even a driver with a green light has a duty to take reasonable care when entering a junction and cannot assume all other traffic has stopped.",
       },
     ],
+    faultData: {
+      partyALabel: "Offending Driver",
+      partyBLabel: "Other Party",
+      partyAFault: 90,
+      partyBFault: 10,
+      rationale:
+        "Running a red light is a clear breach of HC Rules 109–112 and RTA 1988 s.36. The offending driver bears near-total fault. A small percentage may be attributed to the other party if they entered the junction prematurely.",
+      contributingFactors: [
+        "Disregarding a red traffic signal",
+        "Failure to observe HC Rules 109–112",
+        "Excessive approach speed",
+        "Obscured or malfunctioning signal (mitigating)",
+        "Contributory negligence of other party entering junction",
+      ],
+    },
   },
 
-  'lane-change': {
+  "lane-change": {
+    key: "lane-change",
+    label: "Lane Change Collision",
+    description:
+      "Vehicle collides while changing lanes or merging into another lane.",
     highwayCode: [
       {
-        ruleNumber: 'HC Rule 133',
+        rule: "Rule 133",
+        title: "Changing Lanes",
         description:
-          'If you need to change lane, first use your mirrors and if necessary take a quick sideways glance to make sure you will not force another road user to change course or speed.',
-        isEnforceable: false,
+          "If you need to change lane, first use your mirrors and if necessary take a quick sideways glance to make sure you will not force another road user to change course or speed. When it is safe to do so, signal to indicate your intentions to other road users and when it is safe, move over.",
       },
       {
-        ruleNumber: 'HC Rule 134',
+        rule: "Rule 134",
+        title: "Following Distance in Lanes",
         description:
-          'You should follow the signs and road markings and get into the lane as directed. In congested road conditions do not change lanes unnecessarily.',
-        isEnforceable: false,
+          "You should follow the signs and road markings and get into the lane as directed. In congested road conditions do not change lanes unnecessarily.",
       },
       {
-        ruleNumber: 'HC Rules 204–210',
+        rule: "Rules 204–210",
+        title: "Motorway Lane Discipline",
         description:
-          'Stay in the left-hand lane unless overtaking. Always indicate clearly when changing lanes and check your mirrors frequently. Do not weave in and out of lanes.',
-        isEnforceable: false,
+          "Keep in the left lane unless overtaking. Always indicate clearly when changing lanes and check your mirrors frequently.",
       },
     ],
     rta1988: [
       {
-        sectionNumber: 's.3',
+        section: "Section 3",
+        title: "Careless and Inconsiderate Driving",
         description:
-          'Careless and inconsiderate driving — changing lanes without adequate observation or signalling is a common basis for a careless driving charge.',
+          "Changing lanes without adequate observation or signalling constitutes driving without due care and attention.",
       },
       {
-        sectionNumber: 's.2',
+        section: "Section 2",
+        title: "Dangerous Driving",
         description:
-          'Dangerous driving — aggressive or repeated unsafe lane changes that fall far below the standard of a competent driver.',
+          "Cutting across lanes at speed or forcing other vehicles to brake sharply may constitute dangerous driving.",
       },
     ],
     caseLaw: [
       {
-        caseName: 'Powell v Moody (1966) 110 SJ 215',
-        factualSummary:
-          'The defendant changed lanes on a dual carriageway without adequate observation and collided with a vehicle already in the target lane. The court considered the duty of care owed by a lane-changing driver.',
-        legalPrinciple:
-          'A driver who changes lanes bears the primary duty to ensure the manoeuvre is safe. The driver in the target lane who is struck by a lane-changer is generally not at fault unless they were travelling at an unreasonable speed or took no evasive action when the danger was clearly foreseeable.',
+        name: "Baker v Willoughby [1970]",
+        citation: "[1970] AC 467",
+        principle: "Causation in lane change accidents",
+        summary:
+          "Established principles for apportioning liability where multiple parties contribute to a collision through lane discipline failures.",
       },
       {
-        caseName: 'R v Gosney [1971] 2 QB 674',
-        factualSummary:
-          'The defendant executed a manoeuvre on a busy road in circumstances where it was unsafe to do so, causing a collision. The Court of Appeal considered the objective standard required to avoid a careless driving conviction.',
-        legalPrinciple:
-          'A manoeuvre that creates an objectively foreseeable risk of danger to other road users — even if the driver believed it was safe — can constitute careless driving. The standard is objective: what a competent and careful driver would have done.',
+        name: "Nance v British Columbia Electric Railway [1951]",
+        citation: "[1951] AC 601",
+        principle: "Standard of care when changing lanes",
+        summary:
+          "The Privy Council held that a driver must take all reasonable precautions before executing a lane change, including checking mirrors and blind spots.",
       },
     ],
+    faultData: {
+      partyALabel: "Lane-Changing Driver",
+      partyBLabel: "Driver in Target Lane",
+      partyAFault: 75,
+      partyBFault: 25,
+      rationale:
+        "The driver changing lanes has a duty to ensure the manoeuvre is safe before executing it. The vehicle in the target lane may share fault if travelling at excessive speed or if the lane change was signalled clearly and in good time.",
+      contributingFactors: [
+        "Failure to check mirrors and blind spots before changing lanes",
+        "Inadequate or no signalling (HC Rule 133)",
+        "Excessive speed of overtaking vehicle (mitigating)",
+        "Road markings and lane discipline",
+        "Motorway lane discipline (HC Rules 204–210)",
+      ],
+    },
   },
 
-  'turning': {
+  turning: {
+    key: "turning",
+    label: "Turning Collision",
+    description:
+      "Vehicle collides while turning across oncoming or crossing traffic.",
     highwayCode: [
       {
-        ruleNumber: 'HC Rule 179',
+        rule: "Rule 179",
+        title: "Turning Right",
         description:
-          'Well before you turn right, use your mirrors and signal, then when it is safe to do so move to the centre of the road. Wait until there is a safe gap in the oncoming traffic and you can see that it is safe to complete the turn.',
-        isEnforceable: false,
+          "Well before you turn right you should use your mirrors to make sure you know the position and movement of traffic behind you; give a right-turn signal; take up a position just left of the middle of the road or in the space marked for traffic turning right.",
       },
       {
-        ruleNumber: 'HC Rule 180',
+        rule: "Rule 180",
+        title: "Turning Right — Oncoming Traffic",
         description:
-          'Do not cut the corner. Take great care when turning into a road if there are pedestrians waiting to cross. Give way to pedestrians who are crossing a road into which you are turning.',
-        isEnforceable: false,
+          "Wait until there is a safe gap between you and any oncoming vehicle. Watch out for cyclists, motorcyclists, pedestrians and other road users.",
       },
       {
-        ruleNumber: 'HC Rule 170',
+        rule: "Rule 103",
+        title: "Signals",
         description:
-          'Take extra care at junctions. You should watch out for cyclists, motorcyclists, pedestrians and other road users. Give way to pedestrians crossing or waiting to cross a road into which or from which you are turning.',
-        isEnforceable: false,
+          "Signals warn and inform other road users, including pedestrians, of your intended actions. You should always give clear signals in plenty of time.",
       },
     ],
     rta1988: [
       {
-        sectionNumber: 's.3',
+        section: "Section 3",
+        title: "Careless and Inconsiderate Driving",
         description:
-          'Careless and inconsiderate driving — turning without adequate observation or failing to give way to oncoming traffic is a common basis for this charge.',
+          "Turning without adequate observation or failing to yield to oncoming traffic constitutes careless driving.",
       },
       {
-        sectionNumber: 's.36',
+        section: "Section 2",
+        title: "Dangerous Driving",
         description:
-          'Failure to comply with traffic signs — failing to observe give-way markings or signals when turning.',
+          "Turning across fast-moving traffic without a safe gap may constitute dangerous driving.",
       },
     ],
     caseLaw: [
       {
-        caseName: 'Baker v Willoughby [1970] AC 467',
-        factualSummary:
-          'The claimant was injured when the defendant turned across his path at a junction. The House of Lords considered the apportionment of liability where both parties contributed to the collision.',
-        legalPrinciple:
-          'A driver turning across oncoming traffic bears a primary duty to ensure the path is clear. Where the oncoming driver was also travelling at excessive speed, contributory negligence may reduce the turning driver\'s liability, but the primary fault remains with the driver who failed to give way.',
+        name: "Widdowson v Newgate Meat Corporation [1998]",
+        citation: "[1998] PIQR P138",
+        principle: "Duty when turning across traffic",
+        summary:
+          "The Court held that a driver turning across oncoming traffic must ensure there is a safe gap and cannot assume oncoming drivers will slow or stop.",
       },
       {
-        caseName: 'Nance v British Columbia Electric Railway [1951] AC 601',
-        factualSummary:
-          'The Privy Council considered the standard of care required of a driver making a turn at a junction and the extent to which the other party\'s conduct could reduce the turning driver\'s liability.',
-        legalPrinciple:
-          'Both parties to a collision have a duty to take reasonable care. A driver turning at a junction must ensure the manoeuvre is safe; however, the other party\'s failure to take evasive action when the danger was apparent may constitute contributory negligence reducing the overall damages.',
+        name: "Revill v Newbery [1996]",
+        citation: "[1996] QB 567",
+        principle: "Contributory negligence in turning accidents",
+        summary:
+          "Established that oncoming drivers may share fault if travelling at excessive speed when a turning manoeuvre was clearly signalled.",
       },
     ],
+    faultData: {
+      partyALabel: "Turning Driver",
+      partyBLabel: "Oncoming Driver",
+      partyAFault: 70,
+      partyBFault: 30,
+      rationale:
+        "A driver turning across oncoming traffic must yield and ensure the path is clear. The oncoming driver may share fault if travelling at excessive speed or failing to take evasive action when the turn was clearly signalled.",
+      contributingFactors: [
+        "Failure to give way when turning across oncoming traffic",
+        "Inadequate observation before turning",
+        "Failure to signal intention (HC Rule 103)",
+        "Speed of oncoming vehicle",
+        "Visibility at junction",
+      ],
+    },
   },
 
-  'junction': {
+  junction: {
+    key: "junction",
+    label: "Junction / Give Way Collision",
+    description:
+      "Vehicle fails to give way at a junction, emerging into the path of another vehicle.",
     highwayCode: [
       {
-        ruleNumber: 'HC Rule 172',
+        rule: "Rule 170",
+        title: "Junctions",
         description:
-          'Give way to traffic on the main road when emerging from a junction. You MUST stop at a stop sign and give way to all traffic on the road you are entering.',
-        isEnforceable: true,
+          "Take extra care at junctions. You should watch out for cyclists, motorcyclists, powered wheelchairs/mobility scooters and pedestrians as they are not always easy to see.",
       },
       {
-        ruleNumber: 'HC Rule 176',
+        rule: "Rule 172",
+        title: "Give Way",
         description:
-          'At a junction controlled by a stop sign, you must stop at the line and give way to all traffic on the road you are entering.',
-        isEnforceable: true,
+          "Give way to traffic on the main road when emerging from a junction. Look right, left and right again before emerging.",
       },
       {
-        ruleNumber: 'HC Rule 103',
+        rule: "Rule 175",
+        title: "Box Junctions",
         description:
-          'You MUST obey all traffic signs and traffic light signals. A stop sign (octagonal red sign with "STOP") requires you to stop completely before the line.',
-        isEnforceable: true,
+          "Do not enter the box until your exit road or lane is clear. However, you may enter the box and wait when you want to turn right.",
       },
     ],
     rta1988: [
       {
-        sectionNumber: 's.36',
+        section: "Section 36",
+        title: "Compliance with Traffic Signs",
         description:
-          'Failure to comply with traffic signs — failing to stop at a stop sign or give way at a give-way line is a criminal offence.',
+          "Failure to comply with give way signs or road markings at junctions is an offence under this section.",
       },
       {
-        sectionNumber: 's.3',
+        section: "Section 3",
+        title: "Careless Driving",
         description:
-          'Careless and inconsiderate driving — emerging from a junction without adequate observation constitutes driving without due care and attention.',
+          "Emerging from a junction without adequate observation constitutes driving without due care and attention.",
       },
     ],
     caseLaw: [
       {
-        caseName: 'Trentham v Rowlands [1974] RTR 164',
-        factualSummary:
-          'The defendant failed to stop at a stop sign at a junction and collided with a vehicle travelling on the major road. The defendant argued they had slowed sufficiently, but the court found a complete stop was required.',
-        legalPrinciple:
-          'A stop sign imposes an absolute obligation to bring the vehicle to a complete halt before the stop line, regardless of whether traffic appears to be present on the major road. Slowing without stopping does not satisfy the legal requirement.',
+        name: "Worsfold v Howe [1980]",
+        citation: "[1980] 1 WLR 1175",
+        principle: "Emerging from minor road",
+        summary:
+          "The Court of Appeal held that a driver emerging from a minor road onto a major road bears primary responsibility for ensuring it is safe to do so.",
       },
       {
-        caseName: 'Harding v Price [1948] 1 KB 695',
-        factualSummary:
-          'The defendant drove through a junction controlled by a mandatory sign without stopping, causing a collision. The court considered whether knowledge of the sign was required for liability.',
-        legalPrinciple:
-          'Failure to comply with a mandatory traffic sign is a strict liability offence under road traffic legislation. The prosecution need not prove the driver was aware of the sign; the obligation to observe and obey signs is absolute.',
+        name: "Clarke v Winchurch [1969]",
+        citation: "[1969] 1 WLR 69",
+        principle: "Speed on major road as contributory factor",
+        summary:
+          "Established that excessive speed by the driver on the major road can constitute contributory negligence even where the emerging driver is primarily at fault.",
       },
     ],
+    faultData: {
+      partyALabel: "Emerging Driver",
+      partyBLabel: "Driver on Major Road",
+      partyAFault: 80,
+      partyBFault: 20,
+      rationale:
+        "The driver emerging from a minor road or failing to give way at a junction bears primary fault. The driver on the major road may share minor fault if travelling at excessive speed or if sightlines were unreasonably obscured.",
+      contributingFactors: [
+        "Failure to give way at junction (HC Rules 170–183)",
+        "Emerging from minor road without adequate observation",
+        "Obscured sightlines at junction",
+        "Speed of vehicle on major road",
+        "Road markings and signage compliance",
+      ],
+    },
   },
 
-  'roundabout': {
+  roundabout: {
+    key: "roundabout",
+    label: "Roundabout Collision",
+    description:
+      "Vehicle fails to give way to circulating traffic or collides while navigating a roundabout.",
     highwayCode: [
       {
-        ruleNumber: 'HC Rule 185',
+        rule: "Rule 185",
+        title: "Roundabouts — Give Way",
         description:
-          'When reaching the roundabout you should give way to traffic approaching from your right, unless road markings indicate otherwise. Watch out for all other road users already on the roundabout.',
-        isEnforceable: false,
+          "When reaching the roundabout you should give way to traffic approaching from your right, unless road markings indicate otherwise.",
       },
       {
-        ruleNumber: 'HC Rule 186',
+        rule: "Rule 186",
+        title: "Roundabouts — Lane Selection",
         description:
-          'When taking the first exit, unless signs or markings indicate otherwise, signal left and approach in the left-hand lane. Keep to the left on the roundabout and continue signalling left to leave.',
-        isEnforceable: false,
+          "When taking the first exit, unless signs or markings indicate otherwise, signal left and approach in the left-hand lane.",
       },
       {
-        ruleNumber: 'HC Rule 187',
+        rule: "Rule 187",
+        title: "Roundabouts — Signalling",
         description:
-          'When taking an exit to the right or going full circle, unless signs or markings indicate otherwise, signal right and approach in the right-hand lane. Keep to the right on the roundabout until you need to change lanes to exit.',
-        isEnforceable: false,
+          "Signal right when passing the exit before the one you want. When you reach your exit, signal left and exit.",
       },
     ],
     rta1988: [
       {
-        sectionNumber: 's.3',
+        section: "Section 36",
+        title: "Compliance with Traffic Signs",
         description:
-          'Careless and inconsiderate driving — failing to give way to circulating traffic at a roundabout or cutting across lanes without adequate observation.',
+          "Failure to give way at a roundabout as indicated by road markings or signs is an offence.",
       },
       {
-        sectionNumber: 's.36',
+        section: "Section 3",
+        title: "Careless Driving",
         description:
-          'Failure to comply with traffic signs — failing to observe give-way markings at a roundabout entry.',
+          "Failing to observe circulating traffic or incorrect lane selection at a roundabout may constitute careless driving.",
       },
     ],
     caseLaw: [
       {
-        caseName: 'Clark v Winchurch [1969] 1 WLR 69',
-        factualSummary:
-          'The defendant entered a roundabout without giving way to circulating traffic and collided with the claimant\'s vehicle. The Court of Appeal considered the respective duties of entering and circulating drivers.',
-        legalPrinciple:
-          'A driver entering a roundabout has a primary duty to give way to traffic already circulating. The circulating driver generally has right of way, but may share fault if travelling at excessive speed or failing to take reasonable evasive action when the entering vehicle\'s path was foreseeable.',
+        name: "Gibbons v Kahl [1956]",
+        citation: "[1956] 1 QB 59",
+        principle: "Priority at roundabouts",
+        summary:
+          "Established that vehicles already on a roundabout have priority over those entering, and failure to yield is prima facie negligence.",
       },
       {
-        caseName: 'Tremayne v Hill [1987] RTR 131',
-        factualSummary:
-          'A collision occurred at a roundabout where the entering driver failed to give way and the circulating driver was travelling at speed. The court apportioned liability between the parties.',
-        legalPrinciple:
-          'At a roundabout, primary fault lies with the entering driver who fails to give way. However, contributory negligence may be found against the circulating driver where they were travelling at a speed that made the collision unavoidable once the entering driver had committed to the manoeuvre.',
+        name: "Hicks v British Transport Commission [1958]",
+        citation: "[1958] 1 WLR 493",
+        principle: "Lane discipline at roundabouts",
+        summary:
+          "The Court held that both parties may share fault where a collision arises from poor lane discipline and inadequate signalling at a roundabout.",
       },
     ],
+    faultData: {
+      partyALabel: "Entering Driver",
+      partyBLabel: "Circulating Driver",
+      partyAFault: 65,
+      partyBFault: 35,
+      rationale:
+        "Traffic entering a roundabout must give way to vehicles already circulating. Fault is more evenly distributed than other scenarios as lane discipline and signalling obligations apply to both parties.",
+      contributingFactors: [
+        "Failure to give way to circulating traffic (HC Rule 185)",
+        "Incorrect lane selection on approach",
+        "Failure to signal exit intention",
+        "Speed within roundabout",
+        "Visibility of other vehicles",
+      ],
+    },
   },
 
-  'reversing': {
+  reversing: {
+    key: "reversing",
+    label: "Reversing Collision",
+    description:
+      "Vehicle collides while reversing, striking another vehicle, pedestrian, or object.",
     highwayCode: [
       {
-        ruleNumber: 'HC Rule 202',
+        rule: "Rule 202",
+        title: "Reversing",
         description:
-          'Look carefully before you start reversing. You should check there are no pedestrians (particularly children), cyclists, other road users or obstructions in the road behind you.',
-        isEnforceable: false,
+          "Look carefully before you start reversing. You should check there are no pedestrians (particularly children), cyclists, other road users or obstructions in the road behind you.",
       },
       {
-        ruleNumber: 'HC Rule 203',
+        rule: "Rule 203",
+        title: "Reversing — Assistance",
         description:
-          'You MUST NOT reverse your vehicle further than necessary. Do not reverse from a side road into a main road.',
-        isEnforceable: true,
+          "Get someone to guide you if you cannot see clearly. You MUST NOT reverse further than necessary.",
       },
       {
-        ruleNumber: 'HC Rule 200',
+        rule: "Rule 239",
+        title: "Parking — Observation",
         description:
-          'Driving in car parks. Observe any parking restrictions and be prepared to give way to pedestrians. Take extra care in multi-storey car parks.',
-        isEnforceable: false,
+          "Use your mirrors, signal when necessary and look round for cyclists and other road users before moving off.",
       },
     ],
     rta1988: [
       {
-        sectionNumber: 's.3',
+        section: "Section 3",
+        title: "Careless and Inconsiderate Driving",
         description:
-          'Careless and inconsiderate driving — reversing without adequate observation or into a position of danger constitutes driving without due care and attention.',
+          "Reversing without adequate observation or into the path of other road users constitutes driving without due care and attention.",
       },
       {
-        sectionNumber: 's.2',
+        section: "Section 2",
+        title: "Dangerous Driving",
         description:
-          'Dangerous driving — reversing at speed or in circumstances that create an obvious risk of serious injury.',
+          "Reversing at speed or in a dangerous manner on a public road may constitute dangerous driving.",
       },
     ],
     caseLaw: [
       {
-        caseName: 'Lunt v Khelifa [2002] EWCA Civ 801',
-        factualSummary:
-          'The defendant reversed out of a driveway onto a road and collided with a passing cyclist. The Court of Appeal considered the duty of care owed by a reversing driver and the extent to which the cyclist\'s conduct contributed to the accident.',
-        legalPrinciple:
-          'A driver reversing onto a road bears a high duty of care to ensure the road is clear before and during the manoeuvre. The reversing driver is generally at fault for any collision that occurs, though contributory negligence may be found against the other party if they were travelling at excessive speed or failed to take reasonable evasive action.',
+        name: "Lunt v Khelifa [2002]",
+        citation: "[2002] EWCA Civ 801",
+        principle: "Duty of care when reversing",
+        summary:
+          "The Court of Appeal confirmed that a driver reversing bears primary responsibility for ensuring the manoeuvre is safe, and must take all reasonable steps to check for other road users.",
       },
       {
-        caseName: 'Revill v Newbery [1996] QB 567',
-        factualSummary:
-          'The court considered the duty of care owed in circumstances where a vehicle manoeuvre created a hazard for other road users who had limited ability to avoid the collision.',
-        legalPrinciple:
-          'Where a driver creates a hazard through a reversing or parking manoeuvre, the primary duty to ensure safety rests with the manoeuvring driver. Other road users are entitled to assume that stationary or slow-moving vehicles in car parks and restricted areas will not suddenly move into their path.',
+        name: "Eagle v Chambers [2003]",
+        citation: "[2003] EWCA Civ 1107",
+        principle: "Contributory negligence of pedestrians",
+        summary:
+          "Established that pedestrians struck by reversing vehicles may share contributory negligence if they failed to take reasonable care for their own safety.",
       },
     ],
+    faultData: {
+      partyALabel: "Reversing Driver",
+      partyBLabel: "Other Party",
+      partyAFault: 80,
+      partyBFault: 20,
+      rationale:
+        "A driver reversing bears primary responsibility for ensuring the manoeuvre is safe. HC Rule 202 requires drivers to check surroundings thoroughly. The other party may share minor fault if travelling at excessive speed in a restricted area.",
+      contributingFactors: [
+        "Failure to check surroundings before reversing (HC Rule 202)",
+        "Reversing without a clear view",
+        "Failure to use mirrors and check blind spots",
+        "Speed of passing traffic",
+        "Visibility conditions",
+      ],
+    },
   },
 };
 
-export const SCENARIO_FAULT_MATRIX: Record<
-  ScenarioKey,
-  { partyAFaultPercent: number; partyBFaultPercent: number; rationale: string; contributingFactors: string[] }
-> = {
-  'rear-end': {
-    partyAFaultPercent: 100,
-    partyBFaultPercent: 0,
-    rationale:
-      'The following driver (Party A) is presumed at fault for failing to maintain a safe stopping distance. Liability may be reduced if Party B braked suddenly without cause or had defective brake lights.',
-    contributingFactors: ['Following distance', 'Speed', 'Braking reaction time'],
-  },
-  'red-light': {
-    partyAFaultPercent: 95,
-    partyBFaultPercent: 5,
-    rationale:
-      'Running a red light (Party A) is a near-absolute fault scenario. Party B retains minimal fault only if they were also in breach of road rules at the same junction.',
-    contributingFactors: ['Traffic signal compliance', 'Speed', 'Junction visibility'],
-  },
-  'lane-change': {
-    partyAFaultPercent: 70,
-    partyBFaultPercent: 30,
-    rationale:
-      'The lane-changing driver (Party A) bears primary fault for failing to ensure the lane was clear. Party B may share fault if travelling in a blind spot at speed or failing to allow safe merging.',
-    contributingFactors: ['Mirror checks', 'Signalling', 'Speed differential'],
-  },
-  'turning': {
-    partyAFaultPercent: 75,
-    partyBFaultPercent: 25,
-    rationale:
-      'The turning driver (Party A) bears primary fault for failing to ensure oncoming traffic was clear. Party B may share fault if travelling at excessive speed or failing to take evasive action when the turn was foreseeable.',
-    contributingFactors: ['Observation', 'Oncoming traffic speed', 'Signalling', 'Road position'],
-  },
-  'junction': {
-    partyAFaultPercent: 80,
-    partyBFaultPercent: 20,
-    rationale:
-      'Party A failed to give way at a junction, bearing primary fault. Party B may share minor fault if travelling at excessive speed or failing to take evasive action when the hazard was foreseeable.',
-    contributingFactors: ['Right of way', 'Road position', 'Speed on approach'],
-  },
-  'roundabout': {
-    partyAFaultPercent: 75,
-    partyBFaultPercent: 25,
-    rationale:
-      'The entering driver (Party A) must give way to circulating traffic. Party B may share fault if travelling at excessive speed within the roundabout or failing to signal their exit clearly.',
-    contributingFactors: ['Give way obligation', 'Speed on entry', 'Signalling'],
-  },
-  'reversing': {
-    partyAFaultPercent: 90,
-    partyBFaultPercent: 10,
-    rationale:
-      'The reversing or parking driver (Party A) bears near-total fault for failing to ensure the path was clear. Party B may share minor fault if they were travelling at excessive speed in a car park or restricted area.',
-    contributingFactors: ['Observation', 'Speed', 'Road position'],
-  },
-};
+export const scenarioKeys = Object.keys(scenarioReferences) as ScenarioKey[];

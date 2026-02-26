@@ -1,79 +1,47 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-26T21:58:51.554Z",
+  "generatedAt": "2026-02-26T22:07:53.549Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 5,
+    "total": 3,
     "implemented": 3,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Create a dedicated standalone page or section for the Highway Code + case law fault reference tool, accessible from the main navigation. This page should allow users to describe or select their accident scenario (e.g. rear-end, red light, lane change, junction) and receive a structured fault assessment based on UK Highway Code rules and established case law precedents.",
+        "summary": "Expand the FaultMatrixPanel component to display complete Party A and Party B fault percentage breakdowns for all scenarios defined in faultMatrix.ts, including contributing factors and rationale text for each scenario entry.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/FaultReferencePage.tsx",
-          "frontend/src/components/ScenarioSelector.tsx",
-          "frontend/src/components/FaultReferenceDisplay.tsx",
-          "frontend/src/App.tsx",
-          "frontend/src/components/Layout.tsx"
+          "frontend/src/components/FaultMatrixPanel.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/FaultReferencePage.tsx",
-          "frontend/src/components/ScenarioSelector.tsx",
-          "frontend/src/components/FaultReferenceDisplay.tsx",
-          "frontend/src/App.tsx",
-          "frontend/src/components/Layout.tsx"
+          "frontend/src/components/FaultMatrixPanel.tsx"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Display an insurer-style fault matrix for the selected accident scenario, showing Party A and Party B fault percentages alongside a plain-English rationale. The matrix should highlight the active scenario row or cell based on the user's selection. Expand the existing faultMatrix.ts static data if needed to cover all common scenario types (rear-end, red light, lane change, turning, junction, roundabout, reversing).",
-        "status": "missing",
-        "plannedFiles": [
-          "frontend/src/data/faultMatrix.ts",
-          "frontend/src/components/FaultMatrixPanel.tsx"
-        ],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-3",
-        "summary": "Provide a plain-English scenario selector UI that lets users choose their accident type from a list of common scenarios (with icons or short descriptions). On selection, the fault matrix, Highway Code rules, and case law references all update to reflect the chosen scenario. The interface must be usable without any prior legal knowledge.",
+        "summary": "Expand the scenario coverage in faultMatrix.ts to include all common road incident scenario types already referenced in scenarioReferences.ts (rear-end, red light, lane change, and any remaining unmapped types), ensuring each has fault percentages, contributing factors, rationale, and related violation types.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/ScenarioSelector.tsx",
-          "frontend/src/pages/FaultReferencePage.tsx"
+          "frontend/src/data/faultMatrix.ts"
         ],
         "matchedFiles": [
-          "frontend/src/components/ScenarioSelector.tsx",
-          "frontend/src/pages/FaultReferencePage.tsx"
+          "frontend/src/data/faultMatrix.ts"
         ]
       },
       {
-        "id": "REQ-4",
-        "summary": "Expand the existing legalReferences.ts and faultMatrix.ts data files to ensure comprehensive coverage of all scenario types used in the selector. Each scenario entry must include: relevant Highway Code rule numbers and summaries, applicable Road Traffic Act 1988 sections, at least one case law precedent with a factual summary and legal principle, and Party A/Party B fault split with rationale.",
-        "status": "missing",
-        "plannedFiles": [
-          "frontend/src/data/legalReferences.ts",
-          "frontend/src/data/faultMatrix.ts"
-        ],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-5",
-        "summary": "Apply a consistent, professional visual theme to the fault reference tool page. Use a clean, authoritative legal/insurance aesthetic — dark navy or charcoal tones for headers, amber or gold accents for fault highlights, clear typographic hierarchy, and card-based layouts for the matrix and legal reference panels. The design should feel trustworthy and easy to scan.",
+        "id": "REQ-3",
+        "summary": "Update FaultReferenceDisplay on the FaultReferencePage to show the full fault percentage breakdown (Party A and Party B with labelled bars) alongside legal references when a scenario is selected, consistent with the expanded faultMatrix.ts data.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/index.css",
-          "frontend/src/pages/FaultReferencePage.tsx",
-          "frontend/src/components/FaultMatrixPanel.tsx",
-          "frontend/src/components/LegalReferencePanel.tsx"
+          "frontend/src/components/FaultReferenceDisplay.tsx",
+          "frontend/src/pages/FaultReferencePage.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/index.css",
+          "frontend/src/components/FaultReferenceDisplay.tsx",
           "frontend/src/pages/FaultReferencePage.tsx"
         ]
       }
@@ -84,14 +52,13 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/App.tsx",
+    "frontend/src/components/FaultMatrixPanel.tsx",
     "frontend/src/components/FaultReferenceDisplay.tsx",
-    "frontend/src/components/Layout.tsx",
+    "frontend/src/components/ReportDetail.tsx",
     "frontend/src/components/ScenarioSelector.tsx",
+    "frontend/src/data/faultMatrix.ts",
     "frontend/src/data/scenarioReferences.ts",
-    "frontend/src/index.css",
     "frontend/src/pages/FaultReferencePage.tsx",
-    "frontend/tailwind.config.js",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

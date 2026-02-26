@@ -1,82 +1,72 @@
-import React, { useState } from 'react';
-import { Scale, ChevronRight } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import ScenarioSelector from '../components/ScenarioSelector';
-import FaultReferenceDisplay from '../components/FaultReferenceDisplay';
-import type { ScenarioKey } from '../data/scenarioReferences';
+import React, { useState } from "react";
+import { ScenarioKey } from "../data/scenarioReferences";
+import ScenarioSelector from "../components/ScenarioSelector";
+import FaultReferenceDisplay from "../components/FaultReferenceDisplay";
+import { BookOpen, Scale, Info } from "lucide-react";
 
 export default function FaultReferencePage() {
-  const [selectedScenario, setSelectedScenario] = useState<ScenarioKey | null>(null);
+  const [selectedScenario, setSelectedScenario] = useState<ScenarioKey | null>(
+    null
+  );
 
   return (
     <div className="space-y-8">
-      {/* Page header */}
-      <div className="space-y-3">
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <span>Tools</span>
-          <ChevronRight className="w-3 h-3" />
-          <span className="text-foreground font-medium">Fault Reference</span>
-        </div>
-
+      {/* Page Header */}
+      <div className="bg-fault-header text-fault-header-fg rounded-xl p-6 shadow-sm">
         <div className="flex items-start gap-4">
-          <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-fault-header shrink-0">
-            <Scale className="w-6 h-6 text-fault-accent" />
+          <div className="p-2 rounded-lg bg-white/10">
+            <Scale className="w-7 h-7" />
           </div>
-          <div className="space-y-1">
-            <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-2xl font-bold tracking-tight text-foreground">
-                Fault Reference Tool
-              </h1>
-              <Badge
-                variant="outline"
-                className="text-xs border-fault-accent/40 text-fault-accent font-medium"
-              >
-                UK Law
-              </Badge>
-            </div>
-            <p className="text-sm text-muted-foreground leading-relaxed max-w-2xl">
-              Select your accident scenario to see the insurer-style fault assessment, relevant Highway Code rules, Road Traffic Act 1988 provisions, and landmark UK case law — all in plain English.
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">
+              Fault Reference Tool
+            </h1>
+            <p className="mt-1 text-fault-header-fg/80 text-sm leading-relaxed max-w-2xl">
+              Select an accident scenario to view the applicable Highway Code
+              rules, Road Traffic Act 1988 sections, landmark case law, and
+              insurer-style fault percentage breakdown for each party.
             </p>
           </div>
         </div>
+      </div>
 
-        {/* Info strip */}
-        <div className="flex flex-wrap gap-4 pt-1">
-          {[
-            { label: '7 Scenario Types', color: 'bg-fault-accent/10 text-fault-accent border-fault-accent/20' },
-            { label: 'Highway Code Rules', color: 'bg-primary/10 text-primary border-primary/20' },
-            { label: 'RTA 1988 Sections', color: 'bg-primary/10 text-primary border-primary/20' },
-            { label: 'Landmark Case Law', color: 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-800/40' },
-          ].map((item) => (
-            <span
-              key={item.label}
-              className={`text-xs px-2.5 py-1 rounded-full border font-medium ${item.color}`}
-            >
-              {item.label}
-            </span>
-          ))}
+      {/* Disclaimer */}
+      <div className="flex items-start gap-3 p-4 rounded-lg bg-muted/60 border border-border text-sm text-muted-foreground">
+        <Info className="w-4 h-4 shrink-0 mt-0.5 text-primary" />
+        <p>
+          This tool provides general legal reference information based on UK law
+          and is intended for educational purposes only. It does not constitute
+          legal advice. Fault percentages are indicative insurer assessments and
+          may vary based on specific circumstances. Always consult a qualified
+          solicitor for advice on your specific situation.
+        </p>
+      </div>
+
+      {/* Scenario Selector */}
+      <section>
+        <div className="flex items-center gap-2 mb-4">
+          <BookOpen className="w-5 h-5 text-primary" />
+          <h2 className="text-lg font-semibold">Select Accident Scenario</h2>
         </div>
-      </div>
+        <ScenarioSelector
+          selected={selectedScenario}
+          onChange={setSelectedScenario}
+        />
+      </section>
 
-      {/* Scenario selector */}
-      <div className="rounded-xl border bg-card p-5 shadow-sm">
-        <ScenarioSelector selected={selectedScenario} onChange={setSelectedScenario} />
-      </div>
-
-      {/* Results */}
+      {/* Reference Display */}
       {selectedScenario ? (
-        <FaultReferenceDisplay scenarioKey={selectedScenario} />
+        <section>
+          <FaultReferenceDisplay scenarioKey={selectedScenario} />
+        </section>
       ) : (
-        <div className="rounded-xl border border-dashed bg-muted/20 p-12 text-center space-y-3">
-          <div className="flex items-center justify-center w-14 h-14 rounded-full bg-muted mx-auto">
-            <Scale className="w-7 h-7 text-muted-foreground" />
-          </div>
-          <div className="space-y-1">
-            <p className="text-sm font-semibold text-foreground">No scenario selected</p>
-            <p className="text-xs text-muted-foreground max-w-xs mx-auto leading-relaxed">
-              Choose one of the accident scenarios above to see the fault assessment, legal references, and case law.
-            </p>
-          </div>
+        <div className="flex flex-col items-center justify-center py-16 text-center text-muted-foreground border-2 border-dashed border-border rounded-xl">
+          <Scale className="w-12 h-12 mb-4 opacity-30" />
+          <p className="text-lg font-medium">No scenario selected</p>
+          <p className="text-sm mt-1 max-w-sm">
+            Choose one of the accident scenarios above to view the relevant
+            legal references and fault breakdown.
+          </p>
         </div>
       )}
     </div>
