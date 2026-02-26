@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet, useNavigate, useLocation } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
-import { Shield, Plus, List } from 'lucide-react';
+import { Shield, Plus, List, Scale } from 'lucide-react';
 
 export default function Layout() {
   const navigate = useNavigate();
@@ -10,7 +10,7 @@ export default function Layout() {
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       <header className="border-b border-border bg-card sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
           <button
             onClick={() => navigate({ to: '/' })}
             className="flex items-center gap-2 font-bold text-lg hover:opacity-80 transition-opacity"
@@ -19,7 +19,7 @@ export default function Layout() {
             <span>AccidentReport</span>
           </button>
 
-          <nav className="flex items-center gap-2">
+          <nav className="flex items-center gap-1.5">
             <Button
               variant={location.pathname === '/' ? 'default' : 'ghost'}
               size="sm"
@@ -38,16 +38,25 @@ export default function Layout() {
               <List className="w-3.5 h-3.5" />
               My Reports
             </Button>
+            <Button
+              variant={location.pathname === '/fault-reference' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => navigate({ to: '/fault-reference' })}
+              className="gap-1.5"
+            >
+              <Scale className="w-3.5 h-3.5" />
+              Fault Reference
+            </Button>
           </nav>
         </div>
       </header>
 
-      <main className="flex-1 max-w-4xl mx-auto w-full px-4 py-8">
+      <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-8">
         <Outlet />
       </main>
 
       <footer className="border-t border-border bg-card mt-auto">
-        <div className="max-w-4xl mx-auto px-4 py-4 text-center text-xs text-muted-foreground">
+        <div className="max-w-5xl mx-auto px-4 py-4 text-center text-xs text-muted-foreground">
           © {new Date().getFullYear()} AccidentReport ·{' '}
           Built with{' '}
           <span className="text-red-500">♥</span>{' '}

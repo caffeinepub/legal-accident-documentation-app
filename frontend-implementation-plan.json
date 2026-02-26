@@ -1,60 +1,142 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Add Highway Code Citations and Road Traffic Act 1988 References in collapsible Legal Reference panel",
+  "title": "Highway Code + Case Law Fault Reference Tool with Insurer-Style Fault Matrix",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Add a static data structure (frontend-side) that maps each violation type to relevant Highway Code rules, including the rule number, description, and whether the rule is legally enforceable or advisory",
+      "summary": "Create a dedicated standalone page for the Highway Code + case law fault reference tool with scenario selection and structured fault assessment",
       "acceptanceCriteria": [
-        "Each violation type maps to at least one Highway Code rule entry",
-        "Each entry includes rule number, short description, and an enforceable/advisory flag",
-        "Advisory rules are visually distinguished from enforceable ones (e.g. label or badge)"
+        "A dedicated route or prominent section exists for the fault reference tool",
+        "Users can select or describe a common accident scenario type",
+        "The tool displays relevant Highway Code rules for the selected scenario",
+        "The tool displays relevant Road Traffic Act 1988 sections where applicable",
+        "The tool displays relevant UK case law precedents for the selected scenario"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/data/legalReferences.ts",
+          "path": "frontend/src/pages/FaultReferencePage.tsx",
           "operation": "create",
-          "description": "Create a static data structure that maps violation types to Highway Code rules. Each rule includes ruleNumber (e.g., 'HC 126'), description (short plain-English text), and isEnforceable (boolean flag). Use common UK road traffic violation types that align with the existing app's violation tracking (e.g., 'speeding', 'red_light_violation', 'dangerous_driving', 'careless_driving', 'mobile_phone_use', 'no_seatbelt', 'wrong_lane', 'failed_to_stop'). Export a typed constant mapping violationType strings to arrays of Highway Code rule objects."
+          "description": "Create a new page component that serves as the main container for the fault reference tool. This page will orchestrate the scenario selector, fault matrix display, and legal reference panels. Include state management for the selected scenario type and pass it down to child components. The page should have a clear heading, introductory text explaining the tool's purpose, and a structured layout for all tool sections."
+        },
+        {
+          "path": "frontend/src/components/ScenarioSelector.tsx",
+          "operation": "create",
+          "description": "Create a plain-English scenario selector UI component that displays common accident scenarios (rear-end, red light, lane change, turning, junction, roundabout, reversing) as a card grid or button group. Each scenario should have an icon, label, and short description. On selection, emit the chosen scenario via an onChange callback. Use shadcn/ui Card and Button components for the interface."
+        },
+        {
+          "path": "frontend/src/components/FaultReferenceDisplay.tsx",
+          "operation": "create",
+          "description": "Create a component that orchestrates the display of fault matrix, Highway Code rules, Road Traffic Act sections, and case law for the selected scenario. This component receives the selected scenario as a prop and fetches the corresponding data from legalReferences.ts and faultMatrix.ts, then renders FaultMatrixPanel and LegalReferencePanel with the filtered data."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Add a new route for the fault reference tool page at path '/fault-reference' that renders FaultReferencePage. Register this route in the router configuration alongside the existing routes for new report, reports list, and report detail."
+        },
+        {
+          "path": "frontend/src/components/Layout.tsx",
+          "operation": "modify",
+          "description": "Add a navigation button or link in the header for 'Fault Reference' that navigates to '/fault-reference'. Position it alongside the existing 'New Report' and 'My Reports' buttons in the main navigation bar."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Add a static data structure (frontend-side) that maps each violation type to relevant Road Traffic Act 1988 sections, including the section number and a short plain-English description of the offence",
+      "summary": "Display an insurer-style fault matrix with Party A and Party B fault percentages, rationale, and visual highlighting for the selected scenario",
       "acceptanceCriteria": [
-        "Each violation type maps to at least one RTA 1988 section",
-        "Each entry includes section number (e.g. s.3, s.2) and a short description",
-        "Entries are accurate to common UK road traffic violation types already in the app"
+        "The fault matrix renders with Party A and Party B fault percentage columns",
+        "A rationale string is shown for the active scenario",
+        "The active scenario row or cell is visually highlighted",
+        "At least 7 common scenario types are covered in the data (rear-end, red light, lane change, turning, junction, roundabout, reversing)",
+        "Fault percentages are displayed as visual bars or badges alongside numeric values"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/data/legalReferences.ts",
+          "path": "frontend/src/data/faultMatrix.ts",
           "operation": "modify",
-          "description": "Extend the legalReferences module to include a static data structure mapping violation types to Road Traffic Act 1988 sections. Each entry includes sectionNumber (e.g., 's.2', 's.3', 's.35') and description (short plain-English offence description). Use the same violation type keys as the Highway Code mapping. Export a typed constant for RTA 1988 references."
+          "description": "Expand the existing fault matrix data to cover all seven common scenario types: rear-end, red light, lane change, turning, junction, roundabout, and reversing. For each scenario, provide Party A and Party B fault percentages and a plain-English rationale. Ensure the data structure supports easy lookup by scenario type key."
+        },
+        {
+          "path": "frontend/src/components/FaultMatrixPanel.tsx",
+          "operation": "modify",
+          "description": "Enhance the existing FaultMatrixPanel component to support highlighting the active scenario row or cell when a specific scenario is passed as a prop. Add visual fault percentage bars using Progress components or custom styled divs. Display the rationale text prominently below or alongside the matrix. Update the component to handle all seven scenario types and apply distinct styling (amber or gold accent) to the active scenario."
         }
       ]
     },
     {
       "id": "REQ-3",
-      "summary": "In the ReportDetail view, add a collapsible 'Legal Reference' panel that is collapsed by default. When expanded, it shows the Highway Code Citations and Road Traffic Act 1988 References relevant to the violations recorded in that report",
+      "summary": "Provide a plain-English scenario selector UI that updates the fault matrix, Highway Code rules, and case law references on selection",
       "acceptanceCriteria": [
-        "A 'Legal Reference' section is present in the ReportDetail view",
-        "The panel is collapsed by default with a visible toggle button/chevron",
-        "Expanding the panel reveals Highway Code rules and RTA 1988 sections relevant to the report's violations",
-        "If no violations are recorded, the panel shows a message indicating no legal references apply",
-        "The panel can be collapsed again after being expanded"
+        "A scenario selector (e.g. card grid, dropdown, or button group) is present at the top of the tool",
+        "Each scenario has a plain-English label and a short description or icon",
+        "Selecting a scenario updates the fault matrix, legal references, and case law panels simultaneously",
+        "No legal jargon is required to navigate or use the tool"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/LegalReferencePanel.tsx",
-          "operation": "create",
-          "description": "Create a collapsible LegalReferencePanel component that accepts a list of violations as props. The component is collapsed by default and displays a toggle button/chevron to expand/collapse. When expanded, it maps each violation's violationType to the corresponding Highway Code rules and RTA 1988 sections from the static data structures. Display Highway Code rules with rule number, description, and a badge/label to distinguish enforceable from advisory rules. Display RTA 1988 sections with section number and description. If the violations array is empty, show a message like 'No violations recorded, no legal references apply.' Use shadcn/ui Collapsible component for the toggle behavior and Card component for layout."
+          "path": "frontend/src/components/ScenarioSelector.tsx",
+          "operation": "modify",
+          "description": "Enhance the ScenarioSelector component with icons for each scenario type (use lucide-react icons). Provide plain-English labels and concise descriptions (e.g., 'Rear-End Collision: One vehicle hits another from behind'). Ensure the UI is accessible and intuitive without requiring legal knowledge. Use card-based layout with hover states for better UX."
         },
         {
-          "path": "frontend/src/components/ReportDetail.tsx",
+          "path": "frontend/src/pages/FaultReferencePage.tsx",
           "operation": "modify",
-          "description": "Import and integrate the LegalReferencePanel component into the ReportDetail view. Place the panel after the existing violations/liability sections but before the photo gallery. Pass the report's violations array as a prop to LegalReferencePanel. Ensure the panel is rendered for all reports, even those with empty violations arrays (the panel itself will handle the empty state)."
+          "description": "Wire the ScenarioSelector's onChange handler to update the page-level selected scenario state. Pass the selected scenario to FaultReferenceDisplay, which will cascade it down to FaultMatrixPanel and LegalReferencePanel, ensuring all three sections update simultaneously when a scenario is selected."
+        }
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "summary": "Expand legalReferences.ts and faultMatrix.ts data to ensure comprehensive coverage of all scenario types with Highway Code, Road Traffic Act, and case law entries",
+      "acceptanceCriteria": [
+        "legalReferences.ts contains entries for all scenario types covered by the selector",
+        "faultMatrix.ts contains fault split data for all scenario types covered by the selector",
+        "Each legal reference entry includes at least one Highway Code rule, one Road Traffic Act section, and one case law entry",
+        "Each case law entry includes a case name, factual summary, and legal principle"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/data/legalReferences.ts",
+          "operation": "modify",
+          "description": "Expand the legal references data to include comprehensive entries for all seven scenario types (rear-end, red light, lane change, turning, junction, roundabout, reversing). For each scenario, provide: relevant Highway Code rule numbers with summaries, applicable Road Traffic Act 1988 sections, and at least one case law precedent with case name, factual summary, and legal principle. Ensure the data structure supports filtering by scenario type."
+        },
+        {
+          "path": "frontend/src/data/faultMatrix.ts",
+          "operation": "modify",
+          "description": "Ensure the fault matrix data includes complete entries for all seven scenario types. Each entry must have Party A and Party B fault percentages (as numbers) and a plain-English rationale explaining the fault split. Verify consistency with the legalReferences data to ensure every scenario in the selector has corresponding fault matrix data."
+        }
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "summary": "Apply a consistent, professional visual theme to the fault reference tool page with a legal/insurance aesthetic",
+      "acceptanceCriteria": [
+        "The page uses a consistent colour palette distinct from generic defaults",
+        "Headers and section labels have clear typographic hierarchy",
+        "Fault matrix and legal reference content is displayed in card or panel containers",
+        "Fault percentage highlights use a visually distinct accent colour"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/index.css",
+          "operation": "modify",
+          "description": "Add custom CSS variables for the fault reference tool theme: dark navy or charcoal tones for headers (--fault-header-bg, --fault-header-fg), amber or gold accents for fault highlights (--fault-accent), and any additional legal/insurance aesthetic tokens. Apply these within the existing :root and .dark selectors to support both light and dark modes."
+        },
+        {
+          "path": "frontend/src/pages/FaultReferencePage.tsx",
+          "operation": "modify",
+          "description": "Apply the professional visual theme to the page layout. Use the custom CSS variables for header backgrounds and text colors. Ensure clear typographic hierarchy with large, bold headings for the page title and section labels. Use card or panel containers (shadcn/ui Card components) for the fault matrix and legal reference sections. Apply consistent spacing and visual separation between sections."
+        },
+        {
+          "path": "frontend/src/components/FaultMatrixPanel.tsx",
+          "operation": "modify",
+          "description": "Apply the fault accent color (amber or gold) to highlight the active scenario row and fault percentage bars. Ensure the visual design matches the legal/insurance aesthetic with clean lines, professional typography, and card-based layout. Use the custom CSS variables defined in index.css for consistent theming."
+        },
+        {
+          "path": "frontend/src/components/LegalReferencePanel.tsx",
+          "operation": "modify",
+          "description": "Apply the professional theme to the legal reference panel. Use card containers for Highway Code rules, Road Traffic Act sections, and case law entries. Apply the custom CSS variables for header colors and ensure clear typographic hierarchy. Add visual separators between reference types and use consistent spacing."
         }
       ]
     }

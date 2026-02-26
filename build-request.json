@@ -1,77 +1,116 @@
 {
   "kind": "build_request",
-  "title": "Add Highway Code Citations and Road Traffic Act 1988 References in collapsible Legal Reference panel",
-  "projectName": "UK Incident Reporter",
+  "title": "Highway Code + Case Law Fault Reference Tool with Insurer-Style Fault Matrix",
+  "projectName": "Road Fault Advisor",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Add a static data structure (frontend-side) that maps each violation type to relevant Highway Code rules, including the rule number, description, and whether the rule is legally enforceable or advisory.",
+      "text": "Create a dedicated standalone page or section for the Highway Code + case law fault reference tool, accessible from the main navigation. This page should allow users to describe or select their accident scenario (e.g. rear-end, red light, lane change, junction) and receive a structured fault assessment based on UK Highway Code rules and established case law precedents.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-recent"
+          "msg-20"
         ],
         "quotes": [
-          "Highway Code Citations — specific rules flagged as enforceable vs advisory"
+          "Highway Code + case law fault reference tool with the insurer-style fault matrix"
         ]
       },
       "acceptanceCriteria": [
-        "Each violation type maps to at least one Highway Code rule entry",
-        "Each entry includes rule number, short description, and an enforceable/advisory flag",
-        "Advisory rules are visually distinguished from enforceable ones (e.g. label or badge)"
+        "A dedicated route or prominent section exists for the fault reference tool",
+        "Users can select or describe a common accident scenario type",
+        "The tool displays relevant Highway Code rules for the selected scenario",
+        "The tool displays relevant Road Traffic Act 1988 sections where applicable",
+        "The tool displays relevant UK case law precedents for the selected scenario"
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Add a static data structure (frontend-side) that maps each violation type to relevant Road Traffic Act 1988 sections, including the section number and a short plain-English description of the offence.",
+      "text": "Display an insurer-style fault matrix for the selected accident scenario, showing Party A and Party B fault percentages alongside a plain-English rationale. The matrix should highlight the active scenario row or cell based on the user's selection. Expand the existing faultMatrix.ts static data if needed to cover all common scenario types (rear-end, red light, lane change, turning, junction, roundabout, reversing).",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-recent"
+          "msg-20"
         ],
         "quotes": [
-          "Road Traffic Act References — violations tagged to RTA 1988 sections"
+          "insurer-style fault matrix"
         ]
       },
       "acceptanceCriteria": [
-        "Each violation type maps to at least one RTA 1988 section",
-        "Each entry includes section number (e.g. s.3, s.2) and a short description",
-        "Entries are accurate to common UK road traffic violation types already in the app"
+        "The fault matrix renders with Party A and Party B fault percentage columns",
+        "A rationale string is shown for the active scenario",
+        "The active scenario row or cell is visually highlighted",
+        "At least 7 common scenario types are covered in the data (rear-end, red light, lane change, turning, junction, roundabout, reversing)",
+        "Fault percentages are displayed as visual bars or badges alongside numeric values"
       ]
     },
     {
       "id": "REQ-3",
-      "text": "In the ReportDetail view, add a collapsible 'Legal Reference' panel that is collapsed by default. When expanded, it shows the Highway Code Citations and Road Traffic Act 1988 References relevant to the violations recorded in that report. Users who don't need legal detail are not shown it unless they actively expand the panel.",
+      "text": "Provide a plain-English scenario selector UI that lets users choose their accident type from a list of common scenarios (with icons or short descriptions). On selection, the fault matrix, Highway Code rules, and case law references all update to reflect the chosen scenario. The interface must be usable without any prior legal knowledge.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-recent"
+          "msg-20"
         ],
         "quotes": [
-          "All legal references will be tucked away in a collapsible / toggleable 'Legal Reference' panel so users who don't need the legal detail won't be overwhelmed"
+          "users can input their accident scenario and get a fault assessment based on Highway Code rules and established precedents"
         ]
       },
       "acceptanceCriteria": [
-        "A 'Legal Reference' section is present in the ReportDetail view",
-        "The panel is collapsed by default with a visible toggle button/chevron",
-        "Expanding the panel reveals Highway Code rules and RTA 1988 sections relevant to the report's violations",
-        "If no violations are recorded, the panel shows a message indicating no legal references apply",
-        "The panel can be collapsed again after being expanded"
+        "A scenario selector (e.g. card grid, dropdown, or button group) is present at the top of the tool",
+        "Each scenario has a plain-English label and a short description or icon",
+        "Selecting a scenario updates the fault matrix, legal references, and case law panels simultaneously",
+        "No legal jargon is required to navigate or use the tool"
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Expand the existing legalReferences.ts and faultMatrix.ts data files to ensure comprehensive coverage of all scenario types used in the selector. Each scenario entry must include: relevant Highway Code rule numbers and summaries, applicable Road Traffic Act 1988 sections, at least one case law precedent with a factual summary and legal principle, and Party A/Party B fault split with rationale.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-20"
+        ],
+        "quotes": [
+          "fault reference tool",
+          "based on Highway Code rules and established precedents"
+        ]
+      },
+      "acceptanceCriteria": [
+        "legalReferences.ts contains entries for all scenario types covered by the selector",
+        "faultMatrix.ts contains fault split data for all scenario types covered by the selector",
+        "Each legal reference entry includes at least one Highway Code rule, one Road Traffic Act section, and one case law entry",
+        "Each case law entry includes a case name, factual summary, and legal principle"
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "text": "Apply a consistent, professional visual theme to the fault reference tool page. Use a clean, authoritative legal/insurance aesthetic — dark navy or charcoal tones for headers, amber or gold accents for fault highlights, clear typographic hierarchy, and card-based layouts for the matrix and legal reference panels. The design should feel trustworthy and easy to scan.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-20"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The page uses a consistent colour palette distinct from generic defaults",
+        "Headers and section labels have clear typographic hierarchy",
+        "Fault matrix and legal reference content is displayed in card or panel containers",
+        "Fault percentage highlights use a visually distinct accent colour"
       ]
     }
   ],
   "constraints": [
-    "Do not modify any files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui",
-    "Legal reference data must be static frontend-side mappings — no backend schema changes required for this step",
-    "Keep the existing incident/report flow (photo upload, vehicle info, surroundings, violation type, liability split, My Reports history) fully intact"
+    "Do not build the bird's eye grid view or the injury photo upload section in this iteration — those are explicitly deferred",
+    "All legal reference and fault matrix data must be static (no backend AI inference required for this feature)",
+    "Do not modify frontend/src/hooks/useActor.ts, frontend/src/hooks/useInternetIdentity.ts, frontend/src/main.tsx, or any files under frontend/src/components/ui"
   ],
   "nonGoals": [
-    "Case Law References (planned for Step 2)",
-    "Contributory Negligence Framework (planned for Step 3)",
-    "Insurer-Style Fault Matrix (planned for Step 3)",
-    "Next Steps Guidance (planned for Step 3)",
-    "Backend storage of legal reference data"
+    "Bird's eye grid view with AI car placement",
+    "Injury photo upload section",
+    "AI-driven fault inference from photos or descriptions",
+    "Integration with the backend for fault matrix lookups",
+    "Real-time updates or WebSocket-based features"
   ],
   "imageRequirements": {
     "required": [],

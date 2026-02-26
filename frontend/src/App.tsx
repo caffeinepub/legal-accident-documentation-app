@@ -5,6 +5,7 @@ import Layout from './components/Layout';
 import NewReportPage from './pages/NewReportPage';
 import ReportsPage from './pages/ReportsPage';
 import ReportDetailPage from './pages/ReportDetailPage';
+import FaultReferencePage from './pages/FaultReferencePage';
 
 const queryClient = new QueryClient();
 
@@ -28,7 +29,18 @@ const reportDetailRoute = createRoute({
   component: ReportDetailPage,
 });
 
-const routeTree = rootRoute.addChildren([indexRoute, reportsRoute, reportDetailRoute]);
+const faultReferenceRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/fault-reference',
+  component: FaultReferencePage,
+});
+
+const routeTree = rootRoute.addChildren([
+  indexRoute,
+  reportsRoute,
+  reportDetailRoute,
+  faultReferenceRoute,
+]);
 
 const router = createRouter({ routeTree });
 

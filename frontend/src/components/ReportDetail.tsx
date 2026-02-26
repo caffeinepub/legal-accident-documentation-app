@@ -7,12 +7,15 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import {
   Car, Camera, MapPin, CloudRain, AlertTriangle, CheckCircle,
-  ArrowLeft, Calendar, Gauge, Eye, FileText, Users
+  ArrowLeft, Calendar, Gauge, Eye, FileText, Users, Scale
 } from 'lucide-react';
 import PhotoGallery from './PhotoGallery';
 import LiabilityDisplay from './LiabilityDisplay';
 import ViolationsDisplay from './ViolationsDisplay';
 import LegalReferencePanel from './LegalReferencePanel';
+import ContributoryNegligencePanel from './ContributoryNegligencePanel';
+import FaultMatrixPanel from './FaultMatrixPanel';
+import NextStepsPanel from './NextStepsPanel';
 
 interface ReportDetailProps {
   reportId: bigint;
@@ -33,6 +36,11 @@ function capitalize(s: string): string {
 
 export default function ReportDetail({ reportId, report }: ReportDetailProps) {
   const navigate = useNavigate();
+
+  // Derive primary violation type for FaultMatrixPanel highlighting
+  const primaryViolationType = report.violations.length > 0
+    ? report.violations[0].violationType
+    : undefined;
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
@@ -87,8 +95,25 @@ export default function ReportDetail({ reportId, report }: ReportDetailProps) {
         </CardContent>
       </Card>
 
-      {/* Legal Reference Panel — collapsed by default */}
+      {/* Step 2: Legal Reference Panel — collapsed by default */}
       <LegalReferencePanel violations={report.violations} />
+
+      {/* Step 3: Fault Analysis & Next Steps */}
+      <div className="space-y-1">
+        <div className="flex items-center gap-2 px-1 pt-2">
+          <Scale className="w-5 h-5 text-primary" />
+          <h2 className="text-xl font-bold">Step 3: Fault Analysis &amp; Next Steps</h2>
+        </div>
+        <p className="text-sm text-muted-foreground px-1 pb-2">
+          Contributory negligence framework, insurer fault matrix, and practical next steps guidance.
+        </p>
+      </div>
+
+      <div className="space-y-4">
+        <ContributoryNegligencePanel />
+        <FaultMatrixPanel activeViolationType={primaryViolationType} />
+        <NextStepsPanel />
+      </div>
 
       {/* Vehicle Information */}
       <Card>

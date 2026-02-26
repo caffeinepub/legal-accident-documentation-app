@@ -20,91 +20,88 @@ export default {
                     'system-ui',
                     '-apple-system',
                     'BlinkMacSystemFont',
-                    '"Segoe UI"',
+                    'Segoe UI',
                     'Roboto',
-                    '"Helvetica Neue"',
-                    'Arial',
-                    'sans-serif'
-                ]
+                    'sans-serif',
+                ],
+                mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
             },
             colors: {
-                border: 'oklch(var(--border))',
-                input: 'oklch(var(--input))',
-                ring: 'oklch(var(--ring) / <alpha-value>)',
-                background: 'oklch(var(--background))',
-                foreground: 'oklch(var(--foreground))',
+                background: 'oklch(var(--background) / <alpha-value>)',
+                foreground: 'oklch(var(--foreground) / <alpha-value>)',
+                card: {
+                    DEFAULT: 'oklch(var(--card) / <alpha-value>)',
+                    foreground: 'oklch(var(--card-foreground) / <alpha-value>)',
+                },
+                popover: {
+                    DEFAULT: 'oklch(var(--popover) / <alpha-value>)',
+                    foreground: 'oklch(var(--popover-foreground) / <alpha-value>)',
+                },
                 primary: {
                     DEFAULT: 'oklch(var(--primary) / <alpha-value>)',
-                    foreground: 'oklch(var(--primary-foreground))'
+                    foreground: 'oklch(var(--primary-foreground) / <alpha-value>)',
                 },
                 secondary: {
                     DEFAULT: 'oklch(var(--secondary) / <alpha-value>)',
-                    foreground: 'oklch(var(--secondary-foreground))'
-                },
-                destructive: {
-                    DEFAULT: 'oklch(var(--destructive) / <alpha-value>)',
-                    foreground: 'oklch(var(--destructive-foreground))'
+                    foreground: 'oklch(var(--secondary-foreground) / <alpha-value>)',
                 },
                 muted: {
                     DEFAULT: 'oklch(var(--muted) / <alpha-value>)',
-                    foreground: 'oklch(var(--muted-foreground) / <alpha-value>)'
+                    foreground: 'oklch(var(--muted-foreground) / <alpha-value>)',
                 },
                 accent: {
                     DEFAULT: 'oklch(var(--accent) / <alpha-value>)',
-                    foreground: 'oklch(var(--accent-foreground))'
+                    foreground: 'oklch(var(--accent-foreground) / <alpha-value>)',
                 },
-                popover: {
-                    DEFAULT: 'oklch(var(--popover))',
-                    foreground: 'oklch(var(--popover-foreground))'
+                destructive: {
+                    DEFAULT: 'oklch(var(--destructive) / <alpha-value>)',
+                    foreground: 'oklch(var(--destructive-foreground) / <alpha-value>)',
                 },
-                card: {
-                    DEFAULT: 'oklch(var(--card))',
-                    foreground: 'oklch(var(--card-foreground))'
-                },
+                border: 'oklch(var(--border) / <alpha-value>)',
+                input: 'oklch(var(--input) / <alpha-value>)',
+                ring: 'oklch(var(--ring) / <alpha-value>)',
                 chart: {
-                    1: 'oklch(var(--chart-1))',
-                    2: 'oklch(var(--chart-2))',
-                    3: 'oklch(var(--chart-3))',
-                    4: 'oklch(var(--chart-4))',
-                    5: 'oklch(var(--chart-5))'
+                    '1': 'oklch(var(--chart-1) / <alpha-value>)',
+                    '2': 'oklch(var(--chart-2) / <alpha-value>)',
+                    '3': 'oklch(var(--chart-3) / <alpha-value>)',
+                    '4': 'oklch(var(--chart-4) / <alpha-value>)',
+                    '5': 'oklch(var(--chart-5) / <alpha-value>)',
                 },
                 sidebar: {
-                    DEFAULT: 'oklch(var(--sidebar))',
-                    foreground: 'oklch(var(--sidebar-foreground))',
-                    primary: 'oklch(var(--sidebar-primary))',
-                    'primary-foreground': 'oklch(var(--sidebar-primary-foreground))',
-                    accent: 'oklch(var(--sidebar-accent))',
-                    'accent-foreground': 'oklch(var(--sidebar-accent-foreground))',
-                    border: 'oklch(var(--sidebar-border))',
-                    ring: 'oklch(var(--sidebar-ring))'
-                }
+                    DEFAULT: 'oklch(var(--sidebar) / <alpha-value>)',
+                    foreground: 'oklch(var(--sidebar-foreground) / <alpha-value>)',
+                    primary: 'oklch(var(--sidebar-primary) / <alpha-value>)',
+                    'primary-foreground': 'oklch(var(--sidebar-primary-foreground) / <alpha-value>)',
+                    accent: 'oklch(var(--sidebar-accent) / <alpha-value>)',
+                    'accent-foreground': 'oklch(var(--sidebar-accent-foreground) / <alpha-value>)',
+                    border: 'oklch(var(--sidebar-border) / <alpha-value>)',
+                    ring: 'oklch(var(--sidebar-ring) / <alpha-value>)',
+                },
+                // Fault Reference Tool design tokens
+                'fault-accent': 'var(--fault-accent)',
+                'fault-header': 'var(--fault-header-bg)',
+                'fault-header-fg': 'var(--fault-header-fg)',
             },
             borderRadius: {
                 lg: 'var(--radius)',
                 md: 'calc(var(--radius) - 2px)',
-                sm: 'calc(var(--radius) - 4px)'
-            },
-            boxShadow: {
-                xs: '0 1px 2px 0 rgba(0,0,0,0.05)',
-                sm: '0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1)',
-                md: '0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)',
-                lg: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)'
+                sm: 'calc(var(--radius) - 4px)',
             },
             keyframes: {
                 'accordion-down': {
                     from: { height: '0' },
-                    to: { height: 'var(--radix-accordion-content-height)' }
+                    to: { height: 'var(--radix-accordion-content-height)' },
                 },
                 'accordion-up': {
                     from: { height: 'var(--radix-accordion-content-height)' },
-                    to: { height: '0' }
-                }
+                    to: { height: '0' },
+                },
             },
             animation: {
                 'accordion-down': 'accordion-down 0.2s ease-out',
-                'accordion-up': 'accordion-up 0.2s ease-out'
-            }
-        }
+                'accordion-up': 'accordion-up 0.2s ease-out',
+            },
+        },
     },
-    plugins: [typography, containerQueries, animate]
+    plugins: [typography, containerQueries, animate],
 };
