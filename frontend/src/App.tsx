@@ -6,6 +6,7 @@ import NewReportPage from './pages/NewReportPage';
 import ReportsPage from './pages/ReportsPage';
 import ReportDetailPage from './pages/ReportDetailPage';
 import FaultReferencePage from './pages/FaultReferencePage';
+import BirdsEyeGridPage from './pages/BirdsEyeGridPage';
 
 const queryClient = new QueryClient();
 
@@ -35,11 +36,18 @@ const faultReferenceRoute = createRoute({
   component: FaultReferencePage,
 });
 
+const gridRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/grid',
+  component: BirdsEyeGridPage,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   reportsRoute,
   reportDetailRoute,
   faultReferenceRoute,
+  gridRoute,
 ]);
 
 const router = createRouter({ routeTree });

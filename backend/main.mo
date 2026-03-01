@@ -2,18 +2,17 @@ import Text "mo:core/Text";
 import Nat "mo:core/Nat";
 import Map "mo:core/Map";
 import Time "mo:core/Time";
-import Array "mo:core/Array";
+import Migration "migration";
 import Principal "mo:core/Principal";
 import Runtime "mo:core/Runtime";
-import Iter "mo:core/Iter";
 
 import Storage "blob-storage/Storage";
 import MixinStorage "blob-storage/Mixin";
 import AccessControl "authorization/access-control";
 import MixinAuthorization "authorization/MixinAuthorization";
 
-
-
+// Use data migration at runtime
+(with migration = Migration.run)
 actor {
   include MixinStorage();
 
@@ -37,6 +36,12 @@ actor {
     title : Text;
     description : Text;
     applicableScenarios : [Text];
+  };
+
+  type Violation = {
+    violationType : Text;
+    description : Text;
+    detectedAt : Int;
   };
 
   type FaultAnalysis = {
@@ -69,12 +74,6 @@ actor {
     timestamp : Int;
   };
 
-  type Violation = {
-    violationType : Text;
-    description : Text;
-    detectedAt : Int;
-  };
-
   public type UserProfile = {
     name : Text;
     email : Text;
@@ -93,6 +92,25 @@ actor {
     model : Text;
     colour : Text;
     licencePlate : Text;
+    year : Nat;
+    mot : Text;
+    registration : Text;
+  };
+
+  type OtherVehicle = {
+    make : Text;
+    model : Text;
+    ownerName : Text;
+    email : Text;
+    phone : Text;
+    insurer : Text;
+    insurancePolicyNumber : Text;
+    claimReference : Text;
+    licencePlate : Text;
+    year : Nat;
+    colour : Text;
+    mot : Text;
+    registration : Text;
   };
 
   type AccidentReport = {
@@ -117,9 +135,45 @@ actor {
     party1Liability : ?Nat;
     party2Liability : ?Nat;
     vehicleInfo : VehicleInfo;
+    aiAnalysisResult : ?AIAnalysisResult;
+    otherVehicle : ?OtherVehicle;
+    videos : [Storage.ExternalBlob];
+    witnesses : [Witness];
+  };
+
+  type InjuryPhoto = {
+    id : Nat;
+    reportId : Nat;
+    blob : Storage.ExternalBlob;
+    bodyRegion : Text;
+    crashType : Text;
+    timestamp : Int;
+  };
+
+  type InsuranceExport = {
+    reportId : Nat;
+    summary : Text;
+    injuryPhotos : [InjuryPhoto];
+    owner : Principal;
+  };
+
+  type AIAnalysisResult = {
+    narrativeText : Text;
+    inferredCrashType : Text;
+    severity : Text;
+    correlationSummary : Text;
+  };
+
+  type Witness = {
+    name : Text;
+    phone : Text;
+    email : Text;
+    address : Text;
+    statement : Text;
   };
 
   var nextReportId = 0;
+  var nextInjuryPhotoId = 0;
   let stoppingDistances = [
     { speed = 20; distance = 12 },
     { speed = 30; distance = 23 },
@@ -129,7 +183,9 @@ actor {
     { speed = 70; distance = 96 },
   ];
 
-  var accidentReports = Map.empty<Nat, AccidentReport>();
+  let accidentReports = Map.empty<Nat, AccidentReport>();
+  let injuryPhotos = Map.empty<Nat, [InjuryPhoto]>();
+  let exportableInjuries = Map.empty<Nat, InsuranceExport>();
   let userProfiles = Map.empty<Principal, UserProfile>();
 
   // User Profile Management
@@ -187,6 +243,9 @@ actor {
     gpsLocation : Text,
     surroundings : Surroundings,
     vehicleInfo : VehicleInfo,
+    otherVehicle : ?OtherVehicle,
+    witnessDetails : [Witness],
+    videoFiles : [Storage.ExternalBlob],
   ) : async Nat {
     checkUserPermission(caller);
 
@@ -238,12 +297,158 @@ actor {
       party1Liability = ?party1Liability;
       party2Liability = ?party2Liability;
       vehicleInfo;
+      aiAnalysisResult = null;
+      otherVehicle;
+      videos = videoFiles;
+      witnesses = witnessDetails;
     };
 
     let reportId = nextReportId;
     accidentReports.add(reportId, report);
     nextReportId += 1;
     reportId;
+  };
+
+  public shared ({ caller }) func addInjuryPhotos(reportId : Nat, photoBlobs : [(Storage.ExternalBlob, Text, Text)]) : async () {
+    checkUserPermission(caller);
+
+    switch (accidentReports.get(reportId)) {
+      case (null) { Runtime.trap("Report not found for injury photos") };
+      case (?report) {
+        // Only the report owner or an admin can add injury photos
+        checkAdminOrOwner(caller, report.owner);
+
+        let mappedPhotos = photoBlobs.map(
+          func((blob, region, crashType)) {
+            let photo = {
+              id = nextInjuryPhotoId;
+              reportId;
+              blob;
+              bodyRegion = region;
+              crashType;
+              timestamp = Time.now();
+            };
+            nextInjuryPhotoId += 1;
+            photo;
+          }
+        );
+
+        let existing = injuryPhotos.get(reportId);
+        switch (existing) {
+          case (null) {
+            injuryPhotos.add(reportId, mappedPhotos);
+          };
+          case (?existingPhotos) {
+            let allPhotos = existingPhotos.concat(mappedPhotos);
+            injuryPhotos.add(reportId, allPhotos);
+          };
+        };
+      };
+    };
+  };
+
+  public shared ({ caller }) func storeAIAnalysisResult(reportId : Nat, analysisResult : AIAnalysisResult) : async () {
+    checkUserPermission(caller);
+
+    switch (accidentReports.get(reportId)) {
+      case (null) { Runtime.trap("Report not found") };
+      case (?report) {
+        // Only the report owner or an admin can update AI analysis
+        checkAdminOrOwner(caller, report.owner);
+
+        let updatedReport : AccidentReport = {
+          report with
+          aiAnalysisResult = ?analysisResult
+        };
+        accidentReports.add(reportId, updatedReport);
+      };
+    };
+  };
+
+  public query ({ caller }) func getAIAnalysisResult(reportId : Nat) : async ?AIAnalysisResult {
+    checkUserPermission(caller);
+
+    switch (accidentReports.get(reportId)) {
+      case (null) { Runtime.trap("Report not found") };
+      case (?report) {
+        // Only the report owner or an admin can view the analysis
+        checkAdminOrOwner(caller, report.owner);
+
+        report.aiAnalysisResult;
+      };
+    };
+  };
+
+  public query ({ caller }) func getInjuryPhotos(reportId : Nat) : async [InjuryPhoto] {
+    checkUserPermission(caller);
+
+    switch (accidentReports.get(reportId)) {
+      case (null) { Runtime.trap("Report not found for injury photos") };
+      case (?report) {
+        // Only the report owner or an admin can view injury photos
+        checkAdminOrOwner(caller, report.owner);
+
+        switch (injuryPhotos.get(reportId)) {
+          case (null) { [] };
+          case (?photos) { photos };
+        };
+      };
+    };
+  };
+
+  public shared ({ caller }) func deleteInjuryPhotos(reportId : Nat) : async () {
+    checkUserPermission(caller);
+
+    switch (accidentReports.get(reportId)) {
+      case (null) { Runtime.trap("Report not found for injury photos") };
+      case (?report) {
+        // Only the report owner or an admin can delete injury photos
+        checkAdminOrOwner(caller, report.owner);
+        injuryPhotos.remove(reportId);
+      };
+    };
+  };
+
+  public shared ({ caller }) func storeInjuryPhotos(reportId : Nat, summary : Text) : async () {
+    checkUserPermission(caller);
+
+    switch (accidentReports.get(reportId)) {
+      case (null) { Runtime.trap("Cannot store injury photos, no associated accident report") };
+      case (?report) {
+        // Only the report owner or an admin can store injury photos
+        checkAdminOrOwner(caller, report.owner);
+
+        let photos = switch (injuryPhotos.get(reportId)) {
+          case (null) { [] };
+          case (?p) { p };
+        };
+        let exportData = {
+          reportId;
+          summary;
+          injuryPhotos = photos;
+          owner = caller;
+        };
+        exportableInjuries.add(reportId, exportData);
+        injuryPhotos.remove(reportId);
+      };
+    };
+  };
+
+  public query ({ caller }) func getInsuranceExport(reportId : Nat) : async InsuranceExport {
+    checkUserPermission(caller);
+
+    switch (exportableInjuries.get(reportId)) {
+      case (null) {
+        Runtime.trap("No export data found for insurance company");
+      };
+      case (?export) {
+        // Only the export owner or an admin can retrieve the insurance export
+        if (export.owner != caller and not AccessControl.isAdmin(accessControlState, caller)) {
+          Runtime.trap("Unauthorized: Only the owner or an admin can access this insurance export");
+        };
+        export;
+      };
+    };
   };
 
   func detectViolations(

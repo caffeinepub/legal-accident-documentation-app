@@ -1,38 +1,74 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "New project",
-  "architectural_notes": [],
+  "summary": "Auto/personal injury claim submission app with AI-powered analysis of injury and vehicle damage photos. Main page includes injury photo uploader, other vehicle details (driver contact, insurance info, vehicle details), multiple witness entries (name, contact info, statement), and video uploader for relevant footage.",
+  "architectural_notes": [
+    "AI-powered analysis is applied to both injury and vehicle damage photos, feeding into a broader claim summary"
+  ],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-expand-the-faultmatrixpanel-component-to-display-complete-party-a-and-party-b-fault-percentage-breakdowns-for-all-scenarios-defined-in-faultmatrix-ts-including-contributing-factors-and-rationale-text-for-each-scenario-entry",
-      "title": "Expand the FaultMatrixPanel component to display complete Party A and Party B fault percentage breakdowns for all scenarios defined in faultMatrix.ts, including contributing factors and rationale text for each scenario entry.",
+      "id": "feature-add-an-other-vehicle-section-to-the-accidentreportform-that-collects-driver-contact-details-name-phone-email-address-insurance-information-insurer-name-policy-number-claim-reference-and-vehicle-details-make-model-year-colour-licence-plate-mot-registration-info-mirroring-the-structure-and-field-style-of-the-existing-vehicle-section-already-in-the-form",
+      "title": "Add an 'Other Vehicle' section to the AccidentReportForm that collects driver contact details (name, phone, email, address), insurance information (insurer name, policy number, claim reference), and vehicle details (make, model, year, colour, licence plate, MOT/registration info) — mirroring the structure and field style of the existing vehicle section already in the form.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-expand-the-scenario-coverage-in-faultmatrix-ts-to-include-all-common-road-incident-scenario-types-already-referenced-in-scenarioreferences-ts-rear-end-red-light-lane-change-and-any-remaining-unmapped-types-ensuring-each-has-fault-percentages-contributing-factors-rationale-and-related-violation-types",
-      "title": "Expand the scenario coverage in faultMatrix.ts to include all common road incident scenario types already referenced in scenarioReferences.ts (rear-end, red light, lane change, and any remaining unmapped types), ensuring each has fault percentages, contributing factors, rationale, and related violation types.",
+      "id": "feature-add-a-dynamic-multiple-witness-section-to-the-accidentreportform-that-allows-users-to-add-edit-and-remove-individual-witness-entries-each-witness-entry-must-include-full-name-contact-information-phone-and-or-email-and-a-free-text-statement-field",
+      "title": "Add a dynamic multiple-witness section to the AccidentReportForm that allows users to add, edit, and remove individual witness entries. Each witness entry must include: full name, contact information (phone and/or email), and a free-text statement field.",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
     },
     {
-      "id": "feature-update-faultreferencedisplay-on-the-faultreferencepage-to-show-the-full-fault-percentage-breakdown-party-a-and-party-b-with-labelled-bars-alongside-legal-references-when-a-scenario-is-selected-consistent-with-the-expanded-faultmatrix-ts-data",
-      "title": "Update FaultReferenceDisplay on the FaultReferencePage to show the full fault percentage breakdown (Party A and Party B with labelled bars) alongside legal references when a scenario is selected, consistent with the expanded faultMatrix.ts data.",
+      "id": "feature-add-a-video-file-uploader-to-the-accidentreportform-that-accepts-any-relevant-video-footage-from-the-user-s-device-the-uploader-should-support-common-video-formats-mp4-mov-avi-webm-display-the-filename-and-a-remove-option-after-selection-and-store-the-video-as-a-blob-on-the-backend-report",
+      "title": "Add a video file uploader to the AccidentReportForm that accepts any relevant video footage from the user's device. The uploader should support common video formats (MP4, MOV, AVI, WebM), display the filename and a remove option after selection, and store the video as a blob on the backend report.",
       "reqIds": [
         "REQ-3"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-move-the-injury-photo-uploader-injuryphotoupload-injuryanalysispanel-to-a-prominent-position-on-the-main-new-report-page-newreportpage-accidentreportform-ensuring-it-is-visible-without-scrolling-or-clearly-signposted-near-the-top-of-the-form",
+      "title": "Move the injury photo uploader (InjuryPhotoUpload / InjuryAnalysisPanel) to a prominent position on the main new-report page (NewReportPage / AccidentReportForm), ensuring it is visible without scrolling or clearly signposted near the top of the form.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
     }
   ],
-  "new_feature_requests": [],
-  "projectName": "Expand fault matrix Party A/B breakdowns and scenario coverage",
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Move injury photo uploader to main page prominently",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Add other vehicle section with driver contact details, insurance info, and vehicle details matching existing vehicle section format",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Add multiple witness entries with name, contact info, and statement fields",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Add video uploader for any relevant video footage",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "Auto Claim Submission App",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

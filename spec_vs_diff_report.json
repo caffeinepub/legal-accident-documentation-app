@@ -1,20 +1,28 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-26T22:07:53.546Z",
-  "summary": "All three requirements appear to be implemented in the diff. REQ-1 is addressed by the expanded FaultMatrixPanel component with FaultBar sub-component displaying labelled bars for Party A/B, contributing factors, rationale, and active scenario highlighting. REQ-2 is addressed by faultMatrix.ts containing all seven scenario types (rear-end, red-light, lane-change, turning, junction, roundabout, reversing) with required fields. REQ-3 is addressed by FaultReferenceDisplay with FaultPercentageBar components showing labelled bars alongside legal references. No missing requirements or hallucinated features were identified.",
-  "missing_requirements": [],
+  "generatedAt": "2026-02-28T22:15:44.953Z",
+  "summary": "The diff implements all four requirements: REQ-1 (Other Vehicle section), REQ-2 (multiple witnesses), REQ-3 (video uploader), and REQ-4 (injury photo uploader moved to top). Backend types and migration are updated, frontend form and detail view are updated, and query hooks are extended. One minor gap: REQ-1 requires an 'address' field for the other vehicle driver contact, which is present in the frontend OtherVehicleForm interface but the backend OtherVehicle type in main.mo does not include an 'address' field.",
+  "missing_requirements": [
+    {
+      "id": "REQ-1",
+      "requirement": "Driver contact fields include address for the other vehicle section, persisted to backend",
+      "reason": "The frontend OtherVehicleForm interface includes an 'address' field, but the backend OtherVehicle type in main.mo does not include an 'address' field (only ownerName, email, phone, insurer, etc.), so address data cannot be fully persisted to the backend as required.",
+      "evidence": [
+        "backend/main.mo",
+        "frontend/src/components/AccidentReportForm.tsx"
+      ]
+    }
+  ],
   "hallucinated_features": [],
-  "confidence": 0.87,
+  "confidence": 0.8,
   "changed_files": [
+    "backend/main.mo",
+    "backend/migration.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/components/FaultMatrixPanel.tsx",
-    "frontend/src/components/FaultReferenceDisplay.tsx",
+    "frontend/src/components/AccidentReportForm.tsx",
     "frontend/src/components/ReportDetail.tsx",
-    "frontend/src/components/ScenarioSelector.tsx",
-    "frontend/src/data/faultMatrix.ts",
-    "frontend/src/data/scenarioReferences.ts",
-    "frontend/src/pages/FaultReferencePage.tsx",
+    "frontend/src/hooks/useQueries.ts",
     "project_state.json"
   ]
 }

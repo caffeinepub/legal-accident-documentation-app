@@ -1,7 +1,7 @@
 import React from 'react';
 import { Outlet, useNavigate, useLocation } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
-import { Shield, Plus, List, Scale } from 'lucide-react';
+import { Shield, Plus, List, Scale, Grid3X3 } from 'lucide-react';
 
 export default function Layout() {
   const navigate = useNavigate();
@@ -19,7 +19,7 @@ export default function Layout() {
             <span>AccidentReport</span>
           </button>
 
-          <nav className="flex items-center gap-1.5">
+          <nav className="flex items-center gap-1.5 flex-wrap justify-end">
             <Button
               variant={location.pathname === '/' ? 'default' : 'ghost'}
               size="sm"
@@ -46,6 +46,15 @@ export default function Layout() {
             >
               <Scale className="w-3.5 h-3.5" />
               Fault Reference
+            </Button>
+            <Button
+              variant={location.pathname === '/grid' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => navigate({ to: '/grid' })}
+              className="gap-1.5"
+            >
+              <Grid3X3 className="w-3.5 h-3.5" />
+              Grid View
             </Button>
           </nav>
         </div>

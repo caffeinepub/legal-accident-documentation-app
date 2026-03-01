@@ -1,58 +1,98 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Expand fault matrix Party A/B breakdowns and scenario coverage",
+  "title": "Add other vehicle details, multiple witnesses, and video uploader to main report form",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Expand FaultMatrixPanel to display complete Party A and Party B fault percentage breakdowns with contributing factors and rationale for all scenarios, highlighting the active scenario",
+      "summary": "Add an 'Other Vehicle' section to the AccidentReportForm that collects driver contact details, insurance information, and vehicle details — mirroring the structure and field style of the existing vehicle section",
       "acceptanceCriteria": [
-        "Every scenario in faultMatrix.ts has its Party A and Party B fault percentages visually displayed as labelled bars or numeric values.",
-        "Contributing factors and rationale are shown for each scenario row in the panel.",
-        "The active scenario (based on provided violation type) is highlighted distinctly from inactive ones."
+        "The 'Other Vehicle' section appears in the AccidentReportForm with a clearly labelled heading",
+        "Driver contact fields include: full name, phone number, email, and address",
+        "Insurance fields include: insurer name, policy number, and claim reference",
+        "Vehicle detail fields include: make, model, year, colour, and licence plate — matching the layout and styling of the existing vehicle section",
+        "All new fields are persisted to the backend AccidentReport type and returned when a report is fetched",
+        "New report detail view renders the other vehicle section with all submitted data"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/FaultMatrixPanel.tsx",
+          "path": "frontend/src/components/AccidentReportForm.tsx",
           "operation": "modify",
-          "description": "Expand the component to display full Party A and Party B fault percentages using visual bars with labels for each scenario. Add sections to show contributing factors as a bulleted list and rationale text for each scenario row. Implement distinct highlighting (e.g., background color, border, or badge) for the active scenario based on the violationType prop. Ensure all scenarios from faultMatrix.ts are rendered with their complete data including percentages, factors, and rationale."
+          "description": "Add an 'Other Vehicle' section with form fields for driver contact details (name, phone, email, address), insurance information (insurer name, policy number, claim reference), and vehicle details (make, model, year, colour, licence plate, MOT/registration info). Use the same Input/Label/Card components and styling patterns as the existing vehicle section. Add state management for otherVehicle data. Update the createReport mutation to pass otherVehicle data to the backend via the existing otherVehicle parameter."
+        },
+        {
+          "path": "frontend/src/components/ReportDetail.tsx",
+          "operation": "modify",
+          "description": "Add a collapsible 'Other Vehicle' Card section that displays the other vehicle details when report.otherVehicle is present. Render driver contact information, insurance details, and vehicle specifications in a structured layout matching the existing vehicle info display pattern. Use the same typography and spacing as other report sections."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Expand scenario coverage in faultMatrix.ts to include all seven common road incident scenario types from scenarioReferences.ts with fault percentages, contributing factors, rationale, and related violation types",
+      "summary": "Add a dynamic multiple-witness section to the AccidentReportForm that allows users to add, edit, and remove individual witness entries with name, contact info, and statement fields",
       "acceptanceCriteria": [
-        "faultMatrix.ts contains entries for all seven scenario types present in scenarioReferences.ts.",
-        "Each new scenario entry includes Party A percentage, Party B percentage, contributing factors array, rationale string, and related violation types.",
-        "FaultMatrixPanel renders all newly added scenarios without errors."
+        "Users can add multiple witnesses using an 'Add Witness' button",
+        "Each witness entry has fields for: full name, phone number, email, and a statement text area",
+        "Users can remove individual witness entries",
+        "Witness data is stored as an array on the backend AccidentReport type",
+        "Submitted witness entries are displayed in the report detail view",
+        "At least one witness entry can be added and removed without error"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/data/faultMatrix.ts",
+          "path": "frontend/src/components/AccidentReportForm.tsx",
           "operation": "modify",
-          "description": "Add fault matrix entries for all seven scenario types defined in scenarioReferences.ts (rear-end, red light, lane change, and any remaining unmapped types). Each new entry must include: scenario name (matching scenarioReferences.ts keys), Party A fault percentage (number), Party B fault percentage (number, ensuring both sum to 100), contributingFactors array (list of key factors influencing fault split), rationale text (brief explanation of the fault determination), and relatedViolationTypes array (violation types that map to this scenario). Ensure consistency with existing entry structure and verify all scenarios are covered."
+          "description": "Add a 'Witnesses' section with dynamic witness entries. Add state management for a witnesses array. Render each witness entry with Input fields for name, phone, email, and address, plus a Textarea for the statement. Add an 'Add Witness' Button that appends a new empty witness object to the array. Add a 'Remove' Button for each witness entry. Update the createReport mutation to pass the witnesses array to the backend via the existing witnessDetails parameter."
+        },
+        {
+          "path": "frontend/src/components/ReportDetail.tsx",
+          "operation": "modify",
+          "description": "Add a collapsible 'Witnesses' Card section that renders all witness entries from report.witnesses array. Display each witness's name, contact information (phone, email, address), and statement in a structured Card or list format. Show a message if no witnesses were recorded."
         }
       ]
     },
     {
       "id": "REQ-3",
-      "summary": "Update FaultReferenceDisplay to show full fault percentage breakdown with labelled bars for Party A and Party B alongside legal references when a scenario is selected",
+      "summary": "Add a video file uploader to the AccidentReportForm that accepts relevant video footage, displays the filename with a remove option, and stores the video as a blob on the backend",
       "acceptanceCriteria": [
-        "Selecting any scenario on the Fault Reference page displays both Party A and Party B fault percentages with visual bars.",
-        "The displayed percentages match the values in faultMatrix.ts for the selected scenario.",
-        "Legal references (Highway Code, RTA 1988, case law) continue to display alongside the fault breakdown."
+        "A video upload field is present in the AccidentReportForm with a clearly labelled heading",
+        "The uploader accepts MP4, MOV, AVI, and WebM file formats",
+        "After a file is selected, its filename is displayed with an option to remove it",
+        "Video data is persisted to the backend AccidentReport type",
+        "The report detail view indicates when a video has been uploaded and allows viewing or downloading it"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/FaultReferenceDisplay.tsx",
+          "path": "frontend/src/components/AccidentReportForm.tsx",
           "operation": "modify",
-          "description": "Add a fault percentage breakdown section that displays Party A and Party B percentages with labelled visual bars (similar to LiabilityDisplay component style). Retrieve fault data from faultMatrix.ts based on the selected scenario. Position the fault breakdown prominently (e.g., at the top of the component or in a dedicated card) so it displays alongside the existing Highway Code, RTA 1988, and case law sections. Ensure the percentage bars are clearly labelled with party names and percentages, and style them consistently with the application's design system."
+          "description": "Add a 'Video Evidence' section with a file input accepting video/mp4, video/quicktime, video/x-msvideo, and video/webm. Add state management for a videos array holding ExternalBlob instances. When a file is selected, convert it to ExternalBlob using ExternalBlob.fromBytes() and add it to the videos array. Display the filename for each selected video with a Remove Button. Update the createReport mutation to pass the videos array to the backend via the existing videoFiles parameter. Use the blob-storage component's ExternalBlob class. Verify the component's usage instructions before implementing."
         },
         {
-          "path": "frontend/src/pages/FaultReferencePage.tsx",
+          "path": "frontend/src/components/ReportDetail.tsx",
           "operation": "modify",
-          "description": "Pass the selected scenario identifier to FaultReferenceDisplay so it can retrieve and display the corresponding fault percentage breakdown from faultMatrix.ts. Ensure the data flow supports rendering both legal references and fault breakdowns when a scenario is selected."
+          "description": "Add a 'Video Evidence' Card section that checks if report.videos array is present and non-empty. For each video ExternalBlob, display a video player using video.getDirectURL() as the src attribute, or provide a download link. Show a message if no videos were uploaded. Use the blob-storage component to access video URLs. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "summary": "Move the injury photo uploader to a prominent position on the main new-report page, ensuring it is visible without scrolling or clearly signposted near the top of the form",
+      "acceptanceCriteria": [
+        "The injury photo uploader is rendered on the main report creation page",
+        "It appears near the top of the form or in a clearly prominent position",
+        "Uploading injury photos from this location triggers AI analysis as before",
+        "No duplicate injury uploader exists elsewhere on the page"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/AccidentReportForm.tsx",
+          "operation": "modify",
+          "description": "Import and render the InjuryAnalysisPanel component near the top of the AccidentReportForm, placing it prominently after the form title/description but before the vehicle and surroundings sections. Pass an empty reportId (0n or null) to indicate this is for a new report creation context, or adjust InjuryAnalysisPanel to handle the new-report scenario. Ensure the component is visible without scrolling on desktop viewports."
+        },
+        {
+          "path": "frontend/src/components/ReportDetail.tsx",
+          "operation": "modify",
+          "description": "Verify that InjuryAnalysisPanel is still rendered in the report detail view for existing reports, passing the valid reportId. Ensure no duplicate injury uploader is present on this page."
         }
       ]
     }

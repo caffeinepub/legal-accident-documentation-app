@@ -1,64 +1,83 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-26T22:07:53.549Z",
+  "generatedAt": "2026-02-28T22:15:44.956Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 3,
-    "implemented": 3,
+    "total": 4,
+    "implemented": 4,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Expand the FaultMatrixPanel component to display complete Party A and Party B fault percentage breakdowns for all scenarios defined in faultMatrix.ts, including contributing factors and rationale text for each scenario entry.",
+        "summary": "Add an 'Other Vehicle' section to the AccidentReportForm that collects driver contact details (name, phone, email, address), insurance information (insurer name, policy number, claim reference), and vehicle details (make, model, year, colour, licence plate, MOT/registration info) — mirroring the structure and field style of the existing vehicle section already in the form.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/FaultMatrixPanel.tsx"
+          "frontend/src/components/AccidentReportForm.tsx",
+          "frontend/src/components/ReportDetail.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/FaultMatrixPanel.tsx"
+          "frontend/src/components/AccidentReportForm.tsx",
+          "frontend/src/components/ReportDetail.tsx"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Expand the scenario coverage in faultMatrix.ts to include all common road incident scenario types already referenced in scenarioReferences.ts (rear-end, red light, lane change, and any remaining unmapped types), ensuring each has fault percentages, contributing factors, rationale, and related violation types.",
+        "summary": "Add a dynamic multiple-witness section to the AccidentReportForm that allows users to add, edit, and remove individual witness entries. Each witness entry must include: full name, contact information (phone and/or email), and a free-text statement field.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/data/faultMatrix.ts"
+          "frontend/src/components/AccidentReportForm.tsx",
+          "frontend/src/components/ReportDetail.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/data/faultMatrix.ts"
+          "frontend/src/components/AccidentReportForm.tsx",
+          "frontend/src/components/ReportDetail.tsx"
         ]
       },
       {
         "id": "REQ-3",
-        "summary": "Update FaultReferenceDisplay on the FaultReferencePage to show the full fault percentage breakdown (Party A and Party B with labelled bars) alongside legal references when a scenario is selected, consistent with the expanded faultMatrix.ts data.",
+        "summary": "Add a video file uploader to the AccidentReportForm that accepts any relevant video footage from the user's device. The uploader should support common video formats (MP4, MOV, AVI, WebM), display the filename and a remove option after selection, and store the video as a blob on the backend report.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/FaultReferenceDisplay.tsx",
-          "frontend/src/pages/FaultReferencePage.tsx"
+          "frontend/src/components/AccidentReportForm.tsx",
+          "frontend/src/components/ReportDetail.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/FaultReferenceDisplay.tsx",
-          "frontend/src/pages/FaultReferencePage.tsx"
+          "frontend/src/components/AccidentReportForm.tsx",
+          "frontend/src/components/ReportDetail.tsx"
+        ]
+      },
+      {
+        "id": "REQ-4",
+        "summary": "Move the injury photo uploader (InjuryPhotoUpload / InjuryAnalysisPanel) to a prominent position on the main new-report page (NewReportPage / AccidentReportForm), ensuring it is visible without scrolling or clearly signposted near the top of the form.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/AccidentReportForm.tsx",
+          "frontend/src/components/ReportDetail.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/AccidentReportForm.tsx",
+          "frontend/src/components/ReportDetail.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
+    "backend/migration.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/FaultMatrixPanel.tsx",
-    "frontend/src/components/FaultReferenceDisplay.tsx",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
+    "frontend/src/components/AccidentReportForm.tsx",
     "frontend/src/components/ReportDetail.tsx",
-    "frontend/src/components/ScenarioSelector.tsx",
-    "frontend/src/data/faultMatrix.ts",
-    "frontend/src/data/scenarioReferences.ts",
-    "frontend/src/pages/FaultReferencePage.tsx",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
+    "frontend/src/hooks/useQueries.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

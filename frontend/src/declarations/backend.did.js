@@ -19,6 +19,7 @@ export const _CaffeineStorageRefillResult = IDL.Record({
   'success' : IDL.Opt(IDL.Bool),
   'topped_up_amount' : IDL.Opt(IDL.Nat),
 });
+export const ExternalBlob = IDL.Vec(IDL.Nat8);
 export const UserRole = IDL.Variant({
   'admin' : IDL.Null,
   'user' : IDL.Null,
@@ -53,10 +54,41 @@ export const Surroundings = IDL.Record({
   'weather' : IDL.Text,
 });
 export const VehicleInfo = IDL.Record({
+  'mot' : IDL.Text,
   'model' : IDL.Text,
+  'registration' : IDL.Text,
   'make' : IDL.Text,
+  'year' : IDL.Nat,
   'licencePlate' : IDL.Text,
   'colour' : IDL.Text,
+});
+export const OtherVehicle = IDL.Record({
+  'mot' : IDL.Text,
+  'model' : IDL.Text,
+  'ownerName' : IDL.Text,
+  'registration' : IDL.Text,
+  'make' : IDL.Text,
+  'year' : IDL.Nat,
+  'insurancePolicyNumber' : IDL.Text,
+  'claimReference' : IDL.Text,
+  'email' : IDL.Text,
+  'insurer' : IDL.Text,
+  'licencePlate' : IDL.Text,
+  'phone' : IDL.Text,
+  'colour' : IDL.Text,
+});
+export const Witness = IDL.Record({
+  'statement' : IDL.Text,
+  'name' : IDL.Text,
+  'email' : IDL.Text,
+  'address' : IDL.Text,
+  'phone' : IDL.Text,
+});
+export const AIAnalysisResult = IDL.Record({
+  'inferredCrashType' : IDL.Text,
+  'narrativeText' : IDL.Text,
+  'correlationSummary' : IDL.Text,
+  'severity' : IDL.Text,
 });
 export const Violation = IDL.Record({
   'detectedAt' : IDL.Int,
@@ -84,8 +116,10 @@ export const AccidentReport = IDL.Record({
   'damageDescription' : IDL.Text,
   'imageData' : IDL.Vec(IDL.Vec(IDL.Nat8)),
   'trafficSignalState' : IDL.Opt(TrafficSignalState),
+  'otherVehicle' : IDL.Opt(OtherVehicle),
   'owner' : IDL.Opt(IDL.Principal),
   'party1Liability' : IDL.Opt(IDL.Nat),
+  'aiAnalysisResult' : IDL.Opt(AIAnalysisResult),
   'stopLocation' : IDL.Text,
   'violations' : IDL.Vec(Violation),
   'applicableRules' : IDL.Vec(HighwayCodeRule),
@@ -95,6 +129,8 @@ export const AccidentReport = IDL.Record({
   'timestamp' : IDL.Int,
   'isAtFault' : IDL.Bool,
   'accidentMarker' : IDL.Text,
+  'witnesses' : IDL.Vec(Witness),
+  'videos' : IDL.Vec(ExternalBlob),
   'vehicleSpeed' : IDL.Nat,
   'photos' : IDL.Vec(PhotoMetadata),
   'witnessStatement' : IDL.Text,
@@ -105,6 +141,20 @@ export const UserProfile = IDL.Record({
   'email' : IDL.Text,
   'licenseNumber' : IDL.Text,
   'phoneNumber' : IDL.Text,
+});
+export const InjuryPhoto = IDL.Record({
+  'id' : IDL.Nat,
+  'blob' : ExternalBlob,
+  'bodyRegion' : IDL.Text,
+  'timestamp' : IDL.Int,
+  'reportId' : IDL.Nat,
+  'crashType' : IDL.Text,
+});
+export const InsuranceExport = IDL.Record({
+  'owner' : IDL.Principal,
+  'summary' : IDL.Text,
+  'injuryPhotos' : IDL.Vec(InjuryPhoto),
+  'reportId' : IDL.Nat,
 });
 
 export const idlService = IDL.Service({
@@ -135,6 +185,11 @@ export const idlService = IDL.Service({
     ),
   '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
+  'addInjuryPhotos' : IDL.Func(
+      [IDL.Nat, IDL.Vec(IDL.Tuple(ExternalBlob, IDL.Text, IDL.Text))],
+      [],
+      [],
+    ),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
   'createReport' : IDL.Func(
       [
@@ -152,9 +207,18 @@ export const idlService = IDL.Service({
         IDL.Text,
         Surroundings,
         VehicleInfo,
+        IDL.Opt(OtherVehicle),
+        IDL.Vec(Witness),
+        IDL.Vec(ExternalBlob),
       ],
       [IDL.Nat],
       [],
+    ),
+  'deleteInjuryPhotos' : IDL.Func([IDL.Nat], [], []),
+  'getAIAnalysisResult' : IDL.Func(
+      [IDL.Nat],
+      [IDL.Opt(AIAnalysisResult)],
+      ['query'],
     ),
   'getAllPhotos' : IDL.Func(
       [IDL.Nat],
@@ -174,6 +238,8 @@ export const idlService = IDL.Service({
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
   'getFirstPhoto' : IDL.Func([IDL.Nat], [IDL.Opt(PhotoMetadata)], ['query']),
+  'getInjuryPhotos' : IDL.Func([IDL.Nat], [IDL.Vec(InjuryPhoto)], ['query']),
+  'getInsuranceExport' : IDL.Func([IDL.Nat], [InsuranceExport], ['query']),
   'getReport' : IDL.Func([IDL.Nat], [IDL.Opt(AccidentReport)], ['query']),
   'getUserProfile' : IDL.Func(
       [IDL.Principal],
@@ -182,6 +248,8 @@ export const idlService = IDL.Service({
     ),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+  'storeAIAnalysisResult' : IDL.Func([IDL.Nat, AIAnalysisResult], [], []),
+  'storeInjuryPhotos' : IDL.Func([IDL.Nat, IDL.Text], [], []),
   'uploadPhoto' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [PhotoMetadata], []),
 });
 
@@ -199,6 +267,7 @@ export const idlFactory = ({ IDL }) => {
     'success' : IDL.Opt(IDL.Bool),
     'topped_up_amount' : IDL.Opt(IDL.Nat),
   });
+  const ExternalBlob = IDL.Vec(IDL.Nat8);
   const UserRole = IDL.Variant({
     'admin' : IDL.Null,
     'user' : IDL.Null,
@@ -233,10 +302,41 @@ export const idlFactory = ({ IDL }) => {
     'weather' : IDL.Text,
   });
   const VehicleInfo = IDL.Record({
+    'mot' : IDL.Text,
     'model' : IDL.Text,
+    'registration' : IDL.Text,
     'make' : IDL.Text,
+    'year' : IDL.Nat,
     'licencePlate' : IDL.Text,
     'colour' : IDL.Text,
+  });
+  const OtherVehicle = IDL.Record({
+    'mot' : IDL.Text,
+    'model' : IDL.Text,
+    'ownerName' : IDL.Text,
+    'registration' : IDL.Text,
+    'make' : IDL.Text,
+    'year' : IDL.Nat,
+    'insurancePolicyNumber' : IDL.Text,
+    'claimReference' : IDL.Text,
+    'email' : IDL.Text,
+    'insurer' : IDL.Text,
+    'licencePlate' : IDL.Text,
+    'phone' : IDL.Text,
+    'colour' : IDL.Text,
+  });
+  const Witness = IDL.Record({
+    'statement' : IDL.Text,
+    'name' : IDL.Text,
+    'email' : IDL.Text,
+    'address' : IDL.Text,
+    'phone' : IDL.Text,
+  });
+  const AIAnalysisResult = IDL.Record({
+    'inferredCrashType' : IDL.Text,
+    'narrativeText' : IDL.Text,
+    'correlationSummary' : IDL.Text,
+    'severity' : IDL.Text,
   });
   const Violation = IDL.Record({
     'detectedAt' : IDL.Int,
@@ -264,8 +364,10 @@ export const idlFactory = ({ IDL }) => {
     'damageDescription' : IDL.Text,
     'imageData' : IDL.Vec(IDL.Vec(IDL.Nat8)),
     'trafficSignalState' : IDL.Opt(TrafficSignalState),
+    'otherVehicle' : IDL.Opt(OtherVehicle),
     'owner' : IDL.Opt(IDL.Principal),
     'party1Liability' : IDL.Opt(IDL.Nat),
+    'aiAnalysisResult' : IDL.Opt(AIAnalysisResult),
     'stopLocation' : IDL.Text,
     'violations' : IDL.Vec(Violation),
     'applicableRules' : IDL.Vec(HighwayCodeRule),
@@ -275,6 +377,8 @@ export const idlFactory = ({ IDL }) => {
     'timestamp' : IDL.Int,
     'isAtFault' : IDL.Bool,
     'accidentMarker' : IDL.Text,
+    'witnesses' : IDL.Vec(Witness),
+    'videos' : IDL.Vec(ExternalBlob),
     'vehicleSpeed' : IDL.Nat,
     'photos' : IDL.Vec(PhotoMetadata),
     'witnessStatement' : IDL.Text,
@@ -285,6 +389,20 @@ export const idlFactory = ({ IDL }) => {
     'email' : IDL.Text,
     'licenseNumber' : IDL.Text,
     'phoneNumber' : IDL.Text,
+  });
+  const InjuryPhoto = IDL.Record({
+    'id' : IDL.Nat,
+    'blob' : ExternalBlob,
+    'bodyRegion' : IDL.Text,
+    'timestamp' : IDL.Int,
+    'reportId' : IDL.Nat,
+    'crashType' : IDL.Text,
+  });
+  const InsuranceExport = IDL.Record({
+    'owner' : IDL.Principal,
+    'summary' : IDL.Text,
+    'injuryPhotos' : IDL.Vec(InjuryPhoto),
+    'reportId' : IDL.Nat,
   });
   
   return IDL.Service({
@@ -315,6 +433,11 @@ export const idlFactory = ({ IDL }) => {
       ),
     '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
+    'addInjuryPhotos' : IDL.Func(
+        [IDL.Nat, IDL.Vec(IDL.Tuple(ExternalBlob, IDL.Text, IDL.Text))],
+        [],
+        [],
+      ),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
     'createReport' : IDL.Func(
         [
@@ -332,9 +455,18 @@ export const idlFactory = ({ IDL }) => {
           IDL.Text,
           Surroundings,
           VehicleInfo,
+          IDL.Opt(OtherVehicle),
+          IDL.Vec(Witness),
+          IDL.Vec(ExternalBlob),
         ],
         [IDL.Nat],
         [],
+      ),
+    'deleteInjuryPhotos' : IDL.Func([IDL.Nat], [], []),
+    'getAIAnalysisResult' : IDL.Func(
+        [IDL.Nat],
+        [IDL.Opt(AIAnalysisResult)],
+        ['query'],
       ),
     'getAllPhotos' : IDL.Func(
         [IDL.Nat],
@@ -354,6 +486,8 @@ export const idlFactory = ({ IDL }) => {
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
     'getFirstPhoto' : IDL.Func([IDL.Nat], [IDL.Opt(PhotoMetadata)], ['query']),
+    'getInjuryPhotos' : IDL.Func([IDL.Nat], [IDL.Vec(InjuryPhoto)], ['query']),
+    'getInsuranceExport' : IDL.Func([IDL.Nat], [InsuranceExport], ['query']),
     'getReport' : IDL.Func([IDL.Nat], [IDL.Opt(AccidentReport)], ['query']),
     'getUserProfile' : IDL.Func(
         [IDL.Principal],
@@ -362,6 +496,8 @@ export const idlFactory = ({ IDL }) => {
       ),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+    'storeAIAnalysisResult' : IDL.Func([IDL.Nat, AIAnalysisResult], [], []),
+    'storeInjuryPhotos' : IDL.Func([IDL.Nat, IDL.Text], [], []),
     'uploadPhoto' : IDL.Func(
         [IDL.Text, IDL.Text, IDL.Text],
         [PhotoMetadata],

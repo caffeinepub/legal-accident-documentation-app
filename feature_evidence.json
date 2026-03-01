@@ -2,10 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-expand-the-faultmatrixpanel-component-to-display-complete-party-a-and-party-b-fault-percentage-breakdowns-for-all-scenarios-defined-in-faultmatrix-ts-including-contributing-factors-and-rationale-text-for-each-scenario-entry",
-      "featureTitle": "Expand the FaultMatrixPanel component to display complete Party A and Party B fault percentage breakdowns for all scenarios defined in faultMatrix.ts, including contributing factors and rationale text for each scenario entry.",
+      "featureId": "feature-add-an-other-vehicle-section-to-the-accidentreportform-that-collects-driver-contact-details-name-phone-email-address-insurance-information-insurer-name-policy-number-claim-reference-and-vehicle-details-make-model-year-colour-licence-plate-mot-registration-info-mirroring-the-structure-and-field-style-of-the-existing-vehicle-section-already-in-the-form",
+      "featureTitle": "Add an 'Other Vehicle' section to the AccidentReportForm that collects driver contact details (name, phone, email, address), insurance information (insurer name, policy number, claim reference), and vehicle details (make, model, year, colour, licence plate, MOT/registration info) — mirroring the structure and field style of the existing vehicle section already in the form.",
       "files": [
-        "frontend/src/components/FaultMatrixPanel.tsx"
+        "frontend/src/components/AccidentReportForm.tsx",
+        "frontend/src/components/ReportDetail.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -22,10 +23,11 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-expand-the-scenario-coverage-in-faultmatrix-ts-to-include-all-common-road-incident-scenario-types-already-referenced-in-scenarioreferences-ts-rear-end-red-light-lane-change-and-any-remaining-unmapped-types-ensuring-each-has-fault-percentages-contributing-factors-rationale-and-related-violation-types",
-      "featureTitle": "Expand the scenario coverage in faultMatrix.ts to include all common road incident scenario types already referenced in scenarioReferences.ts (rear-end, red light, lane change, and any remaining unmapped types), ensuring each has fault percentages, contributing factors, rationale, and related violation types.",
+      "featureId": "feature-add-a-dynamic-multiple-witness-section-to-the-accidentreportform-that-allows-users-to-add-edit-and-remove-individual-witness-entries-each-witness-entry-must-include-full-name-contact-information-phone-and-or-email-and-a-free-text-statement-field",
+      "featureTitle": "Add a dynamic multiple-witness section to the AccidentReportForm that allows users to add, edit, and remove individual witness entries. Each witness entry must include: full name, contact information (phone and/or email), and a free-text statement field.",
       "files": [
-        "frontend/src/data/faultMatrix.ts"
+        "frontend/src/components/AccidentReportForm.tsx",
+        "frontend/src/components/ReportDetail.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -42,11 +44,11 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-update-faultreferencedisplay-on-the-faultreferencepage-to-show-the-full-fault-percentage-breakdown-party-a-and-party-b-with-labelled-bars-alongside-legal-references-when-a-scenario-is-selected-consistent-with-the-expanded-faultmatrix-ts-data",
-      "featureTitle": "Update FaultReferenceDisplay on the FaultReferencePage to show the full fault percentage breakdown (Party A and Party B with labelled bars) alongside legal references when a scenario is selected, consistent with the expanded faultMatrix.ts data.",
+      "featureId": "feature-add-a-video-file-uploader-to-the-accidentreportform-that-accepts-any-relevant-video-footage-from-the-user-s-device-the-uploader-should-support-common-video-formats-mp4-mov-avi-webm-display-the-filename-and-a-remove-option-after-selection-and-store-the-video-as-a-blob-on-the-backend-report",
+      "featureTitle": "Add a video file uploader to the AccidentReportForm that accepts any relevant video footage from the user's device. The uploader should support common video formats (MP4, MOV, AVI, WebM), display the filename and a remove option after selection, and store the video as a blob on the backend report.",
       "files": [
-        "frontend/src/components/FaultReferenceDisplay.tsx",
-        "frontend/src/pages/FaultReferencePage.tsx"
+        "frontend/src/components/AccidentReportForm.tsx",
+        "frontend/src/components/ReportDetail.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -59,6 +61,27 @@
       ],
       "testIds": [
         "REQ-3"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-move-the-injury-photo-uploader-injuryphotoupload-injuryanalysispanel-to-a-prominent-position-on-the-main-new-report-page-newreportpage-accidentreportform-ensuring-it-is-visible-without-scrolling-or-clearly-signposted-near-the-top-of-the-form",
+      "featureTitle": "Move the injury photo uploader (InjuryPhotoUpload / InjuryAnalysisPanel) to a prominent position on the main new-report page (NewReportPage / AccidentReportForm), ensuring it is visible without scrolling or clearly signposted near the top of the form.",
+      "files": [
+        "frontend/src/components/AccidentReportForm.tsx",
+        "frontend/src/components/ReportDetail.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "blob-storage@4.0.0",
+        "authorization@4.0.0"
+      ],
+      "testIds": [
+        "REQ-4"
       ],
       "confidence": "high"
     }

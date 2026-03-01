@@ -1,11 +1,13 @@
 # Specification
 
 ## Summary
-**Goal:** Expand the fault matrix data and UI to include complete Party A/B fault percentage breakdowns and full scenario coverage for all common road incident types.
+**Goal:** Extend the AccidentReportForm with an "Other Vehicle" section, multiple witness entries, a video uploader, and move the injury photo uploader to a prominent position near the top of the form.
 
 **Planned changes:**
-- Expand `faultMatrix.ts` to include entries for all seven scenario types from `scenarioReferences.ts` (rear-end, red light, lane change, and remaining unmapped types), each with Party A/B fault percentages, contributing factors, rationale, and related violation types.
-- Update `FaultMatrixPanel` to display labelled bars or numeric values for Party A and Party B fault percentages, contributing factors, and rationale for every scenario row, with the active scenario highlighted distinctly.
-- Update `FaultReferenceDisplay` on the Fault Reference page to show Party A and Party B fault percentage bars alongside existing legal references when a scenario is selected.
+- Add an "Other Vehicle" section to the AccidentReportForm with driver contact fields (name, phone, email, address), insurance fields (insurer name, policy number, claim reference), and vehicle detail fields (make, model, year, colour, licence plate) — matching the style of the existing vehicle section
+- Add a dynamic multiple-witness section with "Add Witness" / remove controls; each witness entry includes full name, phone, email, and a statement text area
+- Add a video file uploader supporting MP4, MOV, AVI, and WebM; shows filename and remove option after selection; persists video to the backend report
+- Move the injury photo uploader (InjuryPhotoUpload / InjuryAnalysisPanel) to a prominent position near the top of the AccidentReportForm, removing any duplicate
+- Persist all new data (other vehicle, witnesses, video) to the backend AccidentReport type and display them in the report detail view
 
-**User-visible outcome:** Users can view complete fault percentage breakdowns for all road incident scenarios in both the Fault Matrix panel and the Fault Reference page, with contributing factors, rationale, and legal references displayed together for each scenario.
+**User-visible outcome:** Users filling out a new accident report can now enter other-vehicle and driver details, add multiple witnesses with statements, upload relevant video footage, and easily upload injury photos from the top of the main report form — with all submitted data visible in the report detail view.

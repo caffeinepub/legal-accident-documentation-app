@@ -1,71 +1,100 @@
 {
   "kind": "build_request",
-  "title": "Expand fault matrix Party A/B breakdowns and scenario coverage",
+  "title": "Add other vehicle details, multiple witnesses, and video uploader to main report form",
+  "projectName": "Crash Claim Analyser",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Expand the FaultMatrixPanel component to display complete Party A and Party B fault percentage breakdowns for all scenarios defined in faultMatrix.ts, including contributing factors and rationale text for each scenario entry.",
-      "target": "frontend",
+      "text": "Add an 'Other Vehicle' section to the AccidentReportForm that collects driver contact details (name, phone, email, address), insurance information (insurer name, policy number, claim reference), and vehicle details (make, model, year, colour, licence plate, MOT/registration info) — mirroring the structure and field style of the existing vehicle section already in the form.",
+      "target": "both",
       "source": {
         "messageIds": [
           "msg-4"
         ],
         "quotes": [
-          "flesh out the full Party A/B percentage breakdowns and expand the scenario coverage in the fault matrix"
+          "For 1 just the driver contact details, insurance info, and vehicle details like the other section we did already"
         ]
       },
       "acceptanceCriteria": [
-        "Every scenario in faultMatrix.ts has its Party A and Party B fault percentages visually displayed as labelled bars or numeric values.",
-        "Contributing factors and rationale are shown for each scenario row in the panel.",
-        "The active scenario (based on provided violation type) is highlighted distinctly from inactive ones."
+        "The 'Other Vehicle' section appears in the AccidentReportForm with a clearly labelled heading",
+        "Driver contact fields include: full name, phone number, email, and address",
+        "Insurance fields include: insurer name, policy number, and claim reference",
+        "Vehicle detail fields include: make, model, year, colour, and licence plate — matching the layout and styling of the existing vehicle section",
+        "All new fields are persisted to the backend AccidentReport type and returned when a report is fetched",
+        "New report detail view renders the other vehicle section with all submitted data"
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Expand the scenario coverage in faultMatrix.ts to include all common road incident scenario types already referenced in scenarioReferences.ts (rear-end, red light, lane change, and any remaining unmapped types), ensuring each has fault percentages, contributing factors, rationale, and related violation types.",
-      "target": "frontend",
+      "text": "Add a dynamic multiple-witness section to the AccidentReportForm that allows users to add, edit, and remove individual witness entries. Each witness entry must include: full name, contact information (phone and/or email), and a free-text statement field.",
+      "target": "both",
       "source": {
         "messageIds": [
           "msg-4"
         ],
         "quotes": [
-          "expand the scenario coverage in the fault matrix"
+          "Yes multiple witnesses is good, including names, contact info, statements etc."
         ]
       },
       "acceptanceCriteria": [
-        "faultMatrix.ts contains entries for all seven scenario types present in scenarioReferences.ts.",
-        "Each new scenario entry includes Party A percentage, Party B percentage, contributing factors array, rationale string, and related violation types.",
-        "FaultMatrixPanel renders all newly added scenarios without errors."
+        "Users can add multiple witnesses using an 'Add Witness' button",
+        "Each witness entry has fields for: full name, phone number, email, and a statement text area",
+        "Users can remove individual witness entries",
+        "Witness data is stored as an array on the backend AccidentReport type",
+        "Submitted witness entries are displayed in the report detail view",
+        "At least one witness entry can be added and removed without error"
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Update FaultReferenceDisplay on the FaultReferencePage to show the full fault percentage breakdown (Party A and Party B with labelled bars) alongside legal references when a scenario is selected, consistent with the expanded faultMatrix.ts data.",
-      "target": "frontend",
+      "text": "Add a video file uploader to the AccidentReportForm that accepts any relevant video footage from the user's device. The uploader should support common video formats (MP4, MOV, AVI, WebM), display the filename and a remove option after selection, and store the video as a blob on the backend report.",
+      "target": "both",
       "source": {
         "messageIds": [
           "msg-4"
         ],
         "quotes": [
-          "full Party A/B percentage breakdowns"
+          "Any relevant video will work"
         ]
       },
       "acceptanceCriteria": [
-        "Selecting any scenario on the Fault Reference page displays both Party A and Party B fault percentages with visual bars.",
-        "The displayed percentages match the values in faultMatrix.ts for the selected scenario.",
-        "Legal references (Highway Code, RTA 1988, case law) continue to display alongside the fault breakdown."
+        "A video upload field is present in the AccidentReportForm with a clearly labelled heading",
+        "The uploader accepts MP4, MOV, AVI, and WebM file formats",
+        "After a file is selected, its filename is displayed with an option to remove it",
+        "Video data is persisted to the backend AccidentReport type",
+        "The report detail view indicates when a video has been uploaded and allows viewing or downloading it"
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Move the injury photo uploader (InjuryPhotoUpload / InjuryAnalysisPanel) to a prominent position on the main new-report page (NewReportPage / AccidentReportForm), ensuring it is visible without scrolling or clearly signposted near the top of the form.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-3"
+        ],
+        "quotes": [
+          "Can you put it on the main page?"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The injury photo uploader is rendered on the main report creation page",
+        "It appears near the top of the form or in a clearly prominent position",
+        "Uploading injury photos from this location triggers AI analysis as before",
+        "No duplicate injury uploader exists elsewhere on the page"
       ]
     }
   ],
   "constraints": [
-    "Do not modify any files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui.",
-    "All data changes must remain in static frontend data files (faultMatrix.ts, scenarioReferences.ts); no backend schema changes required."
+    "The other vehicle section must use the same field style and UI patterns as the existing vehicle section in AccidentReportForm",
+    "Do not modify files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui"
   ],
   "nonGoals": [
-    "Adding new backend canister methods or modifying backend/main.mo.",
-    "Changing the routing structure or adding new pages.",
-    "Modifying the ContributoryNegligencePanel or negligenceData.ts."
+    "Real-time video streaming or playback analysis",
+    "AI analysis of uploaded video footage",
+    "Linking to external video hosting services (YouTube, cloud links)",
+    "Changes to the fault reference, grid view, or legal reference pages"
   ],
   "imageRequirements": {
     "required": [],

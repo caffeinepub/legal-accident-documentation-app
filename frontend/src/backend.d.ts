@@ -7,6 +7,19 @@ export interface None {
     __kind__: "None";
 }
 export type Option<T> = Some<T> | None;
+export class ExternalBlob {
+    getBytes(): Promise<Uint8Array<ArrayBuffer>>;
+    getDirectURL(): string;
+    static fromURL(url: string): ExternalBlob;
+    static fromBytes(blob: Uint8Array<ArrayBuffer>): ExternalBlob;
+    withUploadProgress(onProgress: (percentage: number) => void): ExternalBlob;
+}
+export interface HighwayCodeRule {
+    title: string;
+    description: string;
+    ruleNumber: string;
+    applicableScenarios: Array<string>;
+}
 export interface FaultAnalysis {
     weatherConditions?: string;
     speedLimit?: bigint;
@@ -27,6 +40,17 @@ export interface PhotoMetadata {
     uploadTimestamp: bigint;
     filename: string;
 }
+export interface Violation {
+    detectedAt: bigint;
+    description: string;
+    violationType: string;
+}
+export interface InsuranceExport {
+    owner: Principal;
+    summary: string;
+    injuryPhotos: Array<InjuryPhoto>;
+    reportId: bigint;
+}
 export interface AccidentReport {
     party2Liability?: bigint;
     vehicleInfo: VehicleInfo;
@@ -34,8 +58,10 @@ export interface AccidentReport {
     damageDescription: string;
     imageData: Array<Uint8Array>;
     trafficSignalState?: TrafficSignalState;
+    otherVehicle?: OtherVehicle;
     owner?: Principal;
     party1Liability?: bigint;
+    aiAnalysisResult?: AIAnalysisResult;
     stopLocation: string;
     violations: Array<Violation>;
     applicableRules: Array<HighwayCodeRule>;
@@ -45,15 +71,12 @@ export interface AccidentReport {
     timestamp: bigint;
     isAtFault: boolean;
     accidentMarker: string;
+    witnesses: Array<Witness>;
+    videos: Array<ExternalBlob>;
     vehicleSpeed: bigint;
     photos: Array<PhotoMetadata>;
     witnessStatement: string;
     faultAnalysis?: FaultAnalysis;
-}
-export interface Violation {
-    detectedAt: bigint;
-    description: string;
-    violationType: string;
 }
 export type RoadType = {
     __kind__: "urban";
@@ -65,9 +88,18 @@ export type RoadType = {
     __kind__: "motorway";
     motorway: bigint;
 };
+export interface AIAnalysisResult {
+    inferredCrashType: string;
+    narrativeText: string;
+    correlationSummary: string;
+    severity: string;
+}
 export interface VehicleInfo {
+    mot: string;
     model: string;
+    registration: string;
     make: string;
+    year: bigint;
     licencePlate: string;
     colour: string;
 }
@@ -82,11 +114,35 @@ export interface TrafficSign {
     timestamp: bigint;
     position?: string;
 }
-export interface HighwayCodeRule {
-    title: string;
-    description: string;
-    ruleNumber: string;
-    applicableScenarios: Array<string>;
+export interface InjuryPhoto {
+    id: bigint;
+    blob: ExternalBlob;
+    bodyRegion: string;
+    timestamp: bigint;
+    reportId: bigint;
+    crashType: string;
+}
+export interface OtherVehicle {
+    mot: string;
+    model: string;
+    ownerName: string;
+    registration: string;
+    make: string;
+    year: bigint;
+    insurancePolicyNumber: string;
+    claimReference: string;
+    email: string;
+    insurer: string;
+    licencePlate: string;
+    phone: string;
+    colour: string;
+}
+export interface Witness {
+    statement: string;
+    name: string;
+    email: string;
+    address: string;
+    phone: string;
 }
 export interface UserProfile {
     name: string;
@@ -100,17 +156,24 @@ export enum UserRole {
     guest = "guest"
 }
 export interface backendInterface {
+    addInjuryPhotos(reportId: bigint, photoBlobs: Array<[ExternalBlob, string, string]>): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
-    createReport(vehicleSpeed: bigint, witnessStatement: string, damageDescription: string, stopLocation: string, accidentMarker: string, timestamp: bigint, roadType: RoadType, photos: Array<PhotoMetadata>, images: Array<Uint8Array>, trafficSignalState: TrafficSignalState | null, trafficSigns: Array<TrafficSign>, gpsLocation: string, surroundings: Surroundings, vehicleInfo: VehicleInfo): Promise<bigint>;
+    createReport(vehicleSpeed: bigint, witnessStatement: string, damageDescription: string, stopLocation: string, accidentMarker: string, timestamp: bigint, roadType: RoadType, photos: Array<PhotoMetadata>, images: Array<Uint8Array>, trafficSignalState: TrafficSignalState | null, trafficSigns: Array<TrafficSign>, gpsLocation: string, surroundings: Surroundings, vehicleInfo: VehicleInfo, otherVehicle: OtherVehicle | null, witnessDetails: Array<Witness>, videoFiles: Array<ExternalBlob>): Promise<bigint>;
+    deleteInjuryPhotos(reportId: bigint): Promise<void>;
+    getAIAnalysisResult(reportId: bigint): Promise<AIAnalysisResult | null>;
     getAllPhotos(reportId: bigint): Promise<Array<PhotoMetadata> | null>;
     getAllReports(): Promise<Array<[bigint, AccidentReport]>>;
     getAllThumbnails(): Promise<Array<[bigint, Array<PhotoMetadata>]>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
     getFirstPhoto(reportId: bigint): Promise<PhotoMetadata | null>;
+    getInjuryPhotos(reportId: bigint): Promise<Array<InjuryPhoto>>;
+    getInsuranceExport(reportId: bigint): Promise<InsuranceExport>;
     getReport(reportId: bigint): Promise<AccidentReport | null>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
+    storeAIAnalysisResult(reportId: bigint, analysisResult: AIAnalysisResult): Promise<void>;
+    storeInjuryPhotos(reportId: bigint, summary: string): Promise<void>;
     uploadPhoto(filename: string, contentType: string, description: string): Promise<PhotoMetadata>;
 }

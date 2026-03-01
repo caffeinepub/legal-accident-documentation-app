@@ -10,6 +10,12 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
+export interface AIAnalysisResult {
+  'inferredCrashType' : string,
+  'narrativeText' : string,
+  'correlationSummary' : string,
+  'severity' : string,
+}
 export interface AccidentReport {
   'party2Liability' : [] | [bigint],
   'vehicleInfo' : VehicleInfo,
@@ -17,8 +23,10 @@ export interface AccidentReport {
   'damageDescription' : string,
   'imageData' : Array<Uint8Array>,
   'trafficSignalState' : [] | [TrafficSignalState],
+  'otherVehicle' : [] | [OtherVehicle],
   'owner' : [] | [Principal],
   'party1Liability' : [] | [bigint],
+  'aiAnalysisResult' : [] | [AIAnalysisResult],
   'stopLocation' : string,
   'violations' : Array<Violation>,
   'applicableRules' : Array<HighwayCodeRule>,
@@ -28,11 +36,14 @@ export interface AccidentReport {
   'timestamp' : bigint,
   'isAtFault' : boolean,
   'accidentMarker' : string,
+  'witnesses' : Array<Witness>,
+  'videos' : Array<ExternalBlob>,
   'vehicleSpeed' : bigint,
   'photos' : Array<PhotoMetadata>,
   'witnessStatement' : string,
   'faultAnalysis' : [] | [FaultAnalysis],
 }
+export type ExternalBlob = Uint8Array;
 export interface FaultAnalysis {
   'weatherConditions' : [] | [string],
   'speedLimit' : [] | [bigint],
@@ -46,6 +57,35 @@ export interface HighwayCodeRule {
   'description' : string,
   'ruleNumber' : string,
   'applicableScenarios' : Array<string>,
+}
+export interface InjuryPhoto {
+  'id' : bigint,
+  'blob' : ExternalBlob,
+  'bodyRegion' : string,
+  'timestamp' : bigint,
+  'reportId' : bigint,
+  'crashType' : string,
+}
+export interface InsuranceExport {
+  'owner' : Principal,
+  'summary' : string,
+  'injuryPhotos' : Array<InjuryPhoto>,
+  'reportId' : bigint,
+}
+export interface OtherVehicle {
+  'mot' : string,
+  'model' : string,
+  'ownerName' : string,
+  'registration' : string,
+  'make' : string,
+  'year' : bigint,
+  'insurancePolicyNumber' : string,
+  'claimReference' : string,
+  'email' : string,
+  'insurer' : string,
+  'licencePlate' : string,
+  'phone' : string,
+  'colour' : string,
 }
 export interface PhotoMetadata {
   'contentType' : string,
@@ -83,8 +123,11 @@ export type UserRole = { 'admin' : null } |
   { 'user' : null } |
   { 'guest' : null };
 export interface VehicleInfo {
+  'mot' : string,
   'model' : string,
+  'registration' : string,
   'make' : string,
+  'year' : bigint,
   'licencePlate' : string,
   'colour' : string,
 }
@@ -92,6 +135,13 @@ export interface Violation {
   'detectedAt' : bigint,
   'description' : string,
   'violationType' : string,
+}
+export interface Witness {
+  'statement' : string,
+  'name' : string,
+  'email' : string,
+  'address' : string,
+  'phone' : string,
 }
 export interface _CaffeineStorageCreateCertificateResult {
   'method' : string,
@@ -121,6 +171,10 @@ export interface _SERVICE {
   >,
   '_caffeineStorageUpdateGatewayPrincipals' : ActorMethod<[], undefined>,
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
+  'addInjuryPhotos' : ActorMethod<
+    [bigint, Array<[ExternalBlob, string, string]>],
+    undefined
+  >,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
   'createReport' : ActorMethod<
     [
@@ -138,19 +192,28 @@ export interface _SERVICE {
       string,
       Surroundings,
       VehicleInfo,
+      [] | [OtherVehicle],
+      Array<Witness>,
+      Array<ExternalBlob>,
     ],
     bigint
   >,
+  'deleteInjuryPhotos' : ActorMethod<[bigint], undefined>,
+  'getAIAnalysisResult' : ActorMethod<[bigint], [] | [AIAnalysisResult]>,
   'getAllPhotos' : ActorMethod<[bigint], [] | [Array<PhotoMetadata>]>,
   'getAllReports' : ActorMethod<[], Array<[bigint, AccidentReport]>>,
   'getAllThumbnails' : ActorMethod<[], Array<[bigint, Array<PhotoMetadata>]>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getFirstPhoto' : ActorMethod<[bigint], [] | [PhotoMetadata]>,
+  'getInjuryPhotos' : ActorMethod<[bigint], Array<InjuryPhoto>>,
+  'getInsuranceExport' : ActorMethod<[bigint], InsuranceExport>,
   'getReport' : ActorMethod<[bigint], [] | [AccidentReport]>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
+  'storeAIAnalysisResult' : ActorMethod<[bigint, AIAnalysisResult], undefined>,
+  'storeInjuryPhotos' : ActorMethod<[bigint, string], undefined>,
   'uploadPhoto' : ActorMethod<[string, string, string], PhotoMetadata>,
 }
 export declare const idlService: IDL.ServiceClass;
