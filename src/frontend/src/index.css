@@ -3,81 +3,99 @@
 @tailwind utilities;
 
 @layer base {
-    :root {
-        --radius: 0.5rem;
-        --background: 0.98 0 0;
-        --foreground: 0.15 0 0;
-        --card: 1 0 0;
-        --card-foreground: 0.15 0 0;
-        --popover: 1 0 0;
-        --popover-foreground: 0.15 0 0;
-        --primary: 0.2 0 0;
-        --primary-foreground: 0.98 0 0;
-        --secondary: 0.95 0 0;
-        --secondary-foreground: 0.2 0 0;
-        --muted: 0.95 0 0;
-        --muted-foreground: 0.5 0 0;
-        --accent: 0.95 0 0;
-        --accent-foreground: 0.2 0 0;
-        --destructive: 0.6 0.22 25;
-        --destructive-foreground: 0.98 0 0;
-        --border: 0.9 0 0;
-        --input: 0.9 0 0;
-        --ring: 0.65 0 0;
-        --chart-1: 0.65 0.2 40;
-        --chart-2: 0.6 0.12 180;
-        --chart-3: 0.4 0.08 220;
-        --chart-4: 0.8 0.18 80;
-        --chart-5: 0.75 0.18 65;
-        --sidebar: 0.98 0 0;
-        --sidebar-foreground: 0.15 0 0;
-        --sidebar-primary: 0.2 0 0;
-        --sidebar-primary-foreground: 0.98 0 0;
-        --sidebar-accent: 0.95 0 0;
-        --sidebar-accent-foreground: 0.2 0 0;
-        --sidebar-border: 0.9 0 0;
-        --sidebar-ring: 0.65 0 0;
-    }
+  :root {
+    --background: oklch(0.98 0.005 240);
+    --foreground: oklch(0.15 0.02 240);
 
-    .dark {
-        --background: 0.12 0 0;
-        --foreground: 0.95 0 0;
-        --card: 0.18 0 0;
-        --card-foreground: 0.95 0 0;
-        --popover: 0.22 0 0;
-        --popover-foreground: 0.95 0 0;
-        --primary: 0.88 0 0;
-        --primary-foreground: 0.18 0 0;
-        --secondary: 0.25 0 0;
-        --secondary-foreground: 0.95 0 0;
-        --muted: 0.25 0 0;
-        --muted-foreground: 0.65 0 0;
-        --accent: 0.32 0 0;
-        --accent-foreground: 0.95 0 0;
-        --destructive: 0.65 0.2 22;
-        --destructive-foreground: 0.18 0 0;
-        --border: 0.3 0 0;
-        --input: 0.3 0 0;
-        --ring: 0.5 0 0;
-        --chart-1: 0.5 0.24 260;
-        --chart-2: 0.7 0.17 160;
-        --chart-3: 0.75 0.18 65;
-        --chart-4: 0.62 0.26 300;
-        --chart-5: 0.65 0.25 15;
-        --sidebar: 0.18 0 0;
-        --sidebar-foreground: 0.95 0 0;
-        --sidebar-primary: 0.5 0.24 260;
-        --sidebar-primary-foreground: 0.95 0 0;
-        --sidebar-accent: 0.25 0 0;
-        --sidebar-accent-foreground: 0.95 0 0;
-        --sidebar-border: 0.3 0 0;
-        --sidebar-ring: 0.4 0 0;
-    }
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.15 0.02 240);
 
-    * {
-        @apply border-border;
-    }
-    body {
-        @apply bg-background text-foreground;
-    }
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.15 0.02 240);
+
+    --primary: oklch(0.35 0.12 240);
+    --primary-foreground: oklch(0.98 0.005 240);
+
+    --secondary: oklch(0.92 0.01 240);
+    --secondary-foreground: oklch(0.25 0.05 240);
+
+    --muted: oklch(0.94 0.008 240);
+    --muted-foreground: oklch(0.52 0.02 240);
+
+    --accent: oklch(0.92 0.01 240);
+    --accent-foreground: oklch(0.25 0.05 240);
+
+    --destructive: oklch(0.55 0.22 25);
+    --destructive-foreground: oklch(0.98 0.005 240);
+
+    --border: oklch(0.88 0.01 240);
+    --input: oklch(0.88 0.01 240);
+    --ring: oklch(0.35 0.12 240);
+
+    --radius: 0.5rem;
+
+    /* Fault reference tool */
+    --fault-accent: oklch(0.72 0.15 75);
+    --fault-header-bg: oklch(0.22 0.04 240);
+    --fault-header-fg: oklch(0.95 0.01 240);
+
+    /* Dash cam section */
+    --dashcam-accent: oklch(0.58 0.18 160);
+    --dashcam-header-bg: oklch(0.2 0.05 160);
+    --dashcam-header-fg: oklch(0.95 0.02 160);
+    --dashcam-surface: oklch(0.96 0.015 160);
+    --dashcam-border: oklch(0.82 0.04 160);
+  }
+
+  .dark {
+    --background: oklch(0.12 0.015 240);
+    --foreground: oklch(0.93 0.01 240);
+
+    --card: oklch(0.16 0.015 240);
+    --card-foreground: oklch(0.93 0.01 240);
+
+    --popover: oklch(0.16 0.015 240);
+    --popover-foreground: oklch(0.93 0.01 240);
+
+    --primary: oklch(0.65 0.12 240);
+    --primary-foreground: oklch(0.12 0.015 240);
+
+    --secondary: oklch(0.22 0.02 240);
+    --secondary-foreground: oklch(0.85 0.01 240);
+
+    --muted: oklch(0.2 0.015 240);
+    --muted-foreground: oklch(0.6 0.02 240);
+
+    --accent: oklch(0.22 0.02 240);
+    --accent-foreground: oklch(0.85 0.01 240);
+
+    --destructive: oklch(0.6 0.22 25);
+    --destructive-foreground: oklch(0.98 0.005 240);
+
+    --border: oklch(0.25 0.02 240);
+    --input: oklch(0.25 0.02 240);
+    --ring: oklch(0.65 0.12 240);
+
+    /* Fault reference tool */
+    --fault-accent: oklch(0.78 0.15 75);
+    --fault-header-bg: oklch(0.18 0.04 240);
+    --fault-header-fg: oklch(0.95 0.01 240);
+
+    /* Dash cam section */
+    --dashcam-accent: oklch(0.62 0.18 160);
+    --dashcam-header-bg: oklch(0.18 0.06 160);
+    --dashcam-header-fg: oklch(0.92 0.03 160);
+    --dashcam-surface: oklch(0.18 0.025 160);
+    --dashcam-border: oklch(0.28 0.05 160);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
 }

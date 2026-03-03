@@ -1,43 +1,72 @@
-import { RouterProvider, createRouter, createRoute, createRootRoute } from '@tanstack/react-router';
-import Layout from './components/Layout';
-import NewReportPage from './pages/NewReportPage';
-import ReportsPage from './pages/ReportsPage';
-import ReportDetailPage from './pages/ReportDetailPage';
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  RouterProvider,
+  createRootRoute,
+  createRoute,
+  createRouter,
+} from "@tanstack/react-router";
+import React from "react";
+import Layout from "./components/Layout";
+import BirdsEyeGridPage from "./pages/BirdsEyeGridPage";
+import FaultReferencePage from "./pages/FaultReferencePage";
+import NewReportPage from "./pages/NewReportPage";
+import ReportDetailPage from "./pages/ReportDetailPage";
+import ReportsPage from "./pages/ReportsPage";
 
-const rootRoute = createRootRoute({
-  component: Layout,
-});
+const queryClient = new QueryClient();
+
+const rootRoute = createRootRoute({ component: Layout });
 
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/',
+  path: "/",
   component: NewReportPage,
 });
 
 const reportsRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/reports',
+  path: "/reports",
   component: ReportsPage,
 });
 
 const reportDetailRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/reports/$reportId',
+  path: "/reports/$reportId",
   component: ReportDetailPage,
 });
 
-const routeTree = rootRoute.addChildren([indexRoute, reportsRoute, reportDetailRoute]);
+const faultReferenceRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/fault-reference",
+  component: FaultReferencePage,
+});
+
+const gridRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/grid",
+  component: BirdsEyeGridPage,
+});
+
+const routeTree = rootRoute.addChildren([
+  indexRoute,
+  reportsRoute,
+  reportDetailRoute,
+  faultReferenceRoute,
+  gridRoute,
+]);
 
 const router = createRouter({ routeTree });
 
-declare module '@tanstack/react-router' {
+declare module "@tanstack/react-router" {
   interface Register {
     router: typeof router;
   }
 }
 
-function App() {
-  return <RouterProvider router={router} />;
+export default function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>
+  );
 }
-
-export default App;

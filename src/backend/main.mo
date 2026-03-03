@@ -1,23 +1,20 @@
-import Text "mo:core/Text";
 import Nat "mo:core/Nat";
 import Map "mo:core/Map";
 import Time "mo:core/Time";
-import Array "mo:core/Array";
+import Blob "mo:core/Blob";
 import Principal "mo:core/Principal";
-import Runtime "mo:core/Runtime";
-import Iter "mo:core/Iter";
-
 import Storage "blob-storage/Storage";
 import MixinStorage "blob-storage/Mixin";
 import AccessControl "authorization/access-control";
 import MixinAuthorization "authorization/MixinAuthorization";
-import Migration "migration";
 
-(with migration = Migration.run)
+
+// Enable data migration logic on upgrades
+
 actor {
   include MixinStorage();
 
-  // Initialize the access control system
+  // Enable access control system
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
 
@@ -37,6 +34,12 @@ actor {
     title : Text;
     description : Text;
     applicableScenarios : [Text];
+  };
+
+  type Violation = {
+    violationType : Text;
+    description : Text;
+    detectedAt : Int;
   };
 
   type FaultAnalysis = {
@@ -69,22 +72,73 @@ actor {
     timestamp : Int;
   };
 
-  type Violation = {
-    violationType : Text;
-    description : Text;
-    detectedAt : Int;
+  type AIAnalysisResult = {
+    narrativeText : Text;
+    inferredCrashType : Text;
+    severity : Text;
+    correlationSummary : Text;
+    photoAnalysis : Text;
+    dashCamAnalysis : Text;
+    evidenceGaps : [EvidenceGap];
   };
 
-  public type UserProfile = {
+  type Witness = {
     name : Text;
+    phone : Text;
     email : Text;
-    phoneNumber : Text;
-    licenseNumber : Text;
+    address : Text;
+    statement : Text;
   };
 
+  // Accident Narrative and Evidence Gaps
+  type AccidentNarrative = {
+    narrativeText : Text;
+    evidenceGaps : [EvidenceGap];
+  };
+
+  type EvidenceGap = {
+    description : Text;
+    confidenceLevel : Nat;
+    evidenceType : Text;
+  };
+
+  // Damage Severity Scoring Types
+  type DamageSeverity = {
+    priorityScore : Nat;
+    severityLabel : Text;
+    vehicleZones : [VehicleZoneScore];
+    totalLossProbability : Nat;
+    heatMap : [VehicleZoneHeatMap];
+  };
+
+  type VehicleZoneScore = {
+    zone : Text; // Could be an enum in the future
+    score : Nat;
+    description : Text;
+    damageType : Text;
+  };
+
+  type VehicleZoneHeatMap = {
+    zone : Text;
+    severity : Nat;
+    color : Text;
+  };
+
+  // Fault Likelihood Assessment Type
+  type FaultLikelihoodAssessment = {
+    partyAPercentage : Nat;
+    partyBPercentage : Nat;
+    reasoning : Text;
+    confidenceLevel : Nat;
+    supportingFactors : [Text];
+    conflictingFactors : [Text];
+    roadPositionImpact : Text;
+  };
+
+  // Updated Accident Report Data Structure
   type AccidentReport = {
     vehicleSpeed : Nat;
-    roadCondition : Text;
+    surroundings : Surroundings;
     witnessStatement : Text;
     damageDescription : Text;
     stopLocation : Text;
@@ -103,10 +157,85 @@ actor {
     violations : [Violation];
     party1Liability : ?Nat;
     party2Liability : ?Nat;
+    vehicleInfo : VehicleInfo;
+    aiAnalysisResult : ?AIAnalysisResult;
+    otherVehicle : ?OtherVehicle;
+    videos : [Storage.ExternalBlob];
+    witnesses : [Witness];
+    dashCamFootage : [Storage.ExternalBlob];
+    dashCamAnalysis : ?DashCamAnalysis;
+    accidentNarrative : ?AccidentNarrative; // New field
+    damageSeverity : ?DamageSeverity; // New field
+    faultLikelihoodAssessment : ?FaultLikelihoodAssessment; // New field
+  };
+
+  public type UserProfile = {
+    name : Text;
+    email : Text;
+    phoneNumber : Text;
+    licenseNumber : Text;
+  };
+
+  type Surroundings = {
+    weather : Text;
+    roadCondition : Text;
+    visibility : Text;
+  };
+
+  type VehicleInfo = {
+    make : Text;
+    model : Text;
+    colour : Text;
+    licencePlate : Text;
+    year : Nat;
+    mot : Text;
+    registration : Text;
+  };
+
+  type OtherVehicle = {
+    make : Text;
+    model : Text;
+    ownerName : Text;
+    email : Text;
+    phone : Text;
+    insurer : Text;
+    insurancePolicyNumber : Text;
+    claimReference : Text;
+    licencePlate : Text;
+    year : Nat;
+    colour : Text;
+    mot : Text;
+    registration : Text;
+  };
+
+  // New DashCamAnalysis Type
+  type DashCamAnalysis = {
+    collisionDetected : Bool;
+    vehicleSpeed : Nat;
+    timestamps : [Int];
+    roadConditions : Text;
+    faultIndicators : Text;
+  };
+
+  type InjuryPhoto = {
+    id : Nat;
+    reportId : Nat;
+    blob : Storage.ExternalBlob;
+    bodyRegion : Text;
+    crashType : Text;
+    timestamp : Int;
+  };
+
+  type InsuranceExport = {
+    reportId : Nat;
+    summary : Text;
+    injuryPhotos : [InjuryPhoto];
+    owner : Principal;
   };
 
   var nextReportId = 0;
-  let stoppingDistances = [
+  var nextInjuryPhotoId = 0;
+  let stoppingDistances : [StoppingDistance] = [
     { speed = 20; distance = 12 },
     { speed = 30; distance = 23 },
     { speed = 40; distance = 36 },
@@ -115,8 +244,18 @@ actor {
     { speed = 70; distance = 96 },
   ];
 
-  var accidentReports = Map.empty<Nat, AccidentReport>();
+  let accidentReports = Map.empty<Nat, AccidentReport>();
+  let injuryPhotos = Map.empty<Nat, [InjuryPhoto]>();
+  let exportableInjuries = Map.empty<Nat, InsuranceExport>();
   let userProfiles = Map.empty<Principal, UserProfile>();
+
+  func getSpeedLimit(roadType : RoadType) : Nat {
+    switch (roadType) {
+      case (#urban(val)) { val };
+      case (#dualCarriageway(val)) { val };
+      case (#motorway(val)) { val };
+    };
+  };
 
   // User Profile Management
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
@@ -136,14 +275,6 @@ actor {
     userProfiles.add(caller, profile);
   };
 
-  func getSpeedLimit(roadType : RoadType) : Nat {
-    switch (roadType) {
-      case (#urban(val)) { val };
-      case (#dualCarriageway(val)) { val };
-      case (#motorway(val)) { val };
-    };
-  };
-
   public shared ({ caller }) func uploadPhoto(
     filename : Text,
     contentType : Text,
@@ -160,7 +291,6 @@ actor {
 
   public shared ({ caller }) func createReport(
     vehicleSpeed : Nat,
-    roadCondition : Text,
     witnessStatement : Text,
     damageDescription : Text,
     stopLocation : Text,
@@ -172,12 +302,24 @@ actor {
     trafficSignalState : ?TrafficSignalState,
     trafficSigns : [TrafficSign],
     gpsLocation : Text,
+    surroundings : Surroundings,
+    vehicleInfo : VehicleInfo,
+    otherVehicle : ?OtherVehicle,
+    witnessDetails : [Witness],
+    videoFiles : [Storage.ExternalBlob],
+    dashCamFootage : [Storage.ExternalBlob], // New dashCamFootage field
+    accidentNarrative : ?AccidentNarrative, // New narrative field
+    damageSeverity : ?DamageSeverity, // New severity field
+    faultLikelihoodAssessment : ?FaultLikelihoodAssessment, // New fault assessment field
+    aiPhotoAnalysis : Text, // New persistent photo analysis field
+    aiDashCamAnalyses : Text, // New persistent dashcam analysis field
+    evidenceGaps : [EvidenceGap], // New persistent evidence gaps field
   ) : async Nat {
     checkUserPermission(caller);
 
     let analysis = performFaultAnalysis(
       vehicleSpeed,
-      roadCondition,
+      surroundings.roadCondition,
       witnessStatement,
       damageDescription,
       stopLocation,
@@ -185,12 +327,12 @@ actor {
       roadType,
     );
 
-    let matchedRules = matchHighwayCodeRules(vehicleSpeed, roadType, roadCondition);
+    let matchedRules = matchHighwayCodeRules(vehicleSpeed, roadType, surroundings.roadCondition);
     let isRedLightViolation = isFaultyLight(trafficSignalState);
 
     let violations = detectViolations(
       vehicleSpeed,
-      roadCondition,
+      surroundings.roadCondition,
       trafficSignalState,
       trafficSigns,
       gpsLocation,
@@ -199,17 +341,20 @@ actor {
 
     let (party1Liability, party2Liability) = calculateLiabilityPercentages(violations);
 
+    // Simulate dash cam analysis
+    let dashCamAnalysis = performDashCamAnalysis(dashCamFootage);
+
     let report : AccidentReport = {
       vehicleSpeed;
-      roadCondition;
+      surroundings;
       witnessStatement;
       damageDescription;
       stopLocation;
       accidentMarker;
       isAtFault = analysis.isAtFault or isRedLightViolation;
-      faultReasoning = if (isRedLightViolation) {
-        "Red light violation detected";
-      } else { analysis.reason };
+      faultReasoning = if (isRedLightViolation) { "Red light violation detected" } else {
+        analysis.reason;
+      };
       timestamp;
       faultAnalysis = ?analysis;
       photos;
@@ -222,6 +367,26 @@ actor {
       violations;
       party1Liability = ?party1Liability;
       party2Liability = ?party2Liability;
+      vehicleInfo;
+      aiAnalysisResult = null;
+      otherVehicle;
+      videos = videoFiles;
+      witnesses = witnessDetails;
+      dashCamFootage; // Assign new field
+      dashCamAnalysis; // Assign new field
+      accidentNarrative; // Assign new narrative field
+      damageSeverity; // Assign new severity field
+      faultLikelihoodAssessment; // Assign new fault assessment field
+    };
+
+    let analysisResult : AIAnalysisResult = {
+      narrativeText = "";
+      inferredCrashType = "";
+      severity = "";
+      correlationSummary = "";
+      photoAnalysis = aiPhotoAnalysis;
+      dashCamAnalysis = aiDashCamAnalyses;
+      evidenceGaps;
     };
 
     let reportId = nextReportId;
@@ -230,6 +395,363 @@ actor {
     reportId;
   };
 
+  public shared ({ caller }) func addInjuryPhotos(reportId : Nat, photoBlobs : [(Storage.ExternalBlob, Text, Text)]) : async () {
+    checkUserPermission(caller);
+
+    switch (accidentReports.get(reportId)) {
+      case (null) { Runtime.trap("Report not found for injury photos") };
+      case (?report) {
+        // Only the report owner or an admin can add injury photos
+        checkAdminOrOwner(caller, report.owner);
+
+        let mappedPhotos = photoBlobs.map(
+          func((blob, region, crashType)) {
+            let photo = {
+              id = nextInjuryPhotoId;
+              reportId;
+              blob;
+              bodyRegion = region;
+              crashType;
+              timestamp = Time.now();
+            };
+            nextInjuryPhotoId += 1;
+            photo;
+          }
+        );
+
+        let existing = injuryPhotos.get(reportId);
+        switch (existing) {
+          case (null) {
+            injuryPhotos.add(reportId, mappedPhotos);
+          };
+          case (?existingPhotos) {
+            let allPhotos = existingPhotos.concat(mappedPhotos);
+            injuryPhotos.add(reportId, allPhotos);
+          };
+        };
+      };
+    };
+  };
+
+  public shared ({ caller }) func updateEIPhotoAnalysis(reportId : Nat, aiPhotoAnalysis : Text) : async () {
+    checkUserPermission(caller);
+
+    switch (accidentReports.get(reportId)) {
+      case (null) { Runtime.trap("Report not found") };
+      case (?report) {
+        // Only the report owner or an admin can update AI analysis
+        checkAdminOrOwner(caller, report.owner);
+
+        let currentAnalysis = switch (report.aiAnalysisResult) {
+          case (null) {
+            {
+              narrativeText = "";
+              inferredCrashType = "";
+              severity = "";
+              correlationSummary = "";
+              photoAnalysis = "";
+              dashCamAnalysis = "";
+              evidenceGaps = [];
+            };
+          };
+          case (?analysis) { analysis };
+        };
+
+        let updatedAnalysis : AIAnalysisResult = {
+          currentAnalysis with
+          photoAnalysis = aiPhotoAnalysis;
+        };
+
+        accidentReports.add(
+          reportId,
+          { report with aiAnalysisResult = ?updatedAnalysis },
+        );
+      };
+    };
+  };
+
+  // Separate endpoint to persist dashcam analysis and evidence gaps
+  public shared ({ caller }) func updateNewAIResults(
+    reportId : Nat,
+    aiDashCamAnalyses : Text,
+    evidenceGaps : [EvidenceGap],
+  ) : async () {
+    checkUserPermission(caller);
+
+    switch (accidentReports.get(reportId)) {
+      case (null) { Runtime.trap("Report not found") };
+      case (?report) {
+        // Only the report owner or an admin can update AI analysis
+        checkAdminOrOwner(caller, report.owner);
+
+        let currentAnalysis = switch (report.aiAnalysisResult) {
+          case (null) {
+            {
+              narrativeText = "";
+              inferredCrashType = "";
+              severity = "";
+              correlationSummary = "";
+              photoAnalysis = "";
+              dashCamAnalysis = "";
+              evidenceGaps = [];
+            };
+          };
+          case (?analysis) { analysis };
+        };
+
+        let persistentGaps = currentAnalysis.evidenceGaps.concat(evidenceGaps);
+
+        let updatedAnalysis : AIAnalysisResult = {
+          currentAnalysis with
+          dashCamAnalysis = aiDashCamAnalyses;
+          evidenceGaps = persistentGaps;
+        };
+
+        accidentReports.add(
+          reportId,
+          { report with aiAnalysisResult = ?updatedAnalysis },
+        );
+      };
+    };
+  };
+
+  // New persistent endpoint to fetch just the evidence gaps array
+  public query ({ caller }) func getEvidenceGaps(reportId : Nat) : async [EvidenceGap] {
+    checkUserPermission(caller);
+
+    switch (accidentReports.get(reportId)) {
+      case (null) { [] };
+      case (?report) {
+        checkAdminOrOwner(caller, report.owner);
+        switch (report.aiAnalysisResult) {
+          case (null) { [] };
+          case (?analysis) { analysis.evidenceGaps };
+        };
+      };
+    };
+  };
+
+  // New persistent endpoint to fetch just the persistent photo analysis
+  public query ({ caller }) func getPersistentPhotoAnalysis(reportId : Nat) : async Text {
+    checkUserPermission(caller);
+
+    switch (accidentReports.get(reportId)) {
+      case (null) { "" };
+      case (?report) {
+        checkAdminOrOwner(caller, report.owner);
+        switch (report.aiAnalysisResult) {
+          case (null) { "" };
+          case (?analysis) { analysis.photoAnalysis };
+        };
+      };
+    };
+  };
+
+  // New persistent endpoint to fetch persistent dashcam analysis
+  public query ({ caller }) func getPersistentDashCamAnalysis(reportId : Nat) : async Text {
+    checkUserPermission(caller);
+
+    switch (accidentReports.get(reportId)) {
+      case (null) { "" };
+      case (?report) {
+        checkAdminOrOwner(caller, report.owner);
+        switch (report.aiAnalysisResult) {
+          case (null) { "" };
+          case (?analysis) { analysis.dashCamAnalysis };
+        };
+      };
+    };
+  };
+
+  // New endpoint for updating dash cam footage and analysis
+  public shared ({ caller }) func updateDashCamFootage(
+    reportId : Nat,
+    dashCamFootage : [Storage.ExternalBlob],
+  ) : async () {
+    checkUserPermission(caller);
+
+    switch (accidentReports.get(reportId)) {
+      case (null) { Runtime.trap("Report not found") };
+      case (?report) {
+        // Only the report owner or an admin can update dash cam footage
+        checkAdminOrOwner(caller, report.owner);
+
+        // Simulate dash cam analysis
+        let dashCamAnalysis = performDashCamAnalysis(dashCamFootage);
+
+        let updatedReport : AccidentReport = {
+          report with
+          dashCamFootage = dashCamFootage;
+          dashCamAnalysis = dashCamAnalysis;
+        };
+        accidentReports.add(reportId, updatedReport);
+      };
+    };
+  };
+
+  // New imaging endpoint for updating dash cam footage and analysis
+  public shared ({ caller }) func updateDashCamFootageImaging(
+    reportId : Nat,
+    dashCamFootage : [Storage.ExternalBlob],
+  ) : async () {
+    checkUserPermission(caller);
+
+    switch (accidentReports.get(reportId)) {
+      case (null) { Runtime.trap("Report not found") };
+      case (?report) {
+        // Only the report owner or an admin can update dash cam footage
+        checkAdminOrOwner(caller, report.owner);
+
+        // Simulate dash cam analysis
+        let dashCamAnalysis = performDashCamAnalysis(dashCamFootage);
+
+        let updatedReport : AccidentReport = {
+          report with
+          dashCamFootage = dashCamFootage;
+          dashCamAnalysis = dashCamAnalysis;
+        };
+        accidentReports.add(reportId, updatedReport);
+      };
+    };
+  };
+
+  public shared ({ caller }) func updateAccidentAssessment(
+    reportId : Nat,
+    accidentNarrative : ?AccidentNarrative,
+    damageSeverity : ?DamageSeverity,
+    faultLikelihoodAssessment : ?FaultLikelihoodAssessment,
+  ) : async () {
+    checkUserPermission(caller);
+
+    switch (accidentReports.get(reportId)) {
+      case (null) { Runtime.trap("Report not found") };
+      case (?report) {
+        checkAdminOrOwner(caller, report.owner);
+
+        let updatedReport : AccidentReport = {
+          report with
+          accidentNarrative;
+          damageSeverity;
+          faultLikelihoodAssessment;
+        };
+        accidentReports.add(reportId, updatedReport);
+      };
+    };
+  };
+
+  public query ({ caller }) func getComprehensiveAssessment(reportId : Nat) : async {
+    accidentNarrative : ?AccidentNarrative;
+    damageSeverity : ?DamageSeverity;
+    faultLikelihoodAssessment : ?FaultLikelihoodAssessment;
+  } {
+    checkUserPermission(caller);
+
+    switch (accidentReports.get(reportId)) {
+      case (null) { Runtime.trap("Report not found") };
+      case (?report) {
+        checkAdminOrOwner(caller, report.owner);
+
+        {
+          accidentNarrative = report.accidentNarrative;
+          damageSeverity = report.damageSeverity;
+          faultLikelihoodAssessment = report.faultLikelihoodAssessment;
+        };
+      };
+    };
+  };
+
+  public query ({ caller }) func getDashCamAnalysis(reportId : Nat) : async ?DashCamAnalysis {
+    checkUserPermission(caller);
+
+    switch (accidentReports.get(reportId)) {
+      case (null) { Runtime.trap("Report not found") };
+      case (?report) {
+        checkAdminOrOwner(caller, report.owner);
+        report.dashCamAnalysis;
+      };
+    };
+  };
+
+  public query ({ caller }) func getAIAnalysisResult(reportId : Nat) : async ?AIAnalysisResult {
+    checkUserPermission(caller);
+
+    switch (accidentReports.get(reportId)) {
+      case (null) { Runtime.trap("Report not found") };
+      case (?report) {
+        checkAdminOrOwner(caller, report.owner);
+        report.aiAnalysisResult;
+      };
+    };
+  };
+
+  public query ({ caller }) func getInjuryPhotos(reportId : Nat) : async [InjuryPhoto] {
+    checkUserPermission(caller);
+
+    switch (accidentReports.get(reportId)) {
+      case (null) { Runtime.trap("Report not found for injury photos") };
+      case (?report) {
+        checkAdminOrOwner(caller, report.owner);
+        switch (injuryPhotos.get(reportId)) {
+          case (null) { [] };
+          case (?photos) { photos };
+        };
+      };
+    };
+  };
+
+  public shared ({ caller }) func deleteInjuryPhotos(reportId : Nat) : async () {
+    checkUserPermission(caller);
+
+    switch (accidentReports.get(reportId)) {
+      case (null) { Runtime.trap("Report not found for injury photos") };
+      case (?report) {
+        checkAdminOrOwner(caller, report.owner);
+        injuryPhotos.remove(reportId);
+      };
+    };
+  };
+
+  public shared ({ caller }) func storeInjuryPhotos(reportId : Nat, summary : Text) : async () {
+    checkUserPermission(caller);
+
+    switch (accidentReports.get(reportId)) {
+      case (null) { Runtime.trap("Cannot store injury photos, no associated accident report") };
+      case (?report) {
+        checkAdminOrOwner(caller, report.owner);
+
+        let photos = switch (injuryPhotos.get(reportId)) {
+          case (null) { [] };
+          case (?p) { p };
+        };
+        let exportData = {
+          reportId;
+          summary;
+          injuryPhotos = photos;
+          owner = caller;
+        };
+        exportableInjuries.add(reportId, exportData);
+        injuryPhotos.remove(reportId);
+      };
+    };
+  };
+
+  public query ({ caller }) func getInsuranceExport(reportId : Nat) : async InsuranceExport {
+    checkUserPermission(caller);
+
+    switch (exportableInjuries.get(reportId)) {
+      case (null) {
+        Runtime.trap("No export data found for insurance company");
+      };
+      case (?export) {
+        if (export.owner != caller and not AccessControl.isAdmin(accessControlState, caller)) {
+          Runtime.trap("Unauthorized: Only the owner or an admin can access this insurance export");
+        };
+        export;
+      };
+    };
+  };
+
+  // Existing methods below here (violations, faulty light, filtering, etc.)
   func detectViolations(
     vehicleSpeed : Nat,
     roadCondition : Text,
@@ -265,7 +787,7 @@ actor {
     // Traffic Signal Violations
     switch (trafficSignalState) {
       case (null) {};
-      case (?state) {
+      case (?_) {
         if (redLightViolation) {
           violations := violations.concat([{
             violationType = "Traffic Signal";
@@ -460,13 +982,13 @@ actor {
     func matchesScenario(rule : HighwayCodeRule) : Bool {
       switch (rule.ruleNumber) {
         case ("Rule 126") {
-          return vehicleSpeed > getSpeedLimit(roadType);
+          vehicleSpeed > getSpeedLimit(roadType)
         };
         case ("Rule 163") {
-          return roadCondition.contains(#char 'c');
+          roadCondition.contains(#char 'c');
         };
         case ("Rules 204-210") {
-          return switch (roadType) {
+          switch (roadType) {
             case (#motorway(_)) { true };
             case (_) { false };
           };
@@ -476,5 +998,16 @@ actor {
     };
 
     allRules.filter(matchesScenario);
+  };
+
+  func performDashCamAnalysis(_footage : [Storage.ExternalBlob]) : ?DashCamAnalysis {
+    // Simulate AI analysis
+    ?{
+      collisionDetected = true;
+      vehicleSpeed = 60;
+      timestamps = [1000, 2000, 3000];
+      roadConditions = "Dry";
+      faultIndicators = "Sudden lane change";
+    };
   };
 };

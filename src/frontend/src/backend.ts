@@ -89,45 +89,13 @@ export class ExternalBlob {
         return this;
     }
 }
-export type RoadType = {
-    __kind__: "urban";
-    urban: bigint;
-} | {
-    __kind__: "dualCarriageway";
-    dualCarriageway: bigint;
-} | {
-    __kind__: "motorway";
-    motorway: bigint;
-};
-export interface FaultAnalysis {
-    weatherConditions?: string;
-    speedLimit?: bigint;
-    isAtFault: boolean;
-    violatedRules: Array<HighwayCodeRule>;
-    actualSpeed?: bigint;
-    reason: string;
+export interface EvidenceGap {
+    description: string;
+    confidenceLevel: bigint;
+    evidenceType: string;
 }
-export interface AccidentReport {
-    party2Liability?: bigint;
-    isRedLightViolation: boolean;
-    damageDescription: string;
-    roadCondition: string;
-    imageData: Array<Uint8Array>;
-    trafficSignalState?: TrafficSignalState;
-    owner?: Principal;
-    party1Liability?: bigint;
-    stopLocation: string;
-    violations: Array<Violation>;
-    applicableRules: Array<HighwayCodeRule>;
-    trafficSigns: Array<TrafficSign>;
-    faultReasoning: string;
-    timestamp: bigint;
-    isAtFault: boolean;
-    accidentMarker: string;
-    vehicleSpeed: bigint;
-    photos: Array<PhotoMetadata>;
-    witnessStatement: string;
-    faultAnalysis?: FaultAnalysis;
+export interface _CaffeineStorageRefillInformation {
+    proposed_top_up_amount?: bigint;
 }
 export interface TrafficSignalState {
     color: string;
@@ -135,20 +103,9 @@ export interface TrafficSignalState {
     witnessTestimony: string;
     position: string;
 }
-export interface _CaffeineStorageRefillInformation {
-    proposed_top_up_amount?: bigint;
-}
-export interface TrafficSign {
-    detectedInPhoto: boolean;
-    signType: string;
-    timestamp: bigint;
-    position?: string;
-}
-export interface PhotoMetadata {
-    contentType: string;
-    description: string;
-    uploadTimestamp: bigint;
-    filename: string;
+export interface AccidentNarrative {
+    narrativeText: string;
+    evidenceGaps: Array<EvidenceGap>;
 }
 export interface _CaffeineStorageCreateCertificateResult {
     method: string;
@@ -159,21 +116,176 @@ export interface Violation {
     description: string;
     violationType: string;
 }
+export type RoadType = {
+    __kind__: "urban";
+    urban: bigint;
+} | {
+    __kind__: "dualCarriageway";
+    dualCarriageway: bigint;
+} | {
+    __kind__: "motorway";
+    motorway: bigint;
+};
+export interface Surroundings {
+    roadCondition: string;
+    visibility: string;
+    weather: string;
+}
+export interface DamageSeverity {
+    totalLossProbability: bigint;
+    severityLabel: string;
+    heatMap: Array<VehicleZoneHeatMap>;
+    priorityScore: bigint;
+    vehicleZones: Array<VehicleZoneScore>;
+}
+export interface OtherVehicle {
+    mot: string;
+    model: string;
+    ownerName: string;
+    registration: string;
+    make: string;
+    year: bigint;
+    insurancePolicyNumber: string;
+    claimReference: string;
+    email: string;
+    insurer: string;
+    licencePlate: string;
+    phone: string;
+    colour: string;
+}
+export interface FaultLikelihoodAssessment {
+    partyBPercentage: bigint;
+    supportingFactors: Array<string>;
+    conflictingFactors: Array<string>;
+    reasoning: string;
+    confidenceLevel: bigint;
+    partyAPercentage: bigint;
+    roadPositionImpact: string;
+}
+export interface Witness {
+    statement: string;
+    name: string;
+    email: string;
+    address: string;
+    phone: string;
+}
+export interface VehicleZoneScore {
+    zone: string;
+    description: string;
+    score: bigint;
+    damageType: string;
+}
+export interface FaultAnalysis {
+    weatherConditions?: string;
+    speedLimit?: bigint;
+    isAtFault: boolean;
+    violatedRules: Array<HighwayCodeRule>;
+    actualSpeed?: bigint;
+    reason: string;
+}
+export interface DashCamAnalysis {
+    collisionDetected: boolean;
+    timestamps: Array<bigint>;
+    faultIndicators: string;
+    roadConditions: string;
+    vehicleSpeed: bigint;
+}
+export interface VehicleZoneHeatMap {
+    color: string;
+    zone: string;
+    severity: bigint;
+}
+export interface AccidentReport {
+    party2Liability?: bigint;
+    vehicleInfo: VehicleInfo;
+    faultLikelihoodAssessment?: FaultLikelihoodAssessment;
+    dashCamAnalysis?: DashCamAnalysis;
+    isRedLightViolation: boolean;
+    damageDescription: string;
+    imageData: Array<Uint8Array>;
+    trafficSignalState?: TrafficSignalState;
+    otherVehicle?: OtherVehicle;
+    owner?: Principal;
+    party1Liability?: bigint;
+    aiAnalysisResult?: AIAnalysisResult;
+    stopLocation: string;
+    violations: Array<Violation>;
+    applicableRules: Array<HighwayCodeRule>;
+    damageSeverity?: DamageSeverity;
+    trafficSigns: Array<TrafficSign>;
+    faultReasoning: string;
+    surroundings: Surroundings;
+    timestamp: bigint;
+    isAtFault: boolean;
+    accidentMarker: string;
+    witnesses: Array<Witness>;
+    videos: Array<ExternalBlob>;
+    vehicleSpeed: bigint;
+    dashCamFootage: Array<ExternalBlob>;
+    photos: Array<PhotoMetadata>;
+    witnessStatement: string;
+    faultAnalysis?: FaultAnalysis;
+    accidentNarrative?: AccidentNarrative;
+}
+export interface PhotoMetadata {
+    contentType: string;
+    description: string;
+    uploadTimestamp: bigint;
+    filename: string;
+}
+export interface InsuranceExport {
+    owner: Principal;
+    summary: string;
+    injuryPhotos: Array<InjuryPhoto>;
+    reportId: bigint;
+}
+export interface AIAnalysisResult {
+    dashCamAnalysis: string;
+    inferredCrashType: string;
+    narrativeText: string;
+    photoAnalysis: string;
+    correlationSummary: string;
+    severity: string;
+    evidenceGaps: Array<EvidenceGap>;
+}
+export interface VehicleInfo {
+    mot: string;
+    model: string;
+    registration: string;
+    make: string;
+    year: bigint;
+    licencePlate: string;
+    colour: string;
+}
+export interface TrafficSign {
+    detectedInPhoto: boolean;
+    signType: string;
+    timestamp: bigint;
+    position?: string;
+}
+export interface InjuryPhoto {
+    id: bigint;
+    blob: ExternalBlob;
+    bodyRegion: string;
+    timestamp: bigint;
+    reportId: bigint;
+    crashType: string;
+}
 export interface HighwayCodeRule {
     title: string;
     description: string;
     ruleNumber: string;
     applicableScenarios: Array<string>;
 }
+export interface _CaffeineStorageRefillResult {
+    success?: boolean;
+    topped_up_amount?: bigint;
+}
 export interface UserProfile {
     name: string;
     email: string;
     licenseNumber: string;
     phoneNumber: string;
-}
-export interface _CaffeineStorageRefillResult {
-    success?: boolean;
-    topped_up_amount?: bigint;
 }
 export enum UserRole {
     admin = "admin",
@@ -188,21 +300,41 @@ export interface backendInterface {
     _caffeineStorageRefillCashier(refillInformation: _CaffeineStorageRefillInformation | null): Promise<_CaffeineStorageRefillResult>;
     _caffeineStorageUpdateGatewayPrincipals(): Promise<void>;
     _initializeAccessControlWithSecret(userSecret: string): Promise<void>;
+    addInjuryPhotos(reportId: bigint, photoBlobs: Array<[ExternalBlob, string, string]>): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
-    createReport(vehicleSpeed: bigint, roadCondition: string, witnessStatement: string, damageDescription: string, stopLocation: string, accidentMarker: string, timestamp: bigint, roadType: RoadType, photos: Array<PhotoMetadata>, images: Array<Uint8Array>, trafficSignalState: TrafficSignalState | null, trafficSigns: Array<TrafficSign>, gpsLocation: string): Promise<bigint>;
+    createReport(vehicleSpeed: bigint, witnessStatement: string, damageDescription: string, stopLocation: string, accidentMarker: string, timestamp: bigint, roadType: RoadType, photos: Array<PhotoMetadata>, images: Array<Uint8Array>, trafficSignalState: TrafficSignalState | null, trafficSigns: Array<TrafficSign>, gpsLocation: string, surroundings: Surroundings, vehicleInfo: VehicleInfo, otherVehicle: OtherVehicle | null, witnessDetails: Array<Witness>, videoFiles: Array<ExternalBlob>, dashCamFootage: Array<ExternalBlob>, accidentNarrative: AccidentNarrative | null, damageSeverity: DamageSeverity | null, faultLikelihoodAssessment: FaultLikelihoodAssessment | null, aiPhotoAnalysis: string, aiDashCamAnalyses: string, evidenceGaps: Array<EvidenceGap>): Promise<bigint>;
+    deleteInjuryPhotos(reportId: bigint): Promise<void>;
+    getAIAnalysisResult(reportId: bigint): Promise<AIAnalysisResult | null>;
     getAllPhotos(reportId: bigint): Promise<Array<PhotoMetadata> | null>;
     getAllReports(): Promise<Array<[bigint, AccidentReport]>>;
     getAllThumbnails(): Promise<Array<[bigint, Array<PhotoMetadata>]>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
+    getComprehensiveAssessment(reportId: bigint): Promise<{
+        faultLikelihoodAssessment?: FaultLikelihoodAssessment;
+        damageSeverity?: DamageSeverity;
+        accidentNarrative?: AccidentNarrative;
+    }>;
+    getDashCamAnalysis(reportId: bigint): Promise<DashCamAnalysis | null>;
+    getEvidenceGaps(reportId: bigint): Promise<Array<EvidenceGap>>;
     getFirstPhoto(reportId: bigint): Promise<PhotoMetadata | null>;
+    getInjuryPhotos(reportId: bigint): Promise<Array<InjuryPhoto>>;
+    getInsuranceExport(reportId: bigint): Promise<InsuranceExport>;
+    getPersistentDashCamAnalysis(reportId: bigint): Promise<string>;
+    getPersistentPhotoAnalysis(reportId: bigint): Promise<string>;
     getReport(reportId: bigint): Promise<AccidentReport | null>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
+    storeInjuryPhotos(reportId: bigint, summary: string): Promise<void>;
+    updateAccidentAssessment(reportId: bigint, accidentNarrative: AccidentNarrative | null, damageSeverity: DamageSeverity | null, faultLikelihoodAssessment: FaultLikelihoodAssessment | null): Promise<void>;
+    updateDashCamFootage(reportId: bigint, dashCamFootage: Array<ExternalBlob>): Promise<void>;
+    updateDashCamFootageImaging(reportId: bigint, dashCamFootage: Array<ExternalBlob>): Promise<void>;
+    updateEIPhotoAnalysis(reportId: bigint, aiPhotoAnalysis: string): Promise<void>;
+    updateNewAIResults(reportId: bigint, aiDashCamAnalyses: string, evidenceGaps: Array<EvidenceGap>): Promise<void>;
     uploadPhoto(filename: string, contentType: string, description: string): Promise<PhotoMetadata>;
 }
-import type { AccidentReport as _AccidentReport, FaultAnalysis as _FaultAnalysis, HighwayCodeRule as _HighwayCodeRule, PhotoMetadata as _PhotoMetadata, RoadType as _RoadType, TrafficSign as _TrafficSign, TrafficSignalState as _TrafficSignalState, UserProfile as _UserProfile, UserRole as _UserRole, Violation as _Violation, _CaffeineStorageRefillInformation as __CaffeineStorageRefillInformation, _CaffeineStorageRefillResult as __CaffeineStorageRefillResult } from "./declarations/backend.did.d.ts";
+import type { AIAnalysisResult as _AIAnalysisResult, AccidentNarrative as _AccidentNarrative, AccidentReport as _AccidentReport, DamageSeverity as _DamageSeverity, DashCamAnalysis as _DashCamAnalysis, ExternalBlob as _ExternalBlob, FaultAnalysis as _FaultAnalysis, FaultLikelihoodAssessment as _FaultLikelihoodAssessment, HighwayCodeRule as _HighwayCodeRule, InjuryPhoto as _InjuryPhoto, InsuranceExport as _InsuranceExport, OtherVehicle as _OtherVehicle, PhotoMetadata as _PhotoMetadata, RoadType as _RoadType, Surroundings as _Surroundings, TrafficSign as _TrafficSign, TrafficSignalState as _TrafficSignalState, UserProfile as _UserProfile, UserRole as _UserRole, VehicleInfo as _VehicleInfo, Violation as _Violation, Witness as _Witness, _CaffeineStorageRefillInformation as __CaffeineStorageRefillInformation, _CaffeineStorageRefillResult as __CaffeineStorageRefillResult } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
     async _caffeineStorageBlobIsLive(arg0: Uint8Array): Promise<boolean> {
@@ -303,60 +435,102 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async assignCallerUserRole(arg0: Principal, arg1: UserRole): Promise<void> {
+    async addInjuryPhotos(arg0: bigint, arg1: Array<[ExternalBlob, string, string]>): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n8(this._uploadFile, this._downloadFile, arg1));
+                const result = await this.actor.addInjuryPhotos(arg0, await to_candid_vec_n8(this._uploadFile, this._downloadFile, arg1));
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n8(this._uploadFile, this._downloadFile, arg1));
+            const result = await this.actor.addInjuryPhotos(arg0, await to_candid_vec_n8(this._uploadFile, this._downloadFile, arg1));
             return result;
         }
     }
-    async createReport(arg0: bigint, arg1: string, arg2: string, arg3: string, arg4: string, arg5: string, arg6: bigint, arg7: RoadType, arg8: Array<PhotoMetadata>, arg9: Array<Uint8Array>, arg10: TrafficSignalState | null, arg11: Array<TrafficSign>, arg12: string): Promise<bigint> {
+    async assignCallerUserRole(arg0: Principal, arg1: UserRole): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.createReport(arg0, arg1, arg2, arg3, arg4, arg5, arg6, to_candid_RoadType_n10(this._uploadFile, this._downloadFile, arg7), arg8, arg9, to_candid_opt_n12(this._uploadFile, this._downloadFile, arg10), to_candid_vec_n13(this._uploadFile, this._downloadFile, arg11), arg12);
+                const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n11(this._uploadFile, this._downloadFile, arg1));
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.createReport(arg0, arg1, arg2, arg3, arg4, arg5, arg6, to_candid_RoadType_n10(this._uploadFile, this._downloadFile, arg7), arg8, arg9, to_candid_opt_n12(this._uploadFile, this._downloadFile, arg10), to_candid_vec_n13(this._uploadFile, this._downloadFile, arg11), arg12);
+            const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n11(this._uploadFile, this._downloadFile, arg1));
             return result;
+        }
+    }
+    async createReport(arg0: bigint, arg1: string, arg2: string, arg3: string, arg4: string, arg5: bigint, arg6: RoadType, arg7: Array<PhotoMetadata>, arg8: Array<Uint8Array>, arg9: TrafficSignalState | null, arg10: Array<TrafficSign>, arg11: string, arg12: Surroundings, arg13: VehicleInfo, arg14: OtherVehicle | null, arg15: Array<Witness>, arg16: Array<ExternalBlob>, arg17: Array<ExternalBlob>, arg18: AccidentNarrative | null, arg19: DamageSeverity | null, arg20: FaultLikelihoodAssessment | null, arg21: string, arg22: string, arg23: Array<EvidenceGap>): Promise<bigint> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.createReport(arg0, arg1, arg2, arg3, arg4, arg5, to_candid_RoadType_n13(this._uploadFile, this._downloadFile, arg6), arg7, arg8, to_candid_opt_n15(this._uploadFile, this._downloadFile, arg9), to_candid_vec_n16(this._uploadFile, this._downloadFile, arg10), arg11, arg12, arg13, to_candid_opt_n19(this._uploadFile, this._downloadFile, arg14), arg15, await to_candid_vec_n20(this._uploadFile, this._downloadFile, arg16), await to_candid_vec_n20(this._uploadFile, this._downloadFile, arg17), to_candid_opt_n21(this._uploadFile, this._downloadFile, arg18), to_candid_opt_n22(this._uploadFile, this._downloadFile, arg19), to_candid_opt_n23(this._uploadFile, this._downloadFile, arg20), arg21, arg22, arg23);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.createReport(arg0, arg1, arg2, arg3, arg4, arg5, to_candid_RoadType_n13(this._uploadFile, this._downloadFile, arg6), arg7, arg8, to_candid_opt_n15(this._uploadFile, this._downloadFile, arg9), to_candid_vec_n16(this._uploadFile, this._downloadFile, arg10), arg11, arg12, arg13, to_candid_opt_n19(this._uploadFile, this._downloadFile, arg14), arg15, await to_candid_vec_n20(this._uploadFile, this._downloadFile, arg16), await to_candid_vec_n20(this._uploadFile, this._downloadFile, arg17), to_candid_opt_n21(this._uploadFile, this._downloadFile, arg18), to_candid_opt_n22(this._uploadFile, this._downloadFile, arg19), to_candid_opt_n23(this._uploadFile, this._downloadFile, arg20), arg21, arg22, arg23);
+            return result;
+        }
+    }
+    async deleteInjuryPhotos(arg0: bigint): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.deleteInjuryPhotos(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.deleteInjuryPhotos(arg0);
+            return result;
+        }
+    }
+    async getAIAnalysisResult(arg0: bigint): Promise<AIAnalysisResult | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAIAnalysisResult(arg0);
+                return from_candid_opt_n24(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAIAnalysisResult(arg0);
+            return from_candid_opt_n24(this._uploadFile, this._downloadFile, result);
         }
     }
     async getAllPhotos(arg0: bigint): Promise<Array<PhotoMetadata> | null> {
         if (this.processError) {
             try {
                 const result = await this.actor.getAllPhotos(arg0);
-                return from_candid_opt_n16(this._uploadFile, this._downloadFile, result);
+                return from_candid_opt_n25(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getAllPhotos(arg0);
-            return from_candid_opt_n16(this._uploadFile, this._downloadFile, result);
+            return from_candid_opt_n25(this._uploadFile, this._downloadFile, result);
         }
     }
     async getAllReports(): Promise<Array<[bigint, AccidentReport]>> {
         if (this.processError) {
             try {
                 const result = await this.actor.getAllReports();
-                return from_candid_vec_n17(this._uploadFile, this._downloadFile, result);
+                return from_candid_vec_n26(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getAllReports();
-            return from_candid_vec_n17(this._uploadFile, this._downloadFile, result);
+            return from_candid_vec_n26(this._uploadFile, this._downloadFile, result);
         }
     }
     async getAllThumbnails(): Promise<Array<[bigint, Array<PhotoMetadata>]>> {
@@ -377,70 +551,172 @@ export class Backend implements backendInterface {
         if (this.processError) {
             try {
                 const result = await this.actor.getCallerUserProfile();
-                return from_candid_opt_n30(this._uploadFile, this._downloadFile, result);
+                return from_candid_opt_n46(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getCallerUserProfile();
-            return from_candid_opt_n30(this._uploadFile, this._downloadFile, result);
+            return from_candid_opt_n46(this._uploadFile, this._downloadFile, result);
         }
     }
     async getCallerUserRole(): Promise<UserRole> {
         if (this.processError) {
             try {
                 const result = await this.actor.getCallerUserRole();
-                return from_candid_UserRole_n31(this._uploadFile, this._downloadFile, result);
+                return from_candid_UserRole_n47(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getCallerUserRole();
-            return from_candid_UserRole_n31(this._uploadFile, this._downloadFile, result);
+            return from_candid_UserRole_n47(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getComprehensiveAssessment(arg0: bigint): Promise<{
+        faultLikelihoodAssessment?: FaultLikelihoodAssessment;
+        damageSeverity?: DamageSeverity;
+        accidentNarrative?: AccidentNarrative;
+    }> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getComprehensiveAssessment(arg0);
+                return from_candid_record_n49(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getComprehensiveAssessment(arg0);
+            return from_candid_record_n49(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getDashCamAnalysis(arg0: bigint): Promise<DashCamAnalysis | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getDashCamAnalysis(arg0);
+                return from_candid_opt_n31(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getDashCamAnalysis(arg0);
+            return from_candid_opt_n31(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getEvidenceGaps(arg0: bigint): Promise<Array<EvidenceGap>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getEvidenceGaps(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getEvidenceGaps(arg0);
+            return result;
         }
     }
     async getFirstPhoto(arg0: bigint): Promise<PhotoMetadata | null> {
         if (this.processError) {
             try {
                 const result = await this.actor.getFirstPhoto(arg0);
-                return from_candid_opt_n33(this._uploadFile, this._downloadFile, result);
+                return from_candid_opt_n50(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getFirstPhoto(arg0);
-            return from_candid_opt_n33(this._uploadFile, this._downloadFile, result);
+            return from_candid_opt_n50(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getInjuryPhotos(arg0: bigint): Promise<Array<InjuryPhoto>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getInjuryPhotos(arg0);
+                return from_candid_vec_n51(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getInjuryPhotos(arg0);
+            return from_candid_vec_n51(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getInsuranceExport(arg0: bigint): Promise<InsuranceExport> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getInsuranceExport(arg0);
+                return from_candid_InsuranceExport_n54(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getInsuranceExport(arg0);
+            return from_candid_InsuranceExport_n54(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getPersistentDashCamAnalysis(arg0: bigint): Promise<string> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getPersistentDashCamAnalysis(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getPersistentDashCamAnalysis(arg0);
+            return result;
+        }
+    }
+    async getPersistentPhotoAnalysis(arg0: bigint): Promise<string> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getPersistentPhotoAnalysis(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getPersistentPhotoAnalysis(arg0);
+            return result;
         }
     }
     async getReport(arg0: bigint): Promise<AccidentReport | null> {
         if (this.processError) {
             try {
                 const result = await this.actor.getReport(arg0);
-                return from_candid_opt_n34(this._uploadFile, this._downloadFile, result);
+                return from_candid_opt_n56(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getReport(arg0);
-            return from_candid_opt_n34(this._uploadFile, this._downloadFile, result);
+            return from_candid_opt_n56(this._uploadFile, this._downloadFile, result);
         }
     }
     async getUserProfile(arg0: Principal): Promise<UserProfile | null> {
         if (this.processError) {
             try {
                 const result = await this.actor.getUserProfile(arg0);
-                return from_candid_opt_n30(this._uploadFile, this._downloadFile, result);
+                return from_candid_opt_n46(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getUserProfile(arg0);
-            return from_candid_opt_n30(this._uploadFile, this._downloadFile, result);
+            return from_candid_opt_n46(this._uploadFile, this._downloadFile, result);
         }
     }
     async isCallerAdmin(): Promise<boolean> {
@@ -471,6 +747,90 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async storeInjuryPhotos(arg0: bigint, arg1: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.storeInjuryPhotos(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.storeInjuryPhotos(arg0, arg1);
+            return result;
+        }
+    }
+    async updateAccidentAssessment(arg0: bigint, arg1: AccidentNarrative | null, arg2: DamageSeverity | null, arg3: FaultLikelihoodAssessment | null): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updateAccidentAssessment(arg0, to_candid_opt_n21(this._uploadFile, this._downloadFile, arg1), to_candid_opt_n22(this._uploadFile, this._downloadFile, arg2), to_candid_opt_n23(this._uploadFile, this._downloadFile, arg3));
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updateAccidentAssessment(arg0, to_candid_opt_n21(this._uploadFile, this._downloadFile, arg1), to_candid_opt_n22(this._uploadFile, this._downloadFile, arg2), to_candid_opt_n23(this._uploadFile, this._downloadFile, arg3));
+            return result;
+        }
+    }
+    async updateDashCamFootage(arg0: bigint, arg1: Array<ExternalBlob>): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updateDashCamFootage(arg0, await to_candid_vec_n20(this._uploadFile, this._downloadFile, arg1));
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updateDashCamFootage(arg0, await to_candid_vec_n20(this._uploadFile, this._downloadFile, arg1));
+            return result;
+        }
+    }
+    async updateDashCamFootageImaging(arg0: bigint, arg1: Array<ExternalBlob>): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updateDashCamFootageImaging(arg0, await to_candid_vec_n20(this._uploadFile, this._downloadFile, arg1));
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updateDashCamFootageImaging(arg0, await to_candid_vec_n20(this._uploadFile, this._downloadFile, arg1));
+            return result;
+        }
+    }
+    async updateEIPhotoAnalysis(arg0: bigint, arg1: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updateEIPhotoAnalysis(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updateEIPhotoAnalysis(arg0, arg1);
+            return result;
+        }
+    }
+    async updateNewAIResults(arg0: bigint, arg1: string, arg2: Array<EvidenceGap>): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updateNewAIResults(arg0, arg1, arg2);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updateNewAIResults(arg0, arg1, arg2);
+            return result;
+        }
+    }
     async uploadPhoto(arg0: string, arg1: string, arg2: string): Promise<PhotoMetadata> {
         if (this.processError) {
             try {
@@ -486,44 +846,71 @@ export class Backend implements backendInterface {
         }
     }
 }
-function from_candid_AccidentReport_n19(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _AccidentReport): AccidentReport {
-    return from_candid_record_n20(_uploadFile, _downloadFile, value);
+async function from_candid_AccidentReport_n28(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _AccidentReport): Promise<AccidentReport> {
+    return await from_candid_record_n29(_uploadFile, _downloadFile, value);
 }
-function from_candid_FaultAnalysis_n28(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _FaultAnalysis): FaultAnalysis {
-    return from_candid_record_n29(_uploadFile, _downloadFile, value);
+async function from_candid_ExternalBlob_n41(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _ExternalBlob): Promise<ExternalBlob> {
+    return await _downloadFile(value);
 }
-function from_candid_TrafficSign_n24(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _TrafficSign): TrafficSign {
-    return from_candid_record_n25(_uploadFile, _downloadFile, value);
+function from_candid_FaultAnalysis_n43(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _FaultAnalysis): FaultAnalysis {
+    return from_candid_record_n44(_uploadFile, _downloadFile, value);
 }
-function from_candid_UserRole_n31(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _UserRole): UserRole {
-    return from_candid_variant_n32(_uploadFile, _downloadFile, value);
+async function from_candid_InjuryPhoto_n52(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _InjuryPhoto): Promise<InjuryPhoto> {
+    return await from_candid_record_n53(_uploadFile, _downloadFile, value);
+}
+async function from_candid_InsuranceExport_n54(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _InsuranceExport): Promise<InsuranceExport> {
+    return await from_candid_record_n55(_uploadFile, _downloadFile, value);
+}
+function from_candid_TrafficSign_n37(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _TrafficSign): TrafficSign {
+    return from_candid_record_n38(_uploadFile, _downloadFile, value);
+}
+function from_candid_UserRole_n47(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _UserRole): UserRole {
+    return from_candid_variant_n48(_uploadFile, _downloadFile, value);
 }
 function from_candid__CaffeineStorageRefillResult_n4(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: __CaffeineStorageRefillResult): _CaffeineStorageRefillResult {
     return from_candid_record_n5(_uploadFile, _downloadFile, value);
 }
-function from_candid_opt_n16(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [Array<_PhotoMetadata>]): Array<PhotoMetadata> | null {
+function from_candid_opt_n24(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_AIAnalysisResult]): AIAnalysisResult | null {
     return value.length === 0 ? null : value[0];
 }
-function from_candid_opt_n21(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_TrafficSignalState]): TrafficSignalState | null {
+function from_candid_opt_n25(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [Array<_PhotoMetadata>]): Array<PhotoMetadata> | null {
     return value.length === 0 ? null : value[0];
 }
-function from_candid_opt_n22(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [Principal]): Principal | null {
+function from_candid_opt_n30(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_FaultLikelihoodAssessment]): FaultLikelihoodAssessment | null {
     return value.length === 0 ? null : value[0];
 }
-function from_candid_opt_n26(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [string]): string | null {
+function from_candid_opt_n31(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_DashCamAnalysis]): DashCamAnalysis | null {
     return value.length === 0 ? null : value[0];
 }
-function from_candid_opt_n27(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_FaultAnalysis]): FaultAnalysis | null {
-    return value.length === 0 ? null : from_candid_FaultAnalysis_n28(_uploadFile, _downloadFile, value[0]);
-}
-function from_candid_opt_n30(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_UserProfile]): UserProfile | null {
+function from_candid_opt_n32(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_TrafficSignalState]): TrafficSignalState | null {
     return value.length === 0 ? null : value[0];
 }
-function from_candid_opt_n33(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_PhotoMetadata]): PhotoMetadata | null {
+function from_candid_opt_n33(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_OtherVehicle]): OtherVehicle | null {
     return value.length === 0 ? null : value[0];
 }
-function from_candid_opt_n34(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_AccidentReport]): AccidentReport | null {
-    return value.length === 0 ? null : from_candid_AccidentReport_n19(_uploadFile, _downloadFile, value[0]);
+function from_candid_opt_n34(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [Principal]): Principal | null {
+    return value.length === 0 ? null : value[0];
+}
+function from_candid_opt_n35(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_DamageSeverity]): DamageSeverity | null {
+    return value.length === 0 ? null : value[0];
+}
+function from_candid_opt_n39(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [string]): string | null {
+    return value.length === 0 ? null : value[0];
+}
+function from_candid_opt_n42(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_FaultAnalysis]): FaultAnalysis | null {
+    return value.length === 0 ? null : from_candid_FaultAnalysis_n43(_uploadFile, _downloadFile, value[0]);
+}
+function from_candid_opt_n45(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_AccidentNarrative]): AccidentNarrative | null {
+    return value.length === 0 ? null : value[0];
+}
+function from_candid_opt_n46(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_UserProfile]): UserProfile | null {
+    return value.length === 0 ? null : value[0];
+}
+function from_candid_opt_n50(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_PhotoMetadata]): PhotoMetadata | null {
+    return value.length === 0 ? null : value[0];
+}
+async function from_candid_opt_n56(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_AccidentReport]): Promise<AccidentReport | null> {
+    return value.length === 0 ? null : await from_candid_AccidentReport_n28(_uploadFile, _downloadFile, value[0]);
 }
 function from_candid_opt_n6(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [boolean]): boolean | null {
     return value.length === 0 ? null : value[0];
@@ -531,73 +918,103 @@ function from_candid_opt_n6(_uploadFile: (file: ExternalBlob) => Promise<Uint8Ar
 function from_candid_opt_n7(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [bigint]): bigint | null {
     return value.length === 0 ? null : value[0];
 }
-function from_candid_record_n20(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+async function from_candid_record_n29(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     party2Liability: [] | [bigint];
+    vehicleInfo: _VehicleInfo;
+    faultLikelihoodAssessment: [] | [_FaultLikelihoodAssessment];
+    dashCamAnalysis: [] | [_DashCamAnalysis];
     isRedLightViolation: boolean;
     damageDescription: string;
-    roadCondition: string;
     imageData: Array<Uint8Array>;
     trafficSignalState: [] | [_TrafficSignalState];
+    otherVehicle: [] | [_OtherVehicle];
     owner: [] | [Principal];
     party1Liability: [] | [bigint];
+    aiAnalysisResult: [] | [_AIAnalysisResult];
     stopLocation: string;
     violations: Array<_Violation>;
     applicableRules: Array<_HighwayCodeRule>;
+    damageSeverity: [] | [_DamageSeverity];
     trafficSigns: Array<_TrafficSign>;
     faultReasoning: string;
+    surroundings: _Surroundings;
     timestamp: bigint;
     isAtFault: boolean;
     accidentMarker: string;
+    witnesses: Array<_Witness>;
+    videos: Array<_ExternalBlob>;
     vehicleSpeed: bigint;
+    dashCamFootage: Array<_ExternalBlob>;
     photos: Array<_PhotoMetadata>;
     witnessStatement: string;
     faultAnalysis: [] | [_FaultAnalysis];
-}): {
+    accidentNarrative: [] | [_AccidentNarrative];
+}): Promise<{
     party2Liability?: bigint;
+    vehicleInfo: VehicleInfo;
+    faultLikelihoodAssessment?: FaultLikelihoodAssessment;
+    dashCamAnalysis?: DashCamAnalysis;
     isRedLightViolation: boolean;
     damageDescription: string;
-    roadCondition: string;
     imageData: Array<Uint8Array>;
     trafficSignalState?: TrafficSignalState;
+    otherVehicle?: OtherVehicle;
     owner?: Principal;
     party1Liability?: bigint;
+    aiAnalysisResult?: AIAnalysisResult;
     stopLocation: string;
     violations: Array<Violation>;
     applicableRules: Array<HighwayCodeRule>;
+    damageSeverity?: DamageSeverity;
     trafficSigns: Array<TrafficSign>;
     faultReasoning: string;
+    surroundings: Surroundings;
     timestamp: bigint;
     isAtFault: boolean;
     accidentMarker: string;
+    witnesses: Array<Witness>;
+    videos: Array<ExternalBlob>;
     vehicleSpeed: bigint;
+    dashCamFootage: Array<ExternalBlob>;
     photos: Array<PhotoMetadata>;
     witnessStatement: string;
     faultAnalysis?: FaultAnalysis;
-} {
+    accidentNarrative?: AccidentNarrative;
+}> {
     return {
         party2Liability: record_opt_to_undefined(from_candid_opt_n7(_uploadFile, _downloadFile, value.party2Liability)),
+        vehicleInfo: value.vehicleInfo,
+        faultLikelihoodAssessment: record_opt_to_undefined(from_candid_opt_n30(_uploadFile, _downloadFile, value.faultLikelihoodAssessment)),
+        dashCamAnalysis: record_opt_to_undefined(from_candid_opt_n31(_uploadFile, _downloadFile, value.dashCamAnalysis)),
         isRedLightViolation: value.isRedLightViolation,
         damageDescription: value.damageDescription,
-        roadCondition: value.roadCondition,
         imageData: value.imageData,
-        trafficSignalState: record_opt_to_undefined(from_candid_opt_n21(_uploadFile, _downloadFile, value.trafficSignalState)),
-        owner: record_opt_to_undefined(from_candid_opt_n22(_uploadFile, _downloadFile, value.owner)),
+        trafficSignalState: record_opt_to_undefined(from_candid_opt_n32(_uploadFile, _downloadFile, value.trafficSignalState)),
+        otherVehicle: record_opt_to_undefined(from_candid_opt_n33(_uploadFile, _downloadFile, value.otherVehicle)),
+        owner: record_opt_to_undefined(from_candid_opt_n34(_uploadFile, _downloadFile, value.owner)),
         party1Liability: record_opt_to_undefined(from_candid_opt_n7(_uploadFile, _downloadFile, value.party1Liability)),
+        aiAnalysisResult: record_opt_to_undefined(from_candid_opt_n24(_uploadFile, _downloadFile, value.aiAnalysisResult)),
         stopLocation: value.stopLocation,
         violations: value.violations,
         applicableRules: value.applicableRules,
-        trafficSigns: from_candid_vec_n23(_uploadFile, _downloadFile, value.trafficSigns),
+        damageSeverity: record_opt_to_undefined(from_candid_opt_n35(_uploadFile, _downloadFile, value.damageSeverity)),
+        trafficSigns: from_candid_vec_n36(_uploadFile, _downloadFile, value.trafficSigns),
         faultReasoning: value.faultReasoning,
+        surroundings: value.surroundings,
         timestamp: value.timestamp,
         isAtFault: value.isAtFault,
         accidentMarker: value.accidentMarker,
+        witnesses: value.witnesses,
+        videos: await from_candid_vec_n40(_uploadFile, _downloadFile, value.videos),
         vehicleSpeed: value.vehicleSpeed,
+        dashCamFootage: await from_candid_vec_n40(_uploadFile, _downloadFile, value.dashCamFootage),
         photos: value.photos,
         witnessStatement: value.witnessStatement,
-        faultAnalysis: record_opt_to_undefined(from_candid_opt_n27(_uploadFile, _downloadFile, value.faultAnalysis))
+        faultAnalysis: record_opt_to_undefined(from_candid_opt_n42(_uploadFile, _downloadFile, value.faultAnalysis)),
+        accidentNarrative: record_opt_to_undefined(from_candid_opt_n45(_uploadFile, _downloadFile, value.accidentNarrative))
     };
 }
-function from_candid_record_n25(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+function from_candid_record_n38(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     detectedInPhoto: boolean;
     signType: string;
     timestamp: bigint;
@@ -612,10 +1029,10 @@ function from_candid_record_n25(_uploadFile: (file: ExternalBlob) => Promise<Uin
         detectedInPhoto: value.detectedInPhoto,
         signType: value.signType,
         timestamp: value.timestamp,
-        position: record_opt_to_undefined(from_candid_opt_n26(_uploadFile, _downloadFile, value.position))
+        position: record_opt_to_undefined(from_candid_opt_n39(_uploadFile, _downloadFile, value.position))
     };
 }
-function from_candid_record_n29(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+function from_candid_record_n44(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     weatherConditions: [] | [string];
     speedLimit: [] | [bigint];
     isAtFault: boolean;
@@ -631,12 +1048,27 @@ function from_candid_record_n29(_uploadFile: (file: ExternalBlob) => Promise<Uin
     reason: string;
 } {
     return {
-        weatherConditions: record_opt_to_undefined(from_candid_opt_n26(_uploadFile, _downloadFile, value.weatherConditions)),
+        weatherConditions: record_opt_to_undefined(from_candid_opt_n39(_uploadFile, _downloadFile, value.weatherConditions)),
         speedLimit: record_opt_to_undefined(from_candid_opt_n7(_uploadFile, _downloadFile, value.speedLimit)),
         isAtFault: value.isAtFault,
         violatedRules: value.violatedRules,
         actualSpeed: record_opt_to_undefined(from_candid_opt_n7(_uploadFile, _downloadFile, value.actualSpeed)),
         reason: value.reason
+    };
+}
+function from_candid_record_n49(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    faultLikelihoodAssessment: [] | [_FaultLikelihoodAssessment];
+    damageSeverity: [] | [_DamageSeverity];
+    accidentNarrative: [] | [_AccidentNarrative];
+}): {
+    faultLikelihoodAssessment?: FaultLikelihoodAssessment;
+    damageSeverity?: DamageSeverity;
+    accidentNarrative?: AccidentNarrative;
+} {
+    return {
+        faultLikelihoodAssessment: record_opt_to_undefined(from_candid_opt_n30(_uploadFile, _downloadFile, value.faultLikelihoodAssessment)),
+        damageSeverity: record_opt_to_undefined(from_candid_opt_n35(_uploadFile, _downloadFile, value.damageSeverity)),
+        accidentNarrative: record_opt_to_undefined(from_candid_opt_n45(_uploadFile, _downloadFile, value.accidentNarrative))
     };
 }
 function from_candid_record_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
@@ -651,13 +1083,55 @@ function from_candid_record_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint
         topped_up_amount: record_opt_to_undefined(from_candid_opt_n7(_uploadFile, _downloadFile, value.topped_up_amount))
     };
 }
-function from_candid_tuple_n18(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [bigint, _AccidentReport]): [bigint, AccidentReport] {
+async function from_candid_record_n53(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    id: bigint;
+    blob: _ExternalBlob;
+    bodyRegion: string;
+    timestamp: bigint;
+    reportId: bigint;
+    crashType: string;
+}): Promise<{
+    id: bigint;
+    blob: ExternalBlob;
+    bodyRegion: string;
+    timestamp: bigint;
+    reportId: bigint;
+    crashType: string;
+}> {
+    return {
+        id: value.id,
+        blob: await from_candid_ExternalBlob_n41(_uploadFile, _downloadFile, value.blob),
+        bodyRegion: value.bodyRegion,
+        timestamp: value.timestamp,
+        reportId: value.reportId,
+        crashType: value.crashType
+    };
+}
+async function from_candid_record_n55(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    owner: Principal;
+    summary: string;
+    injuryPhotos: Array<_InjuryPhoto>;
+    reportId: bigint;
+}): Promise<{
+    owner: Principal;
+    summary: string;
+    injuryPhotos: Array<InjuryPhoto>;
+    reportId: bigint;
+}> {
+    return {
+        owner: value.owner,
+        summary: value.summary,
+        injuryPhotos: await from_candid_vec_n51(_uploadFile, _downloadFile, value.injuryPhotos),
+        reportId: value.reportId
+    };
+}
+async function from_candid_tuple_n27(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [bigint, _AccidentReport]): Promise<[bigint, AccidentReport]> {
     return [
         value[0],
-        from_candid_AccidentReport_n19(_uploadFile, _downloadFile, value[1])
+        await from_candid_AccidentReport_n28(_uploadFile, _downloadFile, value[1])
     ];
 }
-function from_candid_variant_n32(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+function from_candid_variant_n48(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     admin: null;
 } | {
     user: null;
@@ -666,20 +1140,29 @@ function from_candid_variant_n32(_uploadFile: (file: ExternalBlob) => Promise<Ui
 }): UserRole {
     return "admin" in value ? UserRole.admin : "user" in value ? UserRole.user : "guest" in value ? UserRole.guest : value;
 }
-function from_candid_vec_n17(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<[bigint, _AccidentReport]>): Array<[bigint, AccidentReport]> {
-    return value.map((x)=>from_candid_tuple_n18(_uploadFile, _downloadFile, x));
+async function from_candid_vec_n26(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<[bigint, _AccidentReport]>): Promise<Array<[bigint, AccidentReport]>> {
+    return await Promise.all(value.map(async (x)=>await from_candid_tuple_n27(_uploadFile, _downloadFile, x)));
 }
-function from_candid_vec_n23(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_TrafficSign>): Array<TrafficSign> {
-    return value.map((x)=>from_candid_TrafficSign_n24(_uploadFile, _downloadFile, x));
+function from_candid_vec_n36(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_TrafficSign>): Array<TrafficSign> {
+    return value.map((x)=>from_candid_TrafficSign_n37(_uploadFile, _downloadFile, x));
 }
-function to_candid_RoadType_n10(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: RoadType): _RoadType {
-    return to_candid_variant_n11(_uploadFile, _downloadFile, value);
+async function from_candid_vec_n40(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_ExternalBlob>): Promise<Array<ExternalBlob>> {
+    return await Promise.all(value.map(async (x)=>await from_candid_ExternalBlob_n41(_uploadFile, _downloadFile, x)));
 }
-function to_candid_TrafficSign_n14(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: TrafficSign): _TrafficSign {
-    return to_candid_record_n15(_uploadFile, _downloadFile, value);
+async function from_candid_vec_n51(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_InjuryPhoto>): Promise<Array<InjuryPhoto>> {
+    return await Promise.all(value.map(async (x)=>await from_candid_InjuryPhoto_n52(_uploadFile, _downloadFile, x)));
 }
-function to_candid_UserRole_n8(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): _UserRole {
-    return to_candid_variant_n9(_uploadFile, _downloadFile, value);
+async function to_candid_ExternalBlob_n10(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: ExternalBlob): Promise<_ExternalBlob> {
+    return await _uploadFile(value);
+}
+function to_candid_RoadType_n13(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: RoadType): _RoadType {
+    return to_candid_variant_n14(_uploadFile, _downloadFile, value);
+}
+function to_candid_TrafficSign_n17(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: TrafficSign): _TrafficSign {
+    return to_candid_record_n18(_uploadFile, _downloadFile, value);
+}
+function to_candid_UserRole_n11(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): _UserRole {
+    return to_candid_variant_n12(_uploadFile, _downloadFile, value);
 }
 function to_candid__CaffeineStorageRefillInformation_n2(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _CaffeineStorageRefillInformation): __CaffeineStorageRefillInformation {
     return to_candid_record_n3(_uploadFile, _downloadFile, value);
@@ -687,10 +1170,22 @@ function to_candid__CaffeineStorageRefillInformation_n2(_uploadFile: (file: Exte
 function to_candid_opt_n1(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _CaffeineStorageRefillInformation | null): [] | [__CaffeineStorageRefillInformation] {
     return value === null ? candid_none() : candid_some(to_candid__CaffeineStorageRefillInformation_n2(_uploadFile, _downloadFile, value));
 }
-function to_candid_opt_n12(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: TrafficSignalState | null): [] | [_TrafficSignalState] {
+function to_candid_opt_n15(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: TrafficSignalState | null): [] | [_TrafficSignalState] {
     return value === null ? candid_none() : candid_some(value);
 }
-function to_candid_record_n15(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+function to_candid_opt_n19(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: OtherVehicle | null): [] | [_OtherVehicle] {
+    return value === null ? candid_none() : candid_some(value);
+}
+function to_candid_opt_n21(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: AccidentNarrative | null): [] | [_AccidentNarrative] {
+    return value === null ? candid_none() : candid_some(value);
+}
+function to_candid_opt_n22(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: DamageSeverity | null): [] | [_DamageSeverity] {
+    return value === null ? candid_none() : candid_some(value);
+}
+function to_candid_opt_n23(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: FaultLikelihoodAssessment | null): [] | [_FaultLikelihoodAssessment] {
+    return value === null ? candid_none() : candid_some(value);
+}
+function to_candid_record_n18(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     detectedInPhoto: boolean;
     signType: string;
     timestamp: bigint;
@@ -717,7 +1212,29 @@ function to_candid_record_n3(_uploadFile: (file: ExternalBlob) => Promise<Uint8A
         proposed_top_up_amount: value.proposed_top_up_amount ? candid_some(value.proposed_top_up_amount) : candid_none()
     };
 }
-function to_candid_variant_n11(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+async function to_candid_tuple_n9(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [ExternalBlob, string, string]): Promise<[_ExternalBlob, string, string]> {
+    return [
+        await to_candid_ExternalBlob_n10(_uploadFile, _downloadFile, value[0]),
+        value[1],
+        value[2]
+    ];
+}
+function to_candid_variant_n12(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): {
+    admin: null;
+} | {
+    user: null;
+} | {
+    guest: null;
+} {
+    return value == UserRole.admin ? {
+        admin: null
+    } : value == UserRole.user ? {
+        user: null
+    } : value == UserRole.guest ? {
+        guest: null
+    } : value;
+}
+function to_candid_variant_n14(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     __kind__: "urban";
     urban: bigint;
 } | {
@@ -741,23 +1258,14 @@ function to_candid_variant_n11(_uploadFile: (file: ExternalBlob) => Promise<Uint
         motorway: value.motorway
     } : value;
 }
-function to_candid_variant_n9(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): {
-    admin: null;
-} | {
-    user: null;
-} | {
-    guest: null;
-} {
-    return value == UserRole.admin ? {
-        admin: null
-    } : value == UserRole.user ? {
-        user: null
-    } : value == UserRole.guest ? {
-        guest: null
-    } : value;
+function to_candid_vec_n16(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<TrafficSign>): Array<_TrafficSign> {
+    return value.map((x)=>to_candid_TrafficSign_n17(_uploadFile, _downloadFile, x));
 }
-function to_candid_vec_n13(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<TrafficSign>): Array<_TrafficSign> {
-    return value.map((x)=>to_candid_TrafficSign_n14(_uploadFile, _downloadFile, x));
+async function to_candid_vec_n20(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<ExternalBlob>): Promise<Array<_ExternalBlob>> {
+    return await Promise.all(value.map(async (x)=>await to_candid_ExternalBlob_n10(_uploadFile, _downloadFile, x)));
+}
+async function to_candid_vec_n8(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<[ExternalBlob, string, string]>): Promise<Array<[_ExternalBlob, string, string]>> {
+    return await Promise.all(value.map(async (x)=>await to_candid_tuple_n9(_uploadFile, _downloadFile, x)));
 }
 export interface CreateActorOptions {
     agent?: Agent;

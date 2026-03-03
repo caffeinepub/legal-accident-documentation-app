@@ -1,11 +1,14 @@
-import ReportList from '../components/ReportList';
+import React from "react";
+import ReportList from "../components/ReportList";
 
 export default function ReportsPage() {
   return (
-    <div className="max-w-6xl mx-auto">
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold text-foreground mb-2">Accident Reports</h2>
-        <p className="text-muted-foreground">View and manage all saved accident reports</p>
+    <div>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold">My Reports</h1>
+        <p className="text-muted-foreground text-sm mt-1">
+          View and manage all your saved accident reports.
+        </p>
       </div>
       <ReportList />
     </div>

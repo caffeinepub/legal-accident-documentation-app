@@ -1,312 +1,345 @@
-import { useNavigate } from '@tanstack/react-router';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, AlertTriangle, MapPin, AlertCircle, CheckCircle, Loader2, BookOpen, TrafficCone } from 'lucide-react';
-import { useGetReport } from '../hooks/useQueries';
-import SpeedDisplay from './SpeedDisplay';
-import PhotoGallery from './PhotoGallery';
-import TrafficSignsDisplay from './TrafficSignsDisplay';
-import DiscrepancyAlert from './DiscrepancyAlert';
-import ViolationsDisplay from './ViolationsDisplay';
-import LiabilityDisplay from './LiabilityDisplay';
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
+  AlertTriangle,
+  Camera,
+  ChevronDown,
+  ChevronUp,
+  FileText,
+  ScanSearch,
+  Video,
+} from "lucide-react";
+import type React from "react";
+import { useState } from "react";
+import type { AccidentReport } from "../backend";
+import AccidentNarrativePanel from "./AccidentNarrativePanel";
+import ClaimSummaryPanel from "./ClaimSummaryPanel";
+import ContributoryNegligencePanel from "./ContributoryNegligencePanel";
+import DamageSeverityPanel from "./DamageSeverityPanel";
+import DashCamAnalysisPanel from "./DashCamAnalysisPanel";
+import DashCamGallery from "./DashCamGallery";
+import DiscrepancyAlert from "./DiscrepancyAlert";
+import FaultLikelihoodPanel from "./FaultLikelihoodPanel";
+import FaultMatrixPanel from "./FaultMatrixPanel";
+import InjuryAnalysisPanel from "./InjuryAnalysisPanel";
+import LegalReferencePanel from "./LegalReferencePanel";
+import LiabilityDisplay from "./LiabilityDisplay";
+import NextStepsPanel from "./NextStepsPanel";
+import PhotoGallery from "./PhotoGallery";
+import TrafficSignsDisplay from "./TrafficSignsDisplay";
+import ViolationsDisplay from "./ViolationsDisplay";
 
 interface ReportDetailProps {
   reportId: bigint;
+  report: AccidentReport;
 }
 
-export default function ReportDetail({ reportId }: ReportDetailProps) {
-  const navigate = useNavigate();
-  const { data: report, isLoading, error } = useGetReport(reportId);
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    );
-  }
-
-  if (error || !report) {
-    return (
-      <Card className="border-destructive">
-        <CardContent className="pt-6">
-          <div className="flex items-center gap-2 text-destructive mb-4">
-            <AlertCircle className="h-5 w-5" />
-            <p>Failed to load report. Please try again.</p>
-          </div>
-          <Button onClick={() => navigate({ to: '/reports' })}>Back to Reports</Button>
-        </CardContent>
+function CollapsibleSection({
+  title,
+  icon: Icon,
+  children,
+  defaultOpen = false,
+}: {
+  title: string;
+  icon: React.ElementType;
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <Collapsible open={open} onOpenChange={setOpen}>
+      <Card>
+        <CardHeader className="py-3 px-4">
+          <CollapsibleTrigger asChild>
+            <button
+              type="button"
+              className="flex items-center justify-between w-full text-left"
+            >
+              <div className="flex items-center gap-2">
+                <Icon className="h-4 w-4 text-primary" />
+                <CardTitle className="text-sm font-semibold">{title}</CardTitle>
+              </div>
+              {open ? (
+                <ChevronUp className="h-4 w-4 text-muted-foreground" />
+              ) : (
+                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              )}
+            </button>
+          </CollapsibleTrigger>
+        </CardHeader>
+        <CollapsibleContent>
+          <CardContent className="pt-0 pb-4 px-4">{children}</CardContent>
+        </CollapsibleContent>
       </Card>
-    );
-  }
+    </Collapsible>
+  );
+}
 
-  const date = new Date(Number(report.timestamp));
-  const speedMph = Number(report.vehicleSpeed) / 100;
-  const speedMs = speedMph / 2.23694;
+export default function ReportDetail({ reportId, report }: ReportDetailProps) {
+  const primaryViolation =
+    report.violations && report.violations.length > 0
+      ? report.violations[0].violationType
+      : undefined;
+
+  const photoAnalysis = report.aiAnalysisResult?.photoAnalysis ?? "";
+  const dashCamAnalysisText = report.aiAnalysisResult?.dashCamAnalysis ?? "";
+  const evidenceGaps = report.aiAnalysisResult?.evidenceGaps ?? [];
+
+  const evidenceTypeLabel = (type: string) => {
+    const map: Record<string, string> = {
+      photo: "Photo",
+      video: "Video",
+      witness_statement: "Witness",
+      gps_data: "GPS",
+    };
+    return map[type] ?? type;
+  };
+
+  const hasFootage = report.dashCamFootage && report.dashCamFootage.length > 0;
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <Button variant="outline" onClick={() => navigate({ to: '/reports' })}>
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Reports
-        </Button>
-        <div className="flex items-center gap-2">
-          {report.isAtFault ? (
-            <Badge variant="destructive" className="flex items-center gap-1">
-              <AlertCircle className="h-3 w-3" />
-              At Fault
-            </Badge>
-          ) : (
-            <Badge className="flex items-center gap-1 bg-[oklch(0.7_0.15_145)] text-white">
-              <CheckCircle className="h-3 w-3" />
-              No Fault
-            </Badge>
-          )}
+    <div className="space-y-4 max-w-3xl mx-auto">
+      {/* Report header */}
+      <div className="flex items-start justify-between">
+        <div>
+          <h2 className="text-xl font-bold">Report #{reportId.toString()}</h2>
+          <p className="text-sm text-muted-foreground">
+            {new Date(Number(report.timestamp)).toLocaleString("en-GB")}
+          </p>
+        </div>
+        <div className="flex gap-2">
+          {report.isAtFault && <Badge variant="destructive">At Fault</Badge>}
           {report.isRedLightViolation && (
-            <Badge variant="destructive" className="flex items-center gap-1">
-              <AlertTriangle className="h-3 w-3" />
-              Red Light Violation
-            </Badge>
+            <Badge variant="destructive">Red Light</Badge>
+          )}
+          {!report.isAtFault && !report.isRedLightViolation && (
+            <Badge variant="secondary">No Fault</Badge>
           )}
         </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Report #{reportId.toString()}</CardTitle>
-          <CardDescription>
-            Created on {date.toLocaleDateString()} at {date.toLocaleTimeString()}
-          </CardDescription>
-        </CardHeader>
-      </Card>
-
-      <LiabilityDisplay 
-        party1Liability={report.party1Liability}
-        party2Liability={report.party2Liability}
+      {/* AI Core Panels */}
+      <AccidentNarrativePanel
+        reportId={reportId}
+        report={report}
+        narrative={report.accidentNarrative}
+      />
+      <DamageSeverityPanel
+        reportId={reportId}
+        report={report}
+        damageSeverity={report.damageSeverity}
+      />
+      <FaultLikelihoodPanel
+        reportId={reportId}
+        report={report}
+        faultLikelihoodAssessment={report.faultLikelihoodAssessment}
       />
 
-      {report.trafficSignalState && report.isRedLightViolation && (
-        <DiscrepancyAlert 
+      {/* Photo AI Analysis */}
+      {photoAnalysis && (
+        <CollapsibleSection title="Photo AI Analysis" icon={Camera} defaultOpen>
+          <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
+            {photoAnalysis}
+          </p>
+        </CollapsibleSection>
+      )}
+
+      {/* Dash Cam Cross-Analysis */}
+      {dashCamAnalysisText && (
+        <CollapsibleSection
+          title="Dash Cam Cross-Analysis"
+          icon={Video}
+          defaultOpen
+        >
+          <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
+            {dashCamAnalysisText}
+          </p>
+        </CollapsibleSection>
+      )}
+
+      {/* Evidence Gaps */}
+      {evidenceGaps.length > 0 && (
+        <CollapsibleSection
+          title="Evidence Gaps Detected"
+          icon={AlertTriangle}
+          defaultOpen
+        >
+          <ul className="space-y-2">
+            {evidenceGaps.map((gap) => (
+              <li
+                key={gap.description}
+                className="flex items-start gap-2 text-sm"
+              >
+                <Badge
+                  variant="outline"
+                  className="shrink-0 text-xs border-amber-500 text-amber-700 dark:text-amber-400"
+                >
+                  {evidenceTypeLabel(gap.evidenceType)}
+                </Badge>
+                <span className="text-muted-foreground">{gap.description}</span>
+                <span className="ml-auto text-xs text-muted-foreground shrink-0">
+                  {Number(gap.confidenceLevel)}% confidence
+                </span>
+              </li>
+            ))}
+          </ul>
+        </CollapsibleSection>
+      )}
+
+      {/* Claim Summary — uses reportId + aiAnalysisResult */}
+      <ClaimSummaryPanel
+        reportId={reportId}
+        aiAnalysisResult={report.aiAnalysisResult}
+      />
+
+      {/* Liability */}
+      {report.party1Liability != null && report.party2Liability != null && (
+        <LiabilityDisplay
+          party1Liability={report.party1Liability}
+          party2Liability={report.party2Liability}
+        />
+      )}
+
+      {/* Violations */}
+      {report.violations && report.violations.length > 0 && (
+        <ViolationsDisplay violations={report.violations} />
+      )}
+
+      {/* Traffic Signs — prop is `signs` */}
+      {report.trafficSigns && report.trafficSigns.length > 0 && (
+        <TrafficSignsDisplay signs={report.trafficSigns} />
+      )}
+
+      {/* Discrepancy Alert — requires isRedLightViolation */}
+      {report.trafficSignalState && (
+        <DiscrepancyAlert
           trafficSignalState={report.trafficSignalState}
           isRedLightViolation={report.isRedLightViolation}
         />
       )}
 
-      <ViolationsDisplay violations={report.violations} />
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Velocity Data</CardTitle>
-          <CardDescription>Calculated vehicle speed from observed measurements</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <SpeedDisplay velocityMs={speedMs} velocityMph={speedMph} />
-        </CardContent>
-      </Card>
-
-      {report.photos && report.photos.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Accident Scene Photos</CardTitle>
-            <CardDescription>
-              {report.photos.length} photo{report.photos.length !== 1 ? 's' : ''} uploaded
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <PhotoGallery photos={report.photos} imageData={report.imageData} />
-          </CardContent>
-        </Card>
+      {/* Photos — requires both photos and imageData */}
+      {((report.imageData && report.imageData.length > 0) ||
+        (report.photos && report.photos.length > 0)) && (
+        <CollapsibleSection
+          title="Accident Scene Photos"
+          icon={Camera}
+          defaultOpen
+        >
+          <PhotoGallery photos={report.photos} imageData={report.imageData} />
+        </CollapsibleSection>
       )}
 
-      {report.trafficSigns && report.trafficSigns.length > 0 && (
-        <Card className="border-[oklch(0.65_0.2_30)]">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrafficCone className="h-5 w-5" />
-              AI-Detected Traffic Signs & Road Markings
-            </CardTitle>
-            <CardDescription>
-              Traffic control devices and road markings identified in accident photos
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <TrafficSignsDisplay signs={report.trafficSigns} />
-          </CardContent>
-        </Card>
+      {/* Dash Cam Footage — prop is `footage` */}
+      {hasFootage && (
+        <CollapsibleSection title="Dash Cam Footage" icon={Video} defaultOpen>
+          <DashCamGallery footage={report.dashCamFootage} />
+        </CollapsibleSection>
       )}
 
-      {report.trafficSignalState && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Traffic Signal Information</CardTitle>
-            <CardDescription>Witness testimony about traffic light state</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-              <span className="text-sm font-semibold text-foreground">Traffic Light Color (Witness):</span>
-              <Badge className="bg-[oklch(0.7_0.15_145)] text-white capitalize">
-                {report.trafficSignalState.witnessTestimony}
-              </Badge>
-            </div>
-            <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-              <span className="text-sm font-semibold text-foreground">Position:</span>
-              <span className="text-sm text-muted-foreground">{report.trafficSignalState.position}</span>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {/* Dash Cam Analysis Panel — uses correct props */}
+      <DashCamAnalysisPanel
+        analysis={report.dashCamAnalysis ?? null}
+        hasFootage={!!hasFootage}
+        isAnalysing={false}
+        onAnalyse={() => {}}
+      />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Location Information</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-              <AlertTriangle className="h-4 w-4 text-destructive" />
-              Accident Location
-            </div>
-            <p className="text-muted-foreground pl-6">
-              {report.accidentMarker || 'Not specified'}
-            </p>
+      {/* Injury Analysis — only accepts reportId */}
+      <InjuryAnalysisPanel reportId={reportId} />
+
+      {/* Legal Reference */}
+      <LegalReferencePanel violations={report.violations} />
+
+      {/* Fault Matrix — only accepts violationType */}
+      <FaultMatrixPanel violationType={primaryViolation} />
+
+      {/* Contributory Negligence */}
+      <ContributoryNegligencePanel />
+
+      {/* Next Steps */}
+      <NextStepsPanel />
+
+      {/* Vehicle Info */}
+      <CollapsibleSection title="Vehicle Information" icon={FileText}>
+        <div className="grid grid-cols-2 gap-2 text-sm">
+          <div className="text-muted-foreground">Make / Model</div>
+          <div>
+            {report.vehicleInfo?.make} {report.vehicleInfo?.model}
           </div>
-
-          <Separator />
-
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-              <MapPin className="h-4 w-4 text-[oklch(0.7_0.15_145)]" />
-              Stop Location
-            </div>
-            <p className="text-muted-foreground pl-6">
-              {report.stopLocation || 'Not specified'}
-            </p>
+          <div className="text-muted-foreground">Colour</div>
+          <div>{report.vehicleInfo?.colour || "—"}</div>
+          <div className="text-muted-foreground">Licence Plate</div>
+          <div>{report.vehicleInfo?.licencePlate || "—"}</div>
+          <div className="text-muted-foreground">Year</div>
+          <div>
+            {report.vehicleInfo?.year ? Number(report.vehicleInfo.year) : "—"}
           </div>
-        </CardContent>
-      </Card>
+          <div className="text-muted-foreground">MOT</div>
+          <div>{report.vehicleInfo?.mot || "—"}</div>
+          <div className="text-muted-foreground">Registration</div>
+          <div>{report.vehicleInfo?.registration || "—"}</div>
+        </div>
+      </CollapsibleSection>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Road Conditions</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-foreground">{report.roadCondition || 'Not specified'}</p>
-          {report.faultAnalysis?.weatherConditions && (
-            <div className="mt-3 p-3 bg-muted/50 rounded-lg">
-              <p className="text-xs font-semibold text-foreground mb-1">AI-Detected Conditions:</p>
-              <p className="text-sm text-muted-foreground">{report.faultAnalysis.weatherConditions}</p>
+      {/* Other Vehicle */}
+      {report.otherVehicle && (
+        <CollapsibleSection title="Other Vehicle" icon={FileText}>
+          <div className="grid grid-cols-2 gap-2 text-sm">
+            <div className="text-muted-foreground">Make / Model</div>
+            <div>
+              {report.otherVehicle.make} {report.otherVehicle.model}
             </div>
-          )}
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Witness Statement</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-foreground whitespace-pre-wrap">
-            {report.witnessStatement || 'No witness statement provided'}
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Damage Description</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-foreground whitespace-pre-wrap">
-            {report.damageDescription || 'No damage description provided'}
-          </p>
-        </CardContent>
-      </Card>
-
-      {report.faultAnalysis && (
-        <Card className="border-[oklch(0.65_0.2_30)]">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BookOpen className="h-5 w-5" />
-              AI Fault Analysis
-            </CardTitle>
-            <CardDescription>Automated assessment based on UK Highway Code</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="p-4 bg-muted/50 rounded-lg">
-              <p className="text-sm font-semibold text-foreground mb-2">Analysis Result:</p>
-              <p className="text-foreground">{report.faultAnalysis.reason}</p>
-            </div>
-
-            {report.faultAnalysis.speedLimit && report.faultAnalysis.actualSpeed && (
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-3 bg-muted/50 rounded-lg">
-                  <p className="text-xs font-semibold text-muted-foreground mb-1">Speed Limit</p>
-                  <p className="text-lg font-bold text-foreground">
-                    {Number(report.faultAnalysis.speedLimit)} mph
-                  </p>
-                </div>
-                <div className="p-3 bg-muted/50 rounded-lg">
-                  <p className="text-xs font-semibold text-muted-foreground mb-1">Actual Speed</p>
-                  <p className="text-lg font-bold text-foreground">
-                    {(Number(report.faultAnalysis.actualSpeed) / 100).toFixed(1)} mph
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {report.faultAnalysis.violatedRules && report.faultAnalysis.violatedRules.length > 0 && (
-              <div className="space-y-3">
-                <p className="text-sm font-semibold text-foreground">Violated Highway Code Rules:</p>
-                {report.faultAnalysis.violatedRules.map((rule, index) => (
-                  <div key={index} className="p-4 border border-border rounded-lg space-y-2">
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline">{rule.ruleNumber}</Badge>
-                      <p className="font-semibold text-foreground">{rule.title}</p>
-                    </div>
-                    <p className="text-sm text-muted-foreground">{rule.description}</p>
-                    {rule.applicableScenarios && rule.applicableScenarios.length > 0 && (
-                      <div className="pt-2">
-                        <p className="text-xs font-semibold text-muted-foreground mb-1">Applicable to:</p>
-                        <ul className="list-disc list-inside text-xs text-muted-foreground space-y-1">
-                          {rule.applicableScenarios.map((scenario, idx) => (
-                            <li key={idx}>{scenario}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+            <div className="text-muted-foreground">Owner</div>
+            <div>{report.otherVehicle.ownerName || "—"}</div>
+            <div className="text-muted-foreground">Licence Plate</div>
+            <div>{report.otherVehicle.licencePlate || "—"}</div>
+            <div className="text-muted-foreground">Insurer</div>
+            <div>{report.otherVehicle.insurer || "—"}</div>
+            <div className="text-muted-foreground">Policy Number</div>
+            <div>{report.otherVehicle.insurancePolicyNumber || "—"}</div>
+          </div>
+        </CollapsibleSection>
       )}
 
-      {report.applicableRules && report.applicableRules.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BookOpen className="h-5 w-5" />
-              Applicable Highway Code Rules
-            </CardTitle>
-            <CardDescription>Relevant rules for this accident scenario</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {report.applicableRules.map((rule, index) => (
-              <div key={index} className="p-4 border border-border rounded-lg space-y-2">
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline">{rule.ruleNumber}</Badge>
-                  <p className="font-semibold text-foreground">{rule.title}</p>
-                </div>
-                <p className="text-sm text-muted-foreground">{rule.description}</p>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-      )}
+      {/* Accident Details */}
+      <CollapsibleSection title="Accident Details" icon={ScanSearch}>
+        <div className="grid grid-cols-2 gap-2 text-sm">
+          <div className="text-muted-foreground">Speed</div>
+          <div>{Number(report.vehicleSpeed)} mph</div>
+          <div className="text-muted-foreground">Weather</div>
+          <div>{report.surroundings?.weather || "—"}</div>
+          <div className="text-muted-foreground">Road Condition</div>
+          <div>{report.surroundings?.roadCondition || "—"}</div>
+          <div className="text-muted-foreground">Visibility</div>
+          <div>{report.surroundings?.visibility || "—"}</div>
+          <div className="text-muted-foreground">Stop Location</div>
+          <div>{report.stopLocation || "—"}</div>
+          <div className="text-muted-foreground">Accident Marker</div>
+          <div>{report.accidentMarker || "—"}</div>
+        </div>
+        {report.damageDescription && (
+          <div className="mt-3">
+            <p className="text-muted-foreground text-sm mb-1">
+              Damage Description
+            </p>
+            <p className="text-sm">{report.damageDescription}</p>
+          </div>
+        )}
+        {report.witnessStatement && (
+          <div className="mt-3">
+            <p className="text-muted-foreground text-sm mb-1">
+              Witness Statement
+            </p>
+            <p className="text-sm">{report.witnessStatement}</p>
+          </div>
+        )}
+      </CollapsibleSection>
     </div>
   );
 }

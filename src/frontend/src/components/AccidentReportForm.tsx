@@ -1,345 +1,559 @@
-import { useState } from 'react';
-import { useNavigate } from '@tanstack/react-router';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { AlertTriangle, MapPin, Loader2, TrafficCone, MapPinned } from 'lucide-react';
-import { useVelocityCalculation } from '../hooks/useVelocityCalculation';
-import SpeedDisplay from './SpeedDisplay';
-import PhotoUpload from './PhotoUpload';
-import { useCreateReport } from '../hooks/useQueries';
-import type { RoadType, ExternalBlob } from '../backend';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { useNavigate } from "@tanstack/react-router";
+import { Camera, FileVideo, Loader2 } from "lucide-react";
+import type React from "react";
+import { useState } from "react";
+import type { ExternalBlob } from "../backend";
+import { useCreateReport } from "../hooks/useQueries";
+import DashCamUpload, { type DashCamClip } from "./DashCamUpload";
+import PhotoUpload from "./PhotoUpload";
+
+interface EvidenceGap {
+  description: string;
+  confidenceLevel: bigint;
+  evidenceType: string;
+}
 
 export default function AccidentReportForm() {
   const navigate = useNavigate();
-  const [distance, setDistance] = useState('');
-  const [time, setTime] = useState('');
-  const [roadCondition, setRoadCondition] = useState('');
-  const [witnessStatement, setWitnessStatement] = useState('');
-  const [damageDescription, setDamageDescription] = useState('');
-  const [stopLocation, setStopLocation] = useState('');
-  const [accidentMarker, setAccidentMarker] = useState('');
-  const [roadType, setRoadType] = useState<'urban' | 'dualCarriageway' | 'motorway'>('urban');
-  const [trafficLightColor, setTrafficLightColor] = useState<string>('not-applicable');
-  const [photos, setPhotos] = useState<Array<{ blob: ExternalBlob; filename: string; contentType: string }>>([]);
-  
-  // GPS location fields (optional)
-  const [latitude, setLatitude] = useState('');
-  const [longitude, setLongitude] = useState('');
-  
-  // Timestamp field (defaults to current time)
-  const [timestamp, setTimestamp] = useState(() => {
-    const now = new Date();
-    return now.toISOString().slice(0, 16); // Format: YYYY-MM-DDTHH:mm
-  });
+  const createReport = useCreateReport();
 
-  const { velocityMs, velocityMph } = useVelocityCalculation(
-    parseFloat(distance) || 0,
-    parseFloat(time) || 0
-  );
+  // Media & AI Analysis state
+  const [photos, setPhotos] = useState<
+    Array<{ blob: ExternalBlob; filename: string; contentType: string }>
+  >([]);
+  const [dashCamClips, setDashCamClips] = useState<DashCamClip[]>([]);
+  const [photoAnalysisDescription, setPhotoAnalysisDescription] = useState("");
+  const [dashCamCrossAnalysisDescription, setDashCamCrossAnalysisDescription] =
+    useState("");
+  const [photoEvidenceGaps, setPhotoEvidenceGaps] = useState<EvidenceGap[]>([]);
 
-  const createReportMutation = useCreateReport();
+  // Vehicle info
+  const [make, setMake] = useState("");
+  const [model, setModel] = useState("");
+  const [colour, setColour] = useState("");
+  const [licencePlate, setLicencePlate] = useState("");
+  const [year, setYear] = useState("");
+  const [mot, setMot] = useState("");
+  const [registration, setRegistration] = useState("");
+
+  // Accident details
+  const [vehicleSpeed, setVehicleSpeed] = useState("");
+  const [damageDescription, setDamageDescription] = useState("");
+  const [witnessStatement, setWitnessStatement] = useState("");
+  const [stopLocation, setStopLocation] = useState("");
+  const [accidentMarker, setAccidentMarker] = useState("");
+  const [weather, setWeather] = useState("");
+  const [roadCondition, setRoadCondition] = useState("");
+  const [visibility, setVisibility] = useState("");
+  const [roadType, setRoadType] = useState<
+    "urban" | "dualCarriageway" | "motorway"
+  >("urban");
+  const [speedLimit, setSpeedLimit] = useState("30");
+
+  // Other vehicle
+  const [otherMake, setOtherMake] = useState("");
+  const [otherModel, setOtherModel] = useState("");
+  const [otherOwnerName, setOtherOwnerName] = useState("");
+  const [otherEmail, setOtherEmail] = useState("");
+  const [otherPhone, setOtherPhone] = useState("");
+  const [otherInsurer, setOtherInsurer] = useState("");
+  const [otherPolicyNumber, setOtherPolicyNumber] = useState("");
+  const [otherClaimRef, setOtherClaimRef] = useState("");
+  const [otherLicencePlate, setOtherLicencePlate] = useState("");
+  const [otherYear, setOtherYear] = useState("");
+  const [otherColour, setOtherColour] = useState("");
+  const [otherMot, setOtherMot] = useState("");
+  const [otherRegistration, setOtherRegistration] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!distance || !time || parseFloat(distance) <= 0 || parseFloat(time) <= 0) {
-      alert('Please enter valid positive numbers for distance and time');
-      return;
-    }
+    const roadTypeValue =
+      roadType === "urban"
+        ? { __kind__: "urban" as const, urban: BigInt(speedLimit || 30) }
+        : roadType === "dualCarriageway"
+          ? {
+              __kind__: "dualCarriageway" as const,
+              dualCarriageway: BigInt(speedLimit || 70),
+            }
+          : {
+              __kind__: "motorway" as const,
+              motorway: BigInt(speedLimit || 70),
+            };
 
-    // Convert velocity to bigint (m/s * 100 to preserve 2 decimal places)
-    const vehicleSpeedBigInt = BigInt(Math.round(velocityMph * 100));
+    const photoMetadata = photos.map((p) => ({
+      filename: p.filename,
+      contentType: p.contentType,
+      uploadTimestamp: BigInt(Date.now()),
+      description: "",
+    }));
 
-    // Create RoadType object based on selection
-    let roadTypeObj: RoadType;
-    if (roadType === 'urban') {
-      roadTypeObj = { __kind__: 'urban', urban: BigInt(30) };
-    } else if (roadType === 'dualCarriageway') {
-      roadTypeObj = { __kind__: 'dualCarriageway', dualCarriageway: BigInt(70) };
-    } else {
-      roadTypeObj = { __kind__: 'motorway', motorway: BigInt(70) };
-    }
+    const hasOtherVehicle =
+      otherMake || otherModel || otherOwnerName || otherLicencePlate;
 
-    // Format GPS location as 'lat,lng' if both provided, otherwise empty string
-    let gpsLocation = '';
-    if (latitude && longitude) {
-      const lat = parseFloat(latitude);
-      const lng = parseFloat(longitude);
-      if (!isNaN(lat) && !isNaN(lng)) {
-        gpsLocation = `${lat},${lng}`;
-      }
-    }
+    const otherVehicle = hasOtherVehicle
+      ? {
+          make: otherMake,
+          model: otherModel,
+          ownerName: otherOwnerName,
+          email: otherEmail,
+          phone: otherPhone,
+          insurer: otherInsurer,
+          insurancePolicyNumber: otherPolicyNumber,
+          claimReference: otherClaimRef,
+          licencePlate: otherLicencePlate,
+          year: BigInt(otherYear || 0),
+          colour: otherColour,
+          mot: otherMot,
+          registration: otherRegistration,
+        }
+      : null;
 
-    // Convert timestamp to bigint (milliseconds)
-    const timestampBigInt = BigInt(new Date(timestamp).getTime());
-
-    try {
-      await createReportMutation.mutateAsync({
-        vehicleSpeed: vehicleSpeedBigInt,
+    await createReport.mutateAsync({
+      vehicleSpeed: BigInt(vehicleSpeed || 0),
+      witnessStatement,
+      damageDescription,
+      stopLocation,
+      accidentMarker,
+      timestamp: BigInt(Date.now()),
+      roadType: roadTypeValue,
+      photos: photoMetadata,
+      images: [],
+      trafficSignalState: null,
+      trafficSigns: [],
+      gpsLocation: "",
+      surroundings: {
+        weather,
         roadCondition,
-        witnessStatement,
-        damageDescription,
-        stopLocation,
-        accidentMarker,
-        timestamp: timestampBigInt,
-        roadType: roadTypeObj,
-        photos,
-        trafficLightColor,
-        gpsLocation,
-      });
+        visibility,
+      },
+      vehicleInfo: {
+        make,
+        model,
+        colour,
+        licencePlate,
+        year: BigInt(year || 0),
+        mot,
+        registration,
+      },
+      otherVehicle,
+      witnessDetails: [],
+      videoFiles: [],
+      dashCamFootage: dashCamClips.map((c) => c.blob),
+      accidentNarrative: null,
+      damageSeverity: null,
+      faultLikelihoodAssessment: null,
+      aiPhotoAnalysis: photoAnalysisDescription,
+      aiDashCamAnalyses: dashCamCrossAnalysisDescription,
+      evidenceGaps: photoEvidenceGaps,
+    });
 
-      navigate({ to: '/reports' });
-    } catch (error) {
-      console.error('Failed to create report:', error);
-      alert('Failed to create report. Please try again.');
-    }
+    navigate({ to: "/reports" });
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Velocity Measurements</CardTitle>
-            <CardDescription>Enter observed distance and time to calculate vehicle speed</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="distance">Distance (meters)</Label>
-                <Input
-                  id="distance"
-                  type="number"
-                  step="0.01"
-                  placeholder="e.g., 50"
-                  value={distance}
-                  onChange={(e) => setDistance(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="time">Time (seconds)</Label>
-                <Input
-                  id="time"
-                  type="number"
-                  step="0.01"
-                  placeholder="e.g., 2"
-                  value={time}
-                  onChange={(e) => setTime(e.target.value)}
-                  required
-                />
-              </div>
+    <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl mx-auto">
+      {/* ── Media & AI Analysis ── */}
+      <Card className="border-2 border-primary/20">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Camera className="h-5 w-5 text-primary" />
+            Media &amp; AI Analysis
+          </CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Upload photos and dash cam footage. Use the analyse buttons to
+            generate AI descriptions that complement each other.
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Photo upload */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Camera className="h-4 w-4 text-muted-foreground" />
+              <h3 className="text-sm font-semibold">Accident Scene Photos</h3>
             </div>
+            <PhotoUpload
+              onPhotosSelected={setPhotos}
+              onPhotoAnalysisChange={setPhotoAnalysisDescription}
+              onPhotoEvidenceGapsChange={setPhotoEvidenceGaps}
+              vehicleContext={{
+                make: make || undefined,
+                model: model || undefined,
+                colour: colour || undefined,
+                licencePlate: licencePlate || undefined,
+                year: year || undefined,
+              }}
+            />
+          </div>
 
-            {distance && time && parseFloat(distance) > 0 && parseFloat(time) > 0 && (
-              <div className="pt-4 border-t border-border">
-                <SpeedDisplay velocityMs={velocityMs} velocityMph={velocityMph} />
-              </div>
-            )}
-          </CardContent>
-        </Card>
+          <div className="border-t border-border" />
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Road Information</CardTitle>
-            <CardDescription>Specify road type and conditions</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
+          {/* Dash cam upload */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <FileVideo className="h-4 w-4 text-muted-foreground" />
+              <h3 className="text-sm font-semibold">Dash Cam Footage</h3>
+            </div>
+            <DashCamUpload
+              onChange={setDashCamClips}
+              onDashCamCrossAnalysisChange={setDashCamCrossAnalysisDescription}
+              photoAnalysisDescription={photoAnalysisDescription}
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ── Vehicle Information ── */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg">Your Vehicle</CardTitle>
+        </CardHeader>
+        <CardContent className="grid grid-cols-2 gap-4">
+          <div className="space-y-1">
+            <Label htmlFor="make">Make</Label>
+            <Input
+              id="make"
+              value={make}
+              onChange={(e) => setMake(e.target.value)}
+              placeholder="e.g. Ford"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="model">Model</Label>
+            <Input
+              id="model"
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+              placeholder="e.g. Focus"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="colour">Colour</Label>
+            <Input
+              id="colour"
+              value={colour}
+              onChange={(e) => setColour(e.target.value)}
+              placeholder="e.g. Silver"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="licencePlate">Licence Plate</Label>
+            <Input
+              id="licencePlate"
+              value={licencePlate}
+              onChange={(e) => setLicencePlate(e.target.value)}
+              placeholder="e.g. AB12 CDE"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="year">Year</Label>
+            <Input
+              id="year"
+              type="number"
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
+              placeholder="e.g. 2019"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="mot">MOT Expiry</Label>
+            <Input
+              id="mot"
+              value={mot}
+              onChange={(e) => setMot(e.target.value)}
+              placeholder="e.g. 2025-06-01"
+            />
+          </div>
+          <div className="space-y-1 col-span-2">
+            <Label htmlFor="registration">Registration</Label>
+            <Input
+              id="registration"
+              value={registration}
+              onChange={(e) => setRegistration(e.target.value)}
+              placeholder="Registration number"
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* ── Accident Details ── */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg">Accident Details</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <Label htmlFor="vehicleSpeed">Vehicle Speed (mph)</Label>
+              <Input
+                id="vehicleSpeed"
+                type="number"
+                value={vehicleSpeed}
+                onChange={(e) => setVehicleSpeed(e.target.value)}
+                placeholder="e.g. 30"
+              />
+            </div>
+            <div className="space-y-1">
               <Label htmlFor="roadType">Road Type</Label>
-              <Select value={roadType} onValueChange={(value: any) => setRoadType(value)}>
+              <Select
+                value={roadType}
+                onValueChange={(v) => setRoadType(v as typeof roadType)}
+              >
                 <SelectTrigger id="roadType">
-                  <SelectValue placeholder="Select road type" />
+                  <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="urban">Urban (30 mph limit)</SelectItem>
-                  <SelectItem value="dualCarriageway">Dual Carriageway (70 mph limit)</SelectItem>
-                  <SelectItem value="motorway">Motorway (70 mph limit)</SelectItem>
+                  <SelectItem value="urban">Urban</SelectItem>
+                  <SelectItem value="dualCarriageway">
+                    Dual Carriageway
+                  </SelectItem>
+                  <SelectItem value="motorway">Motorway</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="roadCondition">Road Conditions</Label>
+            <div className="space-y-1">
+              <Label htmlFor="speedLimit">Speed Limit (mph)</Label>
+              <Input
+                id="speedLimit"
+                type="number"
+                value={speedLimit}
+                onChange={(e) => setSpeedLimit(e.target.value)}
+                placeholder="e.g. 30"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="weather">Weather</Label>
+              <Input
+                id="weather"
+                value={weather}
+                onChange={(e) => setWeather(e.target.value)}
+                placeholder="e.g. Clear"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="roadCondition">Road Condition</Label>
               <Input
                 id="roadCondition"
-                placeholder="e.g., Wet surface, poor visibility, foggy weather"
                 value={roadCondition}
                 onChange={(e) => setRoadCondition(e.target.value)}
+                placeholder="e.g. Dry"
               />
-              <p className="text-xs text-muted-foreground">
-                Describe weather, surface type, and visibility conditions
-              </p>
             </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Location Markers</CardTitle>
-            <CardDescription>Mark accident and stop locations</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="accidentMarker" className="flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4 text-destructive" />
-                Accident Location
-              </Label>
+            <div className="space-y-1">
+              <Label htmlFor="visibility">Visibility</Label>
               <Input
-                id="accidentMarker"
-                placeholder="e.g., Junction of High Street and Park Road"
-                value={accidentMarker}
-                onChange={(e) => setAccidentMarker(e.target.value)}
+                id="visibility"
+                value={visibility}
+                onChange={(e) => setVisibility(e.target.value)}
+                placeholder="e.g. Good"
               />
             </div>
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="stopLocation">Stop Location</Label>
+            <Input
+              id="stopLocation"
+              value={stopLocation}
+              onChange={(e) => setStopLocation(e.target.value)}
+              placeholder="Where did the vehicle stop?"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="accidentMarker">Accident Marker / Location</Label>
+            <Input
+              id="accidentMarker"
+              value={accidentMarker}
+              onChange={(e) => setAccidentMarker(e.target.value)}
+              placeholder="e.g. Junction of High St and Mill Rd"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="damageDescription">Damage Description</Label>
+            <Textarea
+              id="damageDescription"
+              value={damageDescription}
+              onChange={(e) => setDamageDescription(e.target.value)}
+              rows={3}
+              placeholder="Describe the damage to your vehicle…"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="witnessStatement">Witness Statement</Label>
+            <Textarea
+              id="witnessStatement"
+              value={witnessStatement}
+              onChange={(e) => setWitnessStatement(e.target.value)}
+              rows={3}
+              placeholder="Any witness accounts of the incident…"
+            />
+          </div>
+        </CardContent>
+      </Card>
 
-            <div className="space-y-2">
-              <Label htmlFor="stopLocation" className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-[oklch(0.7_0.15_145)]" />
-                Stop Location
-              </Label>
-              <Input
-                id="stopLocation"
-                placeholder="e.g., 20 meters before traffic light"
-                value={stopLocation}
-                onChange={(e) => setStopLocation(e.target.value)}
-              />
-            </div>
+      {/* ── Other Vehicle ── */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg">
+            Other Vehicle (if applicable)
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="grid grid-cols-2 gap-4">
+          <div className="space-y-1">
+            <Label htmlFor="otherMake">Make</Label>
+            <Input
+              id="otherMake"
+              value={otherMake}
+              onChange={(e) => setOtherMake(e.target.value)}
+              placeholder="e.g. Toyota"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="otherModel">Model</Label>
+            <Input
+              id="otherModel"
+              value={otherModel}
+              onChange={(e) => setOtherModel(e.target.value)}
+              placeholder="e.g. Corolla"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="otherOwnerName">Owner Name</Label>
+            <Input
+              id="otherOwnerName"
+              value={otherOwnerName}
+              onChange={(e) => setOtherOwnerName(e.target.value)}
+              placeholder="Full name"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="otherLicencePlate">Licence Plate</Label>
+            <Input
+              id="otherLicencePlate"
+              value={otherLicencePlate}
+              onChange={(e) => setOtherLicencePlate(e.target.value)}
+              placeholder="e.g. XY34 ZAB"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="otherEmail">Email</Label>
+            <Input
+              id="otherEmail"
+              type="email"
+              value={otherEmail}
+              onChange={(e) => setOtherEmail(e.target.value)}
+              placeholder="owner@email.com"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="otherPhone">Phone</Label>
+            <Input
+              id="otherPhone"
+              value={otherPhone}
+              onChange={(e) => setOtherPhone(e.target.value)}
+              placeholder="+44 7700 000000"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="otherInsurer">Insurer</Label>
+            <Input
+              id="otherInsurer"
+              value={otherInsurer}
+              onChange={(e) => setOtherInsurer(e.target.value)}
+              placeholder="Insurance company"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="otherPolicyNumber">Policy Number</Label>
+            <Input
+              id="otherPolicyNumber"
+              value={otherPolicyNumber}
+              onChange={(e) => setOtherPolicyNumber(e.target.value)}
+              placeholder="Policy number"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="otherClaimRef">Claim Reference</Label>
+            <Input
+              id="otherClaimRef"
+              value={otherClaimRef}
+              onChange={(e) => setOtherClaimRef(e.target.value)}
+              placeholder="Claim reference"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="otherYear">Year</Label>
+            <Input
+              id="otherYear"
+              type="number"
+              value={otherYear}
+              onChange={(e) => setOtherYear(e.target.value)}
+              placeholder="e.g. 2020"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="otherColour">Colour</Label>
+            <Input
+              id="otherColour"
+              value={otherColour}
+              onChange={(e) => setOtherColour(e.target.value)}
+              placeholder="e.g. Blue"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="otherMot">MOT Expiry</Label>
+            <Input
+              id="otherMot"
+              value={otherMot}
+              onChange={(e) => setOtherMot(e.target.value)}
+              placeholder="e.g. 2025-03-01"
+            />
+          </div>
+          <div className="space-y-1 col-span-2">
+            <Label htmlFor="otherRegistration">Registration</Label>
+            <Input
+              id="otherRegistration"
+              value={otherRegistration}
+              onChange={(e) => setOtherRegistration(e.target.value)}
+              placeholder="Registration number"
+            />
+          </div>
+        </CardContent>
+      </Card>
 
-            <div className="space-y-2">
-              <Label htmlFor="trafficLightColor" className="flex items-center gap-2">
-                <TrafficCone className="h-4 w-4 text-[oklch(0.65_0.2_30)]" />
-                Traffic Light Color at Time of Accident
-              </Label>
-              <Select value={trafficLightColor} onValueChange={setTrafficLightColor}>
-                <SelectTrigger id="trafficLightColor">
-                  <SelectValue placeholder="Select traffic light color" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="red">Red</SelectItem>
-                  <SelectItem value="yellow">Yellow/Amber</SelectItem>
-                  <SelectItem value="green">Green</SelectItem>
-                  <SelectItem value="not-applicable">Not Applicable</SelectItem>
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-muted-foreground">
-                What color was the traffic light when the accident occurred?
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+      {/* Submit */}
+      <Button
+        type="submit"
+        disabled={createReport.isPending}
+        className="w-full"
+        size="lg"
+      >
+        {createReport.isPending ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Submitting Report…
+          </>
+        ) : (
+          "Submit Accident Report"
+        )}
+      </Button>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>GPS Location & Timestamp</CardTitle>
-            <CardDescription>Optional GPS coordinates and incident timestamp for enhanced violation detection</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="latitude" className="flex items-center gap-2">
-                  <MapPinned className="h-4 w-4 text-muted-foreground" />
-                  Latitude (Optional)
-                </Label>
-                <Input
-                  id="latitude"
-                  type="number"
-                  step="any"
-                  placeholder="e.g., 51.5074"
-                  value={latitude}
-                  onChange={(e) => setLatitude(e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="longitude" className="flex items-center gap-2">
-                  <MapPinned className="h-4 w-4 text-muted-foreground" />
-                  Longitude (Optional)
-                </Label>
-                <Input
-                  id="longitude"
-                  type="number"
-                  step="any"
-                  placeholder="e.g., -0.1278"
-                  value={longitude}
-                  onChange={(e) => setLongitude(e.target.value)}
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="timestamp">Incident Timestamp</Label>
-              <Input
-                id="timestamp"
-                type="datetime-local"
-                value={timestamp}
-                onChange={(e) => setTimestamp(e.target.value)}
-                required
-              />
-              <p className="text-xs text-muted-foreground">
-                Date and time when the accident occurred
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Accident Scene Photos</CardTitle>
-            <CardDescription>Upload photos for AI analysis of damage, road conditions, and vehicle positions</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <PhotoUpload onPhotosChange={setPhotos} maxPhotos={10} />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Incident Details</CardTitle>
-            <CardDescription>Provide witness statements and damage descriptions</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="witnessStatement">Witness Statement</Label>
-              <Textarea
-                id="witnessStatement"
-                placeholder="Enter detailed witness account of the accident..."
-                rows={4}
-                value={witnessStatement}
-                onChange={(e) => setWitnessStatement(e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="damageDescription">Damage Description</Label>
-              <Textarea
-                id="damageDescription"
-                placeholder="Describe vehicle damage, impact points, and severity..."
-                rows={4}
-                value={damageDescription}
-                onChange={(e) => setDamageDescription(e.target.value)}
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        <div className="flex justify-end gap-4">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => navigate({ to: '/reports' })}
-            disabled={createReportMutation.isPending}
-          >
-            Cancel
-          </Button>
-          <Button type="submit" disabled={createReportMutation.isPending}>
-            {createReportMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Create Report & Analyze
-          </Button>
-        </div>
-      </div>
+      {createReport.isError && (
+        <p className="text-sm text-destructive text-center">
+          Failed to submit report. Please try again.
+        </p>
+      )}
     </form>
   );
 }

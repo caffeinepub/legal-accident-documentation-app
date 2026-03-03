@@ -10,28 +10,71 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
+export interface AIAnalysisResult {
+  'dashCamAnalysis' : string,
+  'inferredCrashType' : string,
+  'narrativeText' : string,
+  'photoAnalysis' : string,
+  'correlationSummary' : string,
+  'severity' : string,
+  'evidenceGaps' : Array<EvidenceGap>,
+}
+export interface AccidentNarrative {
+  'narrativeText' : string,
+  'evidenceGaps' : Array<EvidenceGap>,
+}
 export interface AccidentReport {
   'party2Liability' : [] | [bigint],
+  'vehicleInfo' : VehicleInfo,
+  'faultLikelihoodAssessment' : [] | [FaultLikelihoodAssessment],
+  'dashCamAnalysis' : [] | [DashCamAnalysis],
   'isRedLightViolation' : boolean,
   'damageDescription' : string,
-  'roadCondition' : string,
   'imageData' : Array<Uint8Array>,
   'trafficSignalState' : [] | [TrafficSignalState],
+  'otherVehicle' : [] | [OtherVehicle],
   'owner' : [] | [Principal],
   'party1Liability' : [] | [bigint],
+  'aiAnalysisResult' : [] | [AIAnalysisResult],
   'stopLocation' : string,
   'violations' : Array<Violation>,
   'applicableRules' : Array<HighwayCodeRule>,
+  'damageSeverity' : [] | [DamageSeverity],
   'trafficSigns' : Array<TrafficSign>,
   'faultReasoning' : string,
+  'surroundings' : Surroundings,
   'timestamp' : bigint,
   'isAtFault' : boolean,
   'accidentMarker' : string,
+  'witnesses' : Array<Witness>,
+  'videos' : Array<ExternalBlob>,
   'vehicleSpeed' : bigint,
+  'dashCamFootage' : Array<ExternalBlob>,
   'photos' : Array<PhotoMetadata>,
   'witnessStatement' : string,
   'faultAnalysis' : [] | [FaultAnalysis],
+  'accidentNarrative' : [] | [AccidentNarrative],
 }
+export interface DamageSeverity {
+  'totalLossProbability' : bigint,
+  'severityLabel' : string,
+  'heatMap' : Array<VehicleZoneHeatMap>,
+  'priorityScore' : bigint,
+  'vehicleZones' : Array<VehicleZoneScore>,
+}
+export interface DashCamAnalysis {
+  'collisionDetected' : boolean,
+  'timestamps' : Array<bigint>,
+  'faultIndicators' : string,
+  'roadConditions' : string,
+  'vehicleSpeed' : bigint,
+}
+export interface EvidenceGap {
+  'description' : string,
+  'confidenceLevel' : bigint,
+  'evidenceType' : string,
+}
+export type ExternalBlob = Uint8Array;
 export interface FaultAnalysis {
   'weatherConditions' : [] | [string],
   'speedLimit' : [] | [bigint],
@@ -40,11 +83,49 @@ export interface FaultAnalysis {
   'actualSpeed' : [] | [bigint],
   'reason' : string,
 }
+export interface FaultLikelihoodAssessment {
+  'partyBPercentage' : bigint,
+  'supportingFactors' : Array<string>,
+  'conflictingFactors' : Array<string>,
+  'reasoning' : string,
+  'confidenceLevel' : bigint,
+  'partyAPercentage' : bigint,
+  'roadPositionImpact' : string,
+}
 export interface HighwayCodeRule {
   'title' : string,
   'description' : string,
   'ruleNumber' : string,
   'applicableScenarios' : Array<string>,
+}
+export interface InjuryPhoto {
+  'id' : bigint,
+  'blob' : ExternalBlob,
+  'bodyRegion' : string,
+  'timestamp' : bigint,
+  'reportId' : bigint,
+  'crashType' : string,
+}
+export interface InsuranceExport {
+  'owner' : Principal,
+  'summary' : string,
+  'injuryPhotos' : Array<InjuryPhoto>,
+  'reportId' : bigint,
+}
+export interface OtherVehicle {
+  'mot' : string,
+  'model' : string,
+  'ownerName' : string,
+  'registration' : string,
+  'make' : string,
+  'year' : bigint,
+  'insurancePolicyNumber' : string,
+  'claimReference' : string,
+  'email' : string,
+  'insurer' : string,
+  'licencePlate' : string,
+  'phone' : string,
+  'colour' : string,
 }
 export interface PhotoMetadata {
   'contentType' : string,
@@ -55,6 +136,11 @@ export interface PhotoMetadata {
 export type RoadType = { 'urban' : bigint } |
   { 'dualCarriageway' : bigint } |
   { 'motorway' : bigint };
+export interface Surroundings {
+  'roadCondition' : string,
+  'visibility' : string,
+  'weather' : string,
+}
 export interface TrafficSign {
   'detectedInPhoto' : boolean,
   'signType' : string,
@@ -76,10 +162,37 @@ export interface UserProfile {
 export type UserRole = { 'admin' : null } |
   { 'user' : null } |
   { 'guest' : null };
+export interface VehicleInfo {
+  'mot' : string,
+  'model' : string,
+  'registration' : string,
+  'make' : string,
+  'year' : bigint,
+  'licencePlate' : string,
+  'colour' : string,
+}
+export interface VehicleZoneHeatMap {
+  'color' : string,
+  'zone' : string,
+  'severity' : bigint,
+}
+export interface VehicleZoneScore {
+  'zone' : string,
+  'description' : string,
+  'score' : bigint,
+  'damageType' : string,
+}
 export interface Violation {
   'detectedAt' : bigint,
   'description' : string,
   'violationType' : string,
+}
+export interface Witness {
+  'statement' : string,
+  'name' : string,
+  'email' : string,
+  'address' : string,
+  'phone' : string,
 }
 export interface _CaffeineStorageCreateCertificateResult {
   'method' : string,
@@ -109,11 +222,14 @@ export interface _SERVICE {
   >,
   '_caffeineStorageUpdateGatewayPrincipals' : ActorMethod<[], undefined>,
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
+  'addInjuryPhotos' : ActorMethod<
+    [bigint, Array<[ExternalBlob, string, string]>],
+    undefined
+  >,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
   'createReport' : ActorMethod<
     [
       bigint,
-      string,
       string,
       string,
       string,
@@ -125,19 +241,70 @@ export interface _SERVICE {
       [] | [TrafficSignalState],
       Array<TrafficSign>,
       string,
+      Surroundings,
+      VehicleInfo,
+      [] | [OtherVehicle],
+      Array<Witness>,
+      Array<ExternalBlob>,
+      Array<ExternalBlob>,
+      [] | [AccidentNarrative],
+      [] | [DamageSeverity],
+      [] | [FaultLikelihoodAssessment],
+      string,
+      string,
+      Array<EvidenceGap>,
     ],
     bigint
   >,
+  'deleteInjuryPhotos' : ActorMethod<[bigint], undefined>,
+  'getAIAnalysisResult' : ActorMethod<[bigint], [] | [AIAnalysisResult]>,
   'getAllPhotos' : ActorMethod<[bigint], [] | [Array<PhotoMetadata>]>,
   'getAllReports' : ActorMethod<[], Array<[bigint, AccidentReport]>>,
   'getAllThumbnails' : ActorMethod<[], Array<[bigint, Array<PhotoMetadata>]>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
+  'getComprehensiveAssessment' : ActorMethod<
+    [bigint],
+    {
+      'faultLikelihoodAssessment' : [] | [FaultLikelihoodAssessment],
+      'damageSeverity' : [] | [DamageSeverity],
+      'accidentNarrative' : [] | [AccidentNarrative],
+    }
+  >,
+  'getDashCamAnalysis' : ActorMethod<[bigint], [] | [DashCamAnalysis]>,
+  'getEvidenceGaps' : ActorMethod<[bigint], Array<EvidenceGap>>,
   'getFirstPhoto' : ActorMethod<[bigint], [] | [PhotoMetadata]>,
+  'getInjuryPhotos' : ActorMethod<[bigint], Array<InjuryPhoto>>,
+  'getInsuranceExport' : ActorMethod<[bigint], InsuranceExport>,
+  'getPersistentDashCamAnalysis' : ActorMethod<[bigint], string>,
+  'getPersistentPhotoAnalysis' : ActorMethod<[bigint], string>,
   'getReport' : ActorMethod<[bigint], [] | [AccidentReport]>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
+  'storeInjuryPhotos' : ActorMethod<[bigint, string], undefined>,
+  'updateAccidentAssessment' : ActorMethod<
+    [
+      bigint,
+      [] | [AccidentNarrative],
+      [] | [DamageSeverity],
+      [] | [FaultLikelihoodAssessment],
+    ],
+    undefined
+  >,
+  'updateDashCamFootage' : ActorMethod<
+    [bigint, Array<ExternalBlob>],
+    undefined
+  >,
+  'updateDashCamFootageImaging' : ActorMethod<
+    [bigint, Array<ExternalBlob>],
+    undefined
+  >,
+  'updateEIPhotoAnalysis' : ActorMethod<[bigint, string], undefined>,
+  'updateNewAIResults' : ActorMethod<
+    [bigint, string, Array<EvidenceGap>],
+    undefined
+  >,
   'uploadPhoto' : ActorMethod<[string, string, string], PhotoMetadata>,
 }
 export declare const idlService: IDL.ServiceClass;

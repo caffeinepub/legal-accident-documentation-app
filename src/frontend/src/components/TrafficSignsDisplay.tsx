@@ -1,28 +1,32 @@
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
-import { TrafficCone, StopCircle, Gauge, Navigation } from 'lucide-react';
-import type { TrafficSign } from '../backend';
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { Gauge, Navigation, StopCircle, TrafficCone } from "lucide-react";
+import type { TrafficSign } from "../backend";
 
 interface TrafficSignsDisplayProps {
   signs: TrafficSign[];
 }
 
-export default function TrafficSignsDisplay({ signs }: TrafficSignsDisplayProps) {
+export default function TrafficSignsDisplay({
+  signs,
+}: TrafficSignsDisplayProps) {
   if (!signs || signs.length === 0) {
     return (
-      <p className="text-sm text-muted-foreground">No traffic signs detected in photos</p>
+      <p className="text-sm text-muted-foreground">
+        No traffic signs detected in photos
+      </p>
     );
   }
 
   const getSignIcon = (signType: string) => {
     const type = signType.toLowerCase();
-    if (type.includes('traffic') || type.includes('signal')) {
+    if (type.includes("traffic") || type.includes("signal")) {
       return <TrafficCone className="h-4 w-4" />;
     }
-    if (type.includes('stop')) {
+    if (type.includes("stop")) {
       return <StopCircle className="h-4 w-4" />;
     }
-    if (type.includes('speed')) {
+    if (type.includes("speed")) {
       return <Gauge className="h-4 w-4" />;
     }
     return <Navigation className="h-4 w-4" />;
@@ -31,28 +35,35 @@ export default function TrafficSignsDisplay({ signs }: TrafficSignsDisplayProps)
   const getConfidenceColor = (signType: string) => {
     // Simulate confidence levels based on sign type
     const type = signType.toLowerCase();
-    if (type.includes('traffic') || type.includes('signal')) {
-      return 'bg-[oklch(0.7_0.15_145)] text-white';
+    if (type.includes("traffic") || type.includes("signal")) {
+      return "bg-[oklch(0.7_0.15_145)] text-white";
     }
-    if (type.includes('stop')) {
-      return 'bg-[oklch(0.65_0.2_30)] text-white';
+    if (type.includes("stop")) {
+      return "bg-[oklch(0.65_0.2_30)] text-white";
     }
-    return 'bg-[oklch(0.45_0.05_240)] text-white';
+    return "bg-[oklch(0.45_0.05_240)] text-white";
   };
 
   return (
     <div className="space-y-3">
-      {signs.map((sign, index) => (
-        <Card key={index} className="border-muted">
+      {signs.map((sign) => (
+        <Card
+          key={`${sign.signType}-${sign.timestamp}`}
+          className="border-muted"
+        >
           <CardContent className="p-4">
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-start gap-3 flex-1">
-                <div className={`p-2 rounded-lg ${getConfidenceColor(sign.signType)}`}>
+                <div
+                  className={`p-2 rounded-lg ${getConfidenceColor(sign.signType)}`}
+                >
                   {getSignIcon(sign.signType)}
                 </div>
                 <div className="flex-1 space-y-1">
                   <div className="flex items-center gap-2">
-                    <h4 className="text-sm font-semibold text-foreground">{sign.signType}</h4>
+                    <h4 className="text-sm font-semibold text-foreground">
+                      {sign.signType}
+                    </h4>
                     {sign.detectedInPhoto && (
                       <Badge variant="outline" className="text-xs">
                         Detected
@@ -65,7 +76,8 @@ export default function TrafficSignsDisplay({ signs }: TrafficSignsDisplayProps)
                     </p>
                   )}
                   <p className="text-xs text-muted-foreground">
-                    Detected at: {new Date(Number(sign.timestamp)).toLocaleTimeString()}
+                    Detected at:{" "}
+                    {new Date(Number(sign.timestamp)).toLocaleTimeString()}
                   </p>
                 </div>
               </div>

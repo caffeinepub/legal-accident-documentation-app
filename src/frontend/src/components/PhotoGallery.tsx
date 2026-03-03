@@ -1,11 +1,16 @@
-import { useState, useMemo } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
-import { ImageOff, ZoomIn, ChevronLeft, ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import type { PhotoMetadata } from '../backend';
-import { ExternalBlob } from '../backend';
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { ChevronLeft, ChevronRight, ImageOff, ZoomIn } from "lucide-react";
+import { useMemo, useState } from "react";
+import type { PhotoMetadata } from "../backend";
+import { ExternalBlob } from "../backend";
 
 interface PhotoGalleryProps {
   photos: PhotoMetadata[];
@@ -13,16 +18,18 @@ interface PhotoGalleryProps {
 }
 
 export default function PhotoGallery({ photos, imageData }: PhotoGalleryProps) {
-  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(
+    null,
+  );
 
   // Create blob URLs for all photos from imageData
   const photoUrls = useMemo(() => {
     if (!imageData || imageData.length === 0) return [];
-    
+
     return imageData.map((data) => {
       // Convert to proper Uint8Array with ArrayBuffer
       const bytes = new Uint8Array(data);
-      const blob = new Blob([bytes], { type: 'image/jpeg' });
+      const blob = new Blob([bytes], { type: "image/jpeg" });
       return URL.createObjectURL(blob);
     });
   }, [imageData]);
@@ -52,8 +59,10 @@ export default function PhotoGallery({ photos, imageData }: PhotoGalleryProps) {
     }
   };
 
-  const selectedPhoto = selectedPhotoIndex !== null ? photos[selectedPhotoIndex] : null;
-  const selectedPhotoUrl = selectedPhotoIndex !== null ? photoUrls[selectedPhotoIndex] : '';
+  const selectedPhoto =
+    selectedPhotoIndex !== null ? photos[selectedPhotoIndex] : null;
+  const selectedPhotoUrl =
+    selectedPhotoIndex !== null ? photoUrls[selectedPhotoIndex] : "";
 
   return (
     <>
@@ -64,7 +73,7 @@ export default function PhotoGallery({ photos, imageData }: PhotoGalleryProps) {
 
           return (
             <Card
-              key={index}
+              key={`${photo.filename}-${photo.uploadTimestamp}`}
               className="cursor-pointer hover:shadow-lg transition-shadow group overflow-hidden"
               onClick={() => setSelectedPhotoIndex(index)}
             >
@@ -89,7 +98,10 @@ export default function PhotoGallery({ photos, imageData }: PhotoGalleryProps) {
                   )}
                 </div>
                 <div className="p-2 space-y-1">
-                  <p className="text-xs font-medium truncate" title={photo.filename}>
+                  <p
+                    className="text-xs font-medium truncate"
+                    title={photo.filename}
+                  >
                     {photo.filename}
                   </p>
                   <p className="text-xs text-muted-foreground">
@@ -102,7 +114,10 @@ export default function PhotoGallery({ photos, imageData }: PhotoGalleryProps) {
         })}
       </div>
 
-      <Dialog open={selectedPhotoIndex !== null} onOpenChange={() => setSelectedPhotoIndex(null)}>
+      <Dialog
+        open={selectedPhotoIndex !== null}
+        onOpenChange={() => setSelectedPhotoIndex(null)}
+      >
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           {selectedPhoto && (
             <>
@@ -135,7 +150,8 @@ export default function PhotoGallery({ photos, imageData }: PhotoGalleryProps) {
                     Previous
                   </Button>
                   <span className="text-sm text-muted-foreground">
-                    {selectedPhotoIndex !== null ? selectedPhotoIndex + 1 : 0} of {photos.length}
+                    {selectedPhotoIndex !== null ? selectedPhotoIndex + 1 : 0}{" "}
+                    of {photos.length}
                   </span>
                   <Button
                     variant="outline"
@@ -152,12 +168,17 @@ export default function PhotoGallery({ photos, imageData }: PhotoGalleryProps) {
                   <div className="flex items-center gap-2">
                     <Badge variant="outline">{selectedPhoto.contentType}</Badge>
                     <span className="text-xs text-muted-foreground">
-                      Uploaded: {new Date(Number(selectedPhoto.uploadTimestamp)).toLocaleString()}
+                      Uploaded:{" "}
+                      {new Date(
+                        Number(selectedPhoto.uploadTimestamp),
+                      ).toLocaleString()}
                     </span>
                   </div>
                   {selectedPhoto.description && (
                     <div className="p-3 bg-muted rounded-lg">
-                      <p className="text-sm text-foreground">{selectedPhoto.description}</p>
+                      <p className="text-sm text-foreground">
+                        {selectedPhoto.description}
+                      </p>
                     </div>
                   )}
                 </div>

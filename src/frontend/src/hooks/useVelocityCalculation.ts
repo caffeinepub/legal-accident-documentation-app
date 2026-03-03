@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo } from "react";
 
 export function useVelocityCalculation(distance: number, time: number) {
   const velocityMs = useMemo(() => {
