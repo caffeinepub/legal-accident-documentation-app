@@ -11,13 +11,36 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useNavigate } from "@tanstack/react-router";
-import { Camera, FileVideo, Loader2 } from "lucide-react";
+import { Camera, FileVideo, Loader2, Plus, Users } from "lucide-react";
 import type React from "react";
 import { useState } from "react";
 import type { ExternalBlob } from "../backend";
 import { useCreateReport } from "../hooks/useQueries";
 import DashCamUpload, { type DashCamClip } from "./DashCamUpload";
+import PartyVehicleCard, { type AdditionalParty } from "./PartyVehicleCard";
 import PhotoUpload from "./PhotoUpload";
+
+const ADDITIONAL_PARTIES_DELIMITER = "\n\n---ADDITIONAL_PARTIES---\n";
+
+function createEmptyParty(id: string): AdditionalParty {
+  return {
+    id,
+    vehicleType: "car",
+    make: "",
+    model: "",
+    colour: "",
+    licencePlate: "",
+    year: "",
+    mot: "",
+    ownerName: "",
+    email: "",
+    phone: "",
+    insurer: "",
+    policyNumber: "",
+    claimRef: "",
+    description: "",
+  };
+}
 
 interface EvidenceGap {
   description: string;
@@ -62,20 +85,27 @@ export default function AccidentReportForm() {
   >("urban");
   const [speedLimit, setSpeedLimit] = useState("30");
 
-  // Other vehicle
-  const [otherMake, setOtherMake] = useState("");
-  const [otherModel, setOtherModel] = useState("");
-  const [otherOwnerName, setOtherOwnerName] = useState("");
-  const [otherEmail, setOtherEmail] = useState("");
-  const [otherPhone, setOtherPhone] = useState("");
-  const [otherInsurer, setOtherInsurer] = useState("");
-  const [otherPolicyNumber, setOtherPolicyNumber] = useState("");
-  const [otherClaimRef, setOtherClaimRef] = useState("");
-  const [otherLicencePlate, setOtherLicencePlate] = useState("");
-  const [otherYear, setOtherYear] = useState("");
-  const [otherColour, setOtherColour] = useState("");
-  const [otherMot, setOtherMot] = useState("");
-  const [otherRegistration, setOtherRegistration] = useState("");
+  // Additional parties (multi-party support)
+  const [additionalParties, setAdditionalParties] = useState<AdditionalParty[]>(
+    [],
+  );
+
+  const addParty = () => {
+    setAdditionalParties((prev) => [
+      ...prev,
+      createEmptyParty(crypto.randomUUID()),
+    ]);
+  };
+
+  const removeParty = (id: string) => {
+    setAdditionalParties((prev) => prev.filter((p) => p.id !== id));
+  };
+
+  const updateParty = (id: string, updated: AdditionalParty) => {
+    setAdditionalParties((prev) =>
+      prev.map((p) => (p.id === id ? updated : p)),
+    );
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,30 +130,42 @@ export default function AccidentReportForm() {
       description: "",
     }));
 
-    const hasOtherVehicle =
-      otherMake || otherModel || otherOwnerName || otherLicencePlate;
+    // Map first additional party → backend OtherVehicle (backward compat)
+    const firstParty = additionalParties[0] ?? null;
+    const otherVehicle =
+      firstParty &&
+      (firstParty.make ||
+        firstParty.model ||
+        firstParty.ownerName ||
+        firstParty.licencePlate ||
+        firstParty.description)
+        ? {
+            make: firstParty.make,
+            model: firstParty.model,
+            ownerName: firstParty.ownerName,
+            email: firstParty.email,
+            phone: firstParty.phone,
+            insurer: firstParty.insurer,
+            insurancePolicyNumber: firstParty.policyNumber,
+            claimReference: firstParty.claimRef,
+            licencePlate: firstParty.licencePlate,
+            year: BigInt(firstParty.year || 0),
+            colour: firstParty.colour,
+            mot: firstParty.mot,
+            registration: firstParty.licencePlate, // use plate as registration fallback
+          }
+        : null;
 
-    const otherVehicle = hasOtherVehicle
-      ? {
-          make: otherMake,
-          model: otherModel,
-          ownerName: otherOwnerName,
-          email: otherEmail,
-          phone: otherPhone,
-          insurer: otherInsurer,
-          insurancePolicyNumber: otherPolicyNumber,
-          claimReference: otherClaimRef,
-          licencePlate: otherLicencePlate,
-          year: BigInt(otherYear || 0),
-          colour: otherColour,
-          mot: otherMot,
-          registration: otherRegistration,
-        }
-      : null;
+    // Parties index 1+ are serialised and appended to the witness statement
+    const extraParties = additionalParties.slice(1);
+    const witnessStatementWithExtras =
+      extraParties.length > 0
+        ? `${witnessStatement}${ADDITIONAL_PARTIES_DELIMITER}${JSON.stringify(extraParties)}`
+        : witnessStatement;
 
     await createReport.mutateAsync({
       vehicleSpeed: BigInt(vehicleSpeed || 0),
-      witnessStatement,
+      witnessStatement: witnessStatementWithExtras,
       damageDescription,
       stopLocation,
       accidentMarker,
@@ -402,134 +444,67 @@ export default function AccidentReportForm() {
         </CardContent>
       </Card>
 
-      {/* ── Other Vehicle ── */}
+      {/* ── Other Parties Involved ── */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg">
-            Other Vehicle (if applicable)
-          </CardTitle>
+          <div className="flex items-center justify-between gap-3">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Users className="h-5 w-5 text-primary" />
+              Other Parties Involved
+            </CardTitle>
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={addParty}
+              className="gap-1.5 shrink-0"
+              data-ocid="report.add_party_button"
+            >
+              <Plus size={14} />
+              Add Party
+            </Button>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Add all other parties involved — vehicles, motorcycles, cyclists,
+            pedestrians, or third-party objects.
+          </p>
         </CardHeader>
-        <CardContent className="grid grid-cols-2 gap-4">
-          <div className="space-y-1">
-            <Label htmlFor="otherMake">Make</Label>
-            <Input
-              id="otherMake"
-              value={otherMake}
-              onChange={(e) => setOtherMake(e.target.value)}
-              placeholder="e.g. Toyota"
-            />
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="otherModel">Model</Label>
-            <Input
-              id="otherModel"
-              value={otherModel}
-              onChange={(e) => setOtherModel(e.target.value)}
-              placeholder="e.g. Corolla"
-            />
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="otherOwnerName">Owner Name</Label>
-            <Input
-              id="otherOwnerName"
-              value={otherOwnerName}
-              onChange={(e) => setOtherOwnerName(e.target.value)}
-              placeholder="Full name"
-            />
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="otherLicencePlate">Licence Plate</Label>
-            <Input
-              id="otherLicencePlate"
-              value={otherLicencePlate}
-              onChange={(e) => setOtherLicencePlate(e.target.value)}
-              placeholder="e.g. XY34 ZAB"
-            />
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="otherEmail">Email</Label>
-            <Input
-              id="otherEmail"
-              type="email"
-              value={otherEmail}
-              onChange={(e) => setOtherEmail(e.target.value)}
-              placeholder="owner@email.com"
-            />
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="otherPhone">Phone</Label>
-            <Input
-              id="otherPhone"
-              value={otherPhone}
-              onChange={(e) => setOtherPhone(e.target.value)}
-              placeholder="+44 7700 000000"
-            />
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="otherInsurer">Insurer</Label>
-            <Input
-              id="otherInsurer"
-              value={otherInsurer}
-              onChange={(e) => setOtherInsurer(e.target.value)}
-              placeholder="Insurance company"
-            />
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="otherPolicyNumber">Policy Number</Label>
-            <Input
-              id="otherPolicyNumber"
-              value={otherPolicyNumber}
-              onChange={(e) => setOtherPolicyNumber(e.target.value)}
-              placeholder="Policy number"
-            />
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="otherClaimRef">Claim Reference</Label>
-            <Input
-              id="otherClaimRef"
-              value={otherClaimRef}
-              onChange={(e) => setOtherClaimRef(e.target.value)}
-              placeholder="Claim reference"
-            />
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="otherYear">Year</Label>
-            <Input
-              id="otherYear"
-              type="number"
-              value={otherYear}
-              onChange={(e) => setOtherYear(e.target.value)}
-              placeholder="e.g. 2020"
-            />
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="otherColour">Colour</Label>
-            <Input
-              id="otherColour"
-              value={otherColour}
-              onChange={(e) => setOtherColour(e.target.value)}
-              placeholder="e.g. Blue"
-            />
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="otherMot">MOT Expiry</Label>
-            <Input
-              id="otherMot"
-              value={otherMot}
-              onChange={(e) => setOtherMot(e.target.value)}
-              placeholder="e.g. 2025-03-01"
-            />
-          </div>
-          <div className="space-y-1 col-span-2">
-            <Label htmlFor="otherRegistration">Registration</Label>
-            <Input
-              id="otherRegistration"
-              value={otherRegistration}
-              onChange={(e) => setOtherRegistration(e.target.value)}
-              placeholder="Registration number"
-            />
-          </div>
-        </CardContent>
+
+        {additionalParties.length > 0 ? (
+          <CardContent className="space-y-3 pt-0">
+            {additionalParties.map((party, idx) => (
+              <PartyVehicleCard
+                key={party.id}
+                party={party}
+                index={idx}
+                onChange={(updated) => updateParty(party.id, updated)}
+                onRemove={() => removeParty(party.id)}
+              />
+            ))}
+          </CardContent>
+        ) : (
+          <CardContent className="pt-0 pb-5">
+            <div
+              className="flex flex-col items-center gap-2 py-6 text-center rounded-lg border-2 border-dashed border-border bg-muted/20"
+              data-ocid="report.parties.empty_state"
+            >
+              <Users size={28} className="text-muted-foreground/40" />
+              <p className="text-sm text-muted-foreground">
+                No other parties added yet.
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={addParty}
+                className="gap-1.5 mt-1"
+              >
+                <Plus size={13} />
+                Add a Party
+              </Button>
+            </div>
+          </CardContent>
+        )}
       </Card>
 
       {/* Submit */}

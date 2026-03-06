@@ -11,6 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { useUpdateAccidentAssessment } from "@/hooks/useQueries";
 import { calculateDamageSeverity } from "@/utils/damageSeverityCalculator";
 import {
+  BrainCircuit,
   CheckCircle,
   ChevronDown,
   ChevronUp,
@@ -320,6 +321,7 @@ export default function DamageSeverityPanel({
     damageSeverity ?? null,
   );
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [isAiInformed, setIsAiInformed] = useState(false);
 
   const updateAssessment = useUpdateAccidentAssessment();
 
@@ -328,7 +330,9 @@ export default function DamageSeverityPanel({
   }, [damageSeverity]);
 
   const handleGenerate = async () => {
-    const calculated = calculateDamageSeverity(report);
+    const photoAnalysis = report.aiAnalysisResult?.photoAnalysis;
+    const calculated = calculateDamageSeverity(report, photoAnalysis);
+    setIsAiInformed(calculated.aiInformed ?? false);
     setLocalSeverity(calculated);
     await updateAssessment.mutateAsync({
       reportId,
@@ -353,15 +357,24 @@ export default function DamageSeverityPanel({
               type="button"
               className="flex items-center justify-between w-full text-left group"
             >
-              <CardTitle className="text-sm flex items-center gap-2">
+              <CardTitle className="text-sm flex items-center gap-2 flex-wrap">
                 <ShieldAlert size={16} className="text-orange-500" />
-                Damage Severity Assessment
+                Vehicle Damage Assessment
                 {localSeverity && (
                   <Badge
                     variant="outline"
                     className={`text-xs ${severityConfig.color} ${severityConfig.border}`}
                   >
-                    {label} — {score}/10
+                    Damage Rating: {label} ({score}/10)
+                  </Badge>
+                )}
+                {localSeverity && isAiInformed && (
+                  <Badge
+                    variant="outline"
+                    className="text-xs border-violet-400 text-violet-700 dark:text-violet-300 dark:border-violet-600 bg-violet-50 dark:bg-violet-900/20 flex items-center gap-1"
+                  >
+                    <BrainCircuit size={10} />
+                    AI-Informed
                   </Badge>
                 )}
                 {saveSuccess && (
@@ -408,7 +421,7 @@ export default function DamageSeverityPanel({
                 >
                   <div>
                     <p className="text-xs text-muted-foreground uppercase tracking-wide font-semibold mb-1">
-                      Overall Severity
+                      Assessed Vehicle Damage
                     </p>
                     <div className="flex items-baseline gap-2">
                       <span
@@ -426,7 +439,7 @@ export default function DamageSeverityPanel({
                   </div>
                   <div className="text-right">
                     <p className="text-xs text-muted-foreground mb-1">
-                      Total Loss Risk
+                      Total Loss Probability
                     </p>
                     <p className={`text-xl font-bold ${severityConfig.color}`}>
                       {Number(localSeverity.totalLossProbability)}%
@@ -458,7 +471,7 @@ export default function DamageSeverityPanel({
                 {/* Vehicle diagram heat map */}
                 <div className="space-y-2">
                   <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                    Vehicle Zone Heat Map
+                    Vehicle Damage Diagram
                   </p>
                   <VehicleDiagramHeatMap heatMap={localSeverity.heatMap} />
                 </div>
@@ -468,7 +481,7 @@ export default function DamageSeverityPanel({
                 {/* Zone breakdown */}
                 <div className="space-y-2">
                   <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                    Zone Breakdown
+                    Damage Particulars by Vehicle Zone
                   </p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {localSeverity.vehicleZones.map((zone) => {

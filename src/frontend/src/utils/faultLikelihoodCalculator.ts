@@ -5,6 +5,213 @@ import {
   getFaultMatrixEntryForViolation,
 } from "@/data/faultMatrix";
 
+/**
+ * Extracts fault-relevant signals from the AI photo analysis text.
+ * Returns a list of findings and an optional fault bias (-ve = reduces partyA, +ve = increases).
+ */
+function parsePhotoAnalysisSignals(photoAnalysis: string): {
+  findings: string[];
+  faultBias: number;
+  confidenceBoost: number;
+} {
+  if (!photoAnalysis || photoAnalysis.trim().length < 10) {
+    return { findings: [], faultBias: 0, confidenceBoost: 0 };
+  }
+
+  const text = photoAnalysis.toLowerCase();
+  const findings: string[] = [];
+  let faultBias = 0;
+  let confidenceBoost = 0;
+
+  // Front / head-on impact — typically increases partyA fault
+  if (
+    text.includes("front") &&
+    (text.includes("damage") ||
+      text.includes("impact") ||
+      text.includes("crushed"))
+  ) {
+    findings.push(
+      "Photo AI: Front-end damage identified — consistent with head-on or rear-end collision",
+    );
+    faultBias += 5;
+    confidenceBoost += 8;
+  }
+
+  // Rear damage — suggests Party A may have been stationary / struck from behind
+  if (
+    text.includes("rear") &&
+    (text.includes("damage") || text.includes("impact"))
+  ) {
+    findings.push(
+      "Photo AI: Rear-end damage identified — may indicate Party A was stationary or struck from behind",
+    );
+    faultBias -= 5;
+    confidenceBoost += 8;
+  }
+
+  // Side / lateral damage — T-bone, lane change
+  if (
+    text.includes("side") &&
+    (text.includes("damage") ||
+      text.includes("impact") ||
+      text.includes("door"))
+  ) {
+    findings.push(
+      "Photo AI: Lateral/side damage identified — consistent with T-bone or lane-change collision",
+    );
+    faultBias += 3;
+    confidenceBoost += 6;
+  }
+
+  // Traffic signs/signals detected
+  if (
+    text.includes("traffic light") ||
+    text.includes("stop sign") ||
+    text.includes("yield") ||
+    text.includes("traffic signal")
+  ) {
+    findings.push(
+      "Photo AI: Traffic control device visible in scene — sign/signal compliance should be assessed",
+    );
+    faultBias += 5;
+    confidenceBoost += 10;
+  }
+
+  // Skid marks
+  if (
+    text.includes("skid") ||
+    text.includes("tyre mark") ||
+    text.includes("brake mark")
+  ) {
+    findings.push(
+      "Photo AI: Skid/tyre marks detected — indicates emergency braking prior to impact",
+    );
+    confidenceBoost += 7;
+  }
+
+  // Airbag deployment
+  if (text.includes("airbag") || text.includes("air bag")) {
+    findings.push(
+      "Photo AI: Airbag deployment visible — indicates high-speed or high-force impact",
+    );
+    faultBias += 4;
+    confidenceBoost += 6;
+  }
+
+  // Adverse road conditions from photos
+  if (
+    text.includes("wet road") ||
+    text.includes("icy") ||
+    text.includes("standing water") ||
+    text.includes("poor visibility")
+  ) {
+    findings.push(
+      "Photo AI: Adverse road conditions visible in scene — may mitigate individual fault attribution",
+    );
+    faultBias -= 3;
+    confidenceBoost += 5;
+  }
+
+  // Severe structural damage
+  if (
+    text.includes("severe") ||
+    text.includes("total loss") ||
+    text.includes("write-off") ||
+    text.includes("structural")
+  ) {
+    findings.push(
+      "Photo AI: Severe/structural damage observed — corroborates high-impact collision",
+    );
+    confidenceBoost += 10;
+  }
+
+  return { findings, faultBias, confidenceBoost };
+}
+
+/**
+ * Extracts fault signals from the inferred crash type (from AI image analysis).
+ */
+function parseCrashTypeSignals(inferredCrashType: string): {
+  findings: string[];
+  faultBias: number;
+  confidenceBoost: number;
+} {
+  if (!inferredCrashType || inferredCrashType.trim().length < 3) {
+    return { findings: [], faultBias: 0, confidenceBoost: 0 };
+  }
+
+  const text = inferredCrashType.toLowerCase();
+  const findings: string[] = [];
+  let faultBias = 0;
+  let confidenceBoost = 0;
+
+  if (text.includes("rear") || text.includes("rear-end")) {
+    const entry = getFaultMatrixEntryByScenario("Rear-End Collision");
+    if (entry) {
+      findings.push(
+        `AI crash type: Rear-end collision inferred — fault matrix suggests Party A ${entry.partyAFault}% / Party B ${entry.partyBFault}%`,
+      );
+      faultBias += (entry.partyAFault - 50) / 10;
+      confidenceBoost += 12;
+    }
+  } else if (
+    text.includes("head-on") ||
+    text.includes("head on") ||
+    text.includes("frontal")
+  ) {
+    findings.push(
+      "AI crash type: Head-on/frontal collision inferred — high severity, fault allocation depends on lane discipline",
+    );
+    faultBias += 8;
+    confidenceBoost += 10;
+  } else if (
+    text.includes("t-bone") ||
+    text.includes("side impact") ||
+    text.includes("right angle")
+  ) {
+    const entry = getFaultMatrixEntryByScenario("T-Bone Collision");
+    if (entry) {
+      findings.push(
+        `AI crash type: T-bone/side impact inferred — fault matrix suggests Party A ${entry.partyAFault}% / Party B ${entry.partyBFault}%`,
+      );
+      faultBias += (entry.partyAFault - 50) / 10;
+      confidenceBoost += 12;
+    } else {
+      findings.push(
+        "AI crash type: T-bone/side impact inferred — right-of-way assessment required",
+      );
+      faultBias += 5;
+      confidenceBoost += 8;
+    }
+  } else if (
+    text.includes("lane change") ||
+    text.includes("lane discipline") ||
+    text.includes("merging")
+  ) {
+    const entry = getFaultMatrixEntryByScenario("Lane Change Collision");
+    if (entry) {
+      findings.push(
+        `AI crash type: Lane change collision inferred — fault matrix suggests Party A ${entry.partyAFault}% / Party B ${entry.partyBFault}%`,
+      );
+      faultBias += (entry.partyAFault - 50) / 10;
+      confidenceBoost += 10;
+    }
+  } else if (text.includes("pedestrian")) {
+    findings.push(
+      "AI crash type: Pedestrian involvement inferred — Highway Code Rules 195-203 apply; driver duty of care is heightened",
+    );
+    faultBias += 10;
+    confidenceBoost += 10;
+  } else {
+    findings.push(
+      `AI crash type inferred: "${inferredCrashType}" — used to contextualise fault determination`,
+    );
+    confidenceBoost += 5;
+  }
+
+  return { findings, faultBias, confidenceBoost };
+}
+
 export function calculateFaultLikelihood(
   report: AccidentReport,
 ): FaultLikelihoodAssessment {
@@ -164,6 +371,55 @@ export function calculateFaultLikelihood(
     }
   }
 
+  // ── AI Photo Analysis signals ────────────────────────────────────────────────
+  const photoAnalysisText = report.aiAnalysisResult?.photoAnalysis ?? "";
+  if (photoAnalysisText) {
+    const photoSignals = parsePhotoAnalysisSignals(photoAnalysisText);
+    if (photoSignals.findings.length > 0) {
+      for (const f of photoSignals.findings) supportingFactors.push(f);
+      partyAFault = Math.max(
+        5,
+        Math.min(95, partyAFault + photoSignals.faultBias),
+      );
+      partyBFault = 100 - partyAFault;
+      confidenceLevel = Math.min(
+        95,
+        confidenceLevel + photoSignals.confidenceBoost,
+      );
+    }
+  } else {
+    conflictingFactors.push(
+      "No AI photo analysis available — visual evidence has not been assessed",
+    );
+  }
+
+  // ── AI Inferred Crash Type ───────────────────────────────────────────────────
+  const inferredCrashType = report.aiAnalysisResult?.inferredCrashType ?? "";
+  if (inferredCrashType) {
+    const crashSignals = parseCrashTypeSignals(inferredCrashType);
+    if (crashSignals.findings.length > 0) {
+      for (const f of crashSignals.findings) supportingFactors.push(f);
+      partyAFault = Math.max(
+        5,
+        Math.min(95, partyAFault + crashSignals.faultBias),
+      );
+      partyBFault = 100 - partyAFault;
+      confidenceLevel = Math.min(
+        95,
+        confidenceLevel + crashSignals.confidenceBoost,
+      );
+    }
+  }
+
+  // ── AI Correlation Summary signals ──────────────────────────────────────────
+  const correlationSummary = report.aiAnalysisResult?.correlationSummary ?? "";
+  if (correlationSummary && correlationSummary.trim().length > 20) {
+    confidenceLevel = Math.min(95, confidenceLevel + 5);
+    supportingFactors.push(
+      "AI cross-analysis of photos and dash cam footage provides corroborating evidence",
+    );
+  }
+
   // Clamp values
   partyAFault = Math.max(5, Math.min(95, partyAFault));
   partyBFault = 100 - partyAFault;
@@ -219,6 +475,17 @@ export function calculateFaultLikelihood(
   if (adverseWeather || adverseRoad) {
     reasoningParts.push(
       `Environmental factors (${weather}, ${roadCondition} road) have been considered and may reduce the certainty of the fault split.`,
+    );
+  }
+
+  // Mention AI-informed assessment in reasoning
+  const aiSourcesUsed: string[] = [];
+  if (photoAnalysisText) aiSourcesUsed.push("AI photo analysis");
+  if (inferredCrashType) aiSourcesUsed.push("inferred crash type");
+  if (correlationSummary) aiSourcesUsed.push("cross-analysis correlation");
+  if (aiSourcesUsed.length > 0) {
+    reasoningParts.push(
+      `This assessment has been further informed by ${aiSourcesUsed.join(", ")}, in accordance with the evidential principles under the Civil Evidence Act 1995 and UK road traffic claim practice.`,
     );
   }
 

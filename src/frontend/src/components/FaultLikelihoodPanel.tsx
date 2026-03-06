@@ -12,6 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { useUpdateAccidentAssessment } from "@/hooks/useQueries";
 import { calculateFaultLikelihood } from "@/utils/faultLikelihoodCalculator";
 import {
+  Bot,
   CheckCircle,
   ChevronDown,
   ChevronUp,
@@ -21,13 +22,35 @@ import {
   Sparkles,
   ThumbsDown,
   ThumbsUp,
+  Users,
 } from "lucide-react";
 import React, { useState, useEffect } from "react";
+
+const ADDITIONAL_PARTIES_DELIMITER = "---ADDITIONAL_PARTIES---";
+
+function parseAdditionalPartyCount(witnessStatement: string): number {
+  if (!witnessStatement.includes(ADDITIONAL_PARTIES_DELIMITER)) return 0;
+  try {
+    const jsonPart = witnessStatement.split(ADDITIONAL_PARTIES_DELIMITER)[1];
+    const parsed = JSON.parse(jsonPart.trim());
+    return Array.isArray(parsed) ? parsed.length : 0;
+  } catch {
+    return 0;
+  }
+}
 
 interface FaultLikelihoodPanelProps {
   reportId: bigint;
   report: AccidentReport;
   faultLikelihoodAssessment?: FaultLikelihoodAssessment;
+}
+
+function hasAIEvidence(report: AccidentReport): boolean {
+  return !!(
+    report.aiAnalysisResult?.photoAnalysis ||
+    report.aiAnalysisResult?.inferredCrashType ||
+    report.aiAnalysisResult?.correlationSummary
+  );
 }
 
 function getFaultColor(percent: number): string {
@@ -95,7 +118,7 @@ export default function FaultLikelihoodPanel({
               type="button"
               className="flex items-center justify-between w-full text-left group"
             >
-              <CardTitle className="text-sm flex items-center gap-2">
+              <CardTitle className="text-sm flex items-center gap-2 flex-wrap">
                 <Scale size={16} className="text-blue-500" />
                 Fault Likelihood Assessment
                 {localAssessment && (
@@ -103,7 +126,16 @@ export default function FaultLikelihoodPanel({
                     variant="outline"
                     className="text-xs text-blue-600 border-blue-400"
                   >
-                    {partyA}% / {partyB}%
+                    Party A: {partyA}% | Party B: {partyB}%
+                  </Badge>
+                )}
+                {localAssessment && hasAIEvidence(report) && (
+                  <Badge
+                    variant="outline"
+                    className="text-xs text-violet-600 border-violet-400 flex items-center gap-1"
+                  >
+                    <Bot size={10} />
+                    AI-Informed
                   </Badge>
                 )}
                 {saveSuccess && (
@@ -121,13 +153,43 @@ export default function FaultLikelihoodPanel({
 
         <CollapsibleContent>
           <CardContent className="space-y-5 pt-0">
+            {/* Multi-party notice */}
+            {(() => {
+              const extraCount = parseAdditionalPartyCount(
+                report.witnessStatement ?? "",
+              );
+              const totalExtra = (report.otherVehicle ? 1 : 0) + extraCount;
+              if (totalExtra <= 1) return null;
+              return (
+                <div className="flex items-start gap-2 rounded-md bg-blue-50 border border-blue-200 px-3 py-2.5 dark:bg-blue-900/10 dark:border-blue-800/40">
+                  <Users
+                    size={14}
+                    className="text-blue-600 dark:text-blue-400 mt-0.5 shrink-0"
+                  />
+                  <p className="text-xs text-blue-800 dark:text-blue-300 leading-relaxed">
+                    <strong>
+                      This incident involves {totalExtra} additional{" "}
+                      {totalExtra === 1 ? "party" : "parties"}.
+                    </strong>{" "}
+                    Fault assessment reflects the primary two parties only. Full
+                    multi-party liability requires legal review.
+                  </p>
+                </div>
+              );
+            })()}
+
             {!localAssessment ? (
               <div className="flex flex-col items-center gap-3 py-6 text-center">
                 <Scale size={32} className="text-muted-foreground/50" />
                 <p className="text-sm text-muted-foreground max-w-sm">
                   Calculate a percentage-based fault likelihood split using
-                  collision type, violations, dash cam signals, and road
-                  conditions.
+                  collision type, violations, dash cam signals, road conditions,
+                  and AI photo &amp; crash-type analysis.
+                  {hasAIEvidence(report) && (
+                    <span className="block mt-1 text-violet-600 font-medium text-xs">
+                      AI evidence detected — will be used in assessment.
+                    </span>
+                  )}
                 </p>
                 <Button
                   onClick={handleGenerate}
@@ -216,10 +278,10 @@ export default function FaultLikelihoodPanel({
                   <Progress value={confidence} className="h-2" />
                   <p className="text-xs text-muted-foreground">
                     {confidence >= 70
-                      ? "High confidence — strong evidence base"
+                      ? "Sufficient evidential basis to support determination"
                       : confidence >= 40
-                        ? "Moderate confidence — additional evidence recommended"
-                        : "Low confidence — limited evidence available"}
+                        ? "Further evidence is recommended to strengthen this determination"
+                        : "Evidential basis is insufficient; determination is provisional"}
                   </p>
                 </div>
 
@@ -228,7 +290,7 @@ export default function FaultLikelihoodPanel({
                 {/* Reasoning */}
                 <div className="space-y-2">
                   <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                    Assessment Reasoning
+                    Liability Determination Basis
                   </p>
                   <div className="p-3 bg-muted/30 rounded-lg border border-border text-sm leading-relaxed">
                     {localAssessment.reasoning}
@@ -241,7 +303,7 @@ export default function FaultLikelihoodPanel({
                     <div className="space-y-2">
                       <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1">
                         <ThumbsUp size={12} className="text-green-500" />
-                        Supporting Factors
+                        Factors Supporting Liability Finding
                       </p>
                       <ul className="space-y-1.5">
                         {localAssessment.supportingFactors.map((factor) => (
@@ -266,7 +328,7 @@ export default function FaultLikelihoodPanel({
                     <div className="space-y-2">
                       <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1">
                         <ThumbsDown size={12} className="text-amber-500" />
-                        Conflicting / Mitigating Factors
+                        Mitigating Circumstances
                       </p>
                       <ul className="space-y-1.5">
                         {localAssessment.conflictingFactors.map((factor) => (

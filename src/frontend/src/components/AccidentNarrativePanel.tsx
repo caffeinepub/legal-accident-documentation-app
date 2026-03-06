@@ -1,4 +1,5 @@
 import type { AccidentNarrative, AccidentReport } from "@/backend";
+import type { AdditionalParty } from "@/components/PartyVehicleCard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,10 +23,64 @@ import {
   Save,
   Sparkles,
   User,
+  Users,
   Video,
 } from "lucide-react";
 import type React from "react";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
+
+const ADDITIONAL_PARTIES_DELIMITER = "---ADDITIONAL_PARTIES---";
+
+function parseAdditionalParties(witnessStatement: string): AdditionalParty[] {
+  if (!witnessStatement.includes(ADDITIONAL_PARTIES_DELIMITER)) return [];
+  try {
+    const jsonPart = witnessStatement.split(ADDITIONAL_PARTIES_DELIMITER)[1];
+    const parsed = JSON.parse(jsonPart.trim());
+    return Array.isArray(parsed) ? (parsed as AdditionalParty[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function buildAdditionalPartiesSection(
+  parties: AdditionalParty[],
+  hasOtherVehicle: boolean,
+): string {
+  if (!hasOtherVehicle && parties.length === 0) return "";
+
+  const lines: string[] = ["\n\nADDITIONAL PARTIES INVOLVED:"];
+
+  if (hasOtherVehicle) {
+    lines.push(
+      "• Party B: recorded as primary third-party vehicle (see Third Party Details section above).",
+    );
+  }
+
+  parties.forEach((p, idx) => {
+    const partyLabel = `Party ${String.fromCharCode(67 + idx)}`; // C, D, E…
+    const vehicleDesc =
+      p.vehicleType === "pedestrian" || p.vehicleType === "third_party_object"
+        ? p.description || p.vehicleType.replace("_", " ")
+        : [p.colour, p.make, p.model].filter(Boolean).join(" ") ||
+          p.vehicleType;
+    const identifier = p.licencePlate
+      ? `, registration ${p.licencePlate}`
+      : p.description
+        ? ` — ${p.description}`
+        : "";
+    const name = p.ownerName ? `, keeper/driver: ${p.ownerName}` : "";
+    lines.push(`• ${partyLabel}: ${vehicleDesc}${identifier}${name}.`);
+  });
+
+  if (parties.length > 0) {
+    lines.push(
+      "\nNote: This incident involves multiple parties. A full multi-party liability analysis should be conducted with legal guidance.",
+    );
+  }
+
+  return lines.join("\n");
+}
 
 interface AccidentNarrativePanelProps {
   reportId: bigint;
@@ -85,6 +140,7 @@ export default function AccidentNarrativePanel({
   const [isOpen, setIsOpen] = useState(true);
   const [editedText, setEditedText] = useState("");
   const [isEditing, setIsEditing] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [localNarrative, setLocalNarrative] =
     useState<AccidentNarrative | null>(narrative ?? null);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -98,11 +154,64 @@ export default function AccidentNarrativePanel({
     }
   }, [narrative]);
 
-  const handleGenerate = () => {
-    const generated = generateAccidentNarrative(report);
-    setLocalNarrative(generated);
-    setEditedText(generated.narrativeText);
-    setIsEditing(true);
+  const handleGenerate = async () => {
+    setIsGenerating(true);
+    try {
+      // Build dash cam context string from analysis fields
+      const dashCamSummaryParts: string[] = [];
+      if (report.dashCamAnalysis?.roadConditions) {
+        dashCamSummaryParts.push(
+          `Road conditions: ${report.dashCamAnalysis.roadConditions}`,
+        );
+      }
+      if (report.dashCamAnalysis?.faultIndicators) {
+        dashCamSummaryParts.push(
+          `Fault indicators: ${report.dashCamAnalysis.faultIndicators}`,
+        );
+      }
+      if (report.dashCamAnalysis?.collisionDetected !== undefined) {
+        dashCamSummaryParts.push(
+          `Collision detected: ${report.dashCamAnalysis.collisionDetected ? "Yes" : "No"}`,
+        );
+      }
+      const dashCamSummary =
+        dashCamSummaryParts.length > 0
+          ? dashCamSummaryParts.join(". ")
+          : undefined;
+
+      const generated = await generateAccidentNarrative(
+        report,
+        report.aiAnalysisResult?.photoAnalysis,
+        dashCamSummary,
+      );
+
+      // Append additional parties section if present
+      const extraParties = parseAdditionalParties(
+        report.witnessStatement ?? "",
+      );
+      const partiesSection = buildAdditionalPartiesSection(
+        extraParties,
+        !!report.otherVehicle,
+      );
+      const fullNarrativeText = partiesSection
+        ? `${generated.narrativeText}${partiesSection}`
+        : generated.narrativeText;
+
+      const finalNarrative: AccidentNarrative = {
+        ...generated,
+        narrativeText: fullNarrativeText,
+      };
+
+      setLocalNarrative(finalNarrative);
+      setEditedText(finalNarrative.narrativeText);
+      setIsEditing(true);
+    } catch {
+      toast.error(
+        "Failed to generate the narrative statement. Please try again.",
+      );
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const handleSave = async () => {
@@ -147,7 +256,7 @@ export default function AccidentNarrativePanel({
             >
               <CardTitle className="text-sm flex items-center gap-2">
                 <Sparkles size={16} className="text-primary" />
-                AI Accident Narrative
+                Incident Report — Narrative Statement
                 {hasNarrative && (
                   <Badge variant="secondary" className="text-xs">
                     Generated
@@ -175,13 +284,28 @@ export default function AccidentNarrativePanel({
               <div className="flex flex-col items-center gap-3 py-6 text-center">
                 <Sparkles size={32} className="text-muted-foreground/50" />
                 <p className="text-sm text-muted-foreground max-w-sm">
-                  Generate an AI-powered accident narrative from your report
-                  data and dash cam analysis. The narrative can be edited before
-                  saving.
+                  Generate a formal narrative statement for this incident. The
+                  statement can be amended prior to submission and is formatted
+                  for insurance or legal purposes.
+                  {report.aiAnalysisResult?.photoAnalysis && (
+                    <span className="block mt-1 text-primary/80 font-medium">
+                      AI photo analysis will be used as source material.
+                    </span>
+                  )}
                 </p>
-                <Button onClick={handleGenerate} size="sm" className="gap-2">
-                  <Sparkles size={14} />
-                  Generate Narrative
+                <Button
+                  onClick={handleGenerate}
+                  size="sm"
+                  className="gap-2"
+                  disabled={isGenerating}
+                  data-ocid="narrative.primary_button"
+                >
+                  {isGenerating ? (
+                    <Loader2 size={14} className="animate-spin" />
+                  ) : (
+                    <Sparkles size={14} />
+                  )}
+                  {isGenerating ? "Generating…" : "Generate Statement"}
                 </Button>
               </div>
             ) : (
@@ -243,7 +367,7 @@ export default function AccidentNarrativePanel({
                       className="text-sm leading-relaxed resize-none"
                     />
                   ) : (
-                    <div className="p-3 bg-muted/30 rounded-lg border border-border text-sm leading-relaxed">
+                    <div className="p-3 bg-amber-50/30 dark:bg-amber-900/5 rounded-lg border border-border text-sm leading-relaxed font-mono text-xs whitespace-pre-wrap">
                       {localNarrative.narrativeText}
                     </div>
                   )}
@@ -255,10 +379,16 @@ export default function AccidentNarrativePanel({
                     variant="outline"
                     size="sm"
                     onClick={handleGenerate}
+                    disabled={isGenerating}
                     className="gap-1 text-xs h-7"
+                    data-ocid="narrative.secondary_button"
                   >
-                    <Sparkles size={12} />
-                    Regenerate
+                    {isGenerating ? (
+                      <Loader2 size={12} className="animate-spin" />
+                    ) : (
+                      <Sparkles size={12} />
+                    )}
+                    {isGenerating ? "Generating…" : "Regenerate Statement"}
                   </Button>
                 </div>
 

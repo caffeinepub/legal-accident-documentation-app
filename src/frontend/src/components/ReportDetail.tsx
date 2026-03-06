@@ -24,6 +24,7 @@ import DamageSeverityPanel from "./DamageSeverityPanel";
 import DashCamAnalysisPanel from "./DashCamAnalysisPanel";
 import DashCamGallery from "./DashCamGallery";
 import DiscrepancyAlert from "./DiscrepancyAlert";
+import ExportReportPanel from "./ExportReportPanel";
 import FaultLikelihoodPanel from "./FaultLikelihoodPanel";
 import FaultMatrixPanel from "./FaultMatrixPanel";
 import InjuryAnalysisPanel from "./InjuryAnalysisPanel";
@@ -122,6 +123,9 @@ export default function ReportDetail({ reportId, report }: ReportDetailProps) {
           )}
         </div>
       </div>
+
+      {/* Export Claim Report */}
+      <ExportReportPanel reportId={reportId} report={report} />
 
       {/* AI Core Panels */}
       <AccidentNarrativePanel

@@ -59,12 +59,12 @@ const _DAMAGE_TYPES = [
   "Total Loss",
 ] as const;
 
-function scoreFromKeywords(text: string, zone: Zone): number {
+function scoreFromKeywords(text: string, zone: Zone, weight = 2): number {
   const lower = text.toLowerCase();
   const keywords = ZONE_KEYWORDS[zone];
   let score = 0;
   for (const kw of keywords) {
-    if (lower.includes(kw)) score += 2;
+    if (lower.includes(kw)) score += weight;
   }
   return Math.min(score, 8);
 }
@@ -136,22 +136,37 @@ function getZoneDescription(zone: Zone, score: number): string {
   return `${descriptions[zone][idx]} (${severity} — score ${score}/10).`;
 }
 
+export interface DamageSeverityResult extends DamageSeverity {
+  aiInformed?: boolean;
+}
+
 export function calculateDamageSeverity(
   report: AccidentReport,
-): DamageSeverity {
+  photoAnalysisText?: string,
+): DamageSeverityResult {
   const damageText = report.damageDescription || "";
   const hasImages = report.imageData && report.imageData.length > 0;
   const dashCam = report.dashCamAnalysis;
+  const hasPhotoAnalysis =
+    !!photoAnalysisText && photoAnalysisText.trim().length > 0;
 
-  // Base scores per zone from damage description keywords
+  // Base scores per zone from damage description keywords (weight 2)
   const zoneScores: Record<Zone, number> = {
-    front: scoreFromKeywords(damageText, "front"),
-    rear: scoreFromKeywords(damageText, "rear"),
-    left: scoreFromKeywords(damageText, "left"),
-    right: scoreFromKeywords(damageText, "right"),
-    roof: scoreFromKeywords(damageText, "roof"),
-    undercarriage: scoreFromKeywords(damageText, "undercarriage"),
+    front: scoreFromKeywords(damageText, "front", 2),
+    rear: scoreFromKeywords(damageText, "rear", 2),
+    left: scoreFromKeywords(damageText, "left", 2),
+    right: scoreFromKeywords(damageText, "right", 2),
+    roof: scoreFromKeywords(damageText, "roof", 2),
+    undercarriage: scoreFromKeywords(damageText, "undercarriage", 2),
   };
+
+  // Boost from photo analysis keywords (weight 1 — secondary source)
+  if (hasPhotoAnalysis) {
+    for (const zone of ZONES) {
+      const photoBoost = scoreFromKeywords(photoAnalysisText!, zone, 1);
+      zoneScores[zone] = Math.min(10, zoneScores[zone] + photoBoost);
+    }
+  }
 
   // Boost scores if dash cam detected collision
   if (dashCam?.collisionDetected) {
@@ -239,5 +254,6 @@ export function calculateDamageSeverity(
     vehicleZones,
     totalLossProbability: BigInt(totalLossProbability),
     heatMap,
+    aiInformed: hasPhotoAnalysis,
   };
 }

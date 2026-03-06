@@ -17,90 +17,6 @@ export interface PhotoAnalysisResult {
   }>;
 }
 
-const DAMAGE_DESCRIPTIONS = [
-  "Front bumper shows significant impact damage with paint transfer visible.",
-  "Rear quarter panel has deep crease damage consistent with side-impact collision.",
-  "Hood is buckled and misaligned, indicating frontal collision force.",
-  "Driver-side door has intrusion damage with shattered window glass.",
-  "Airbag deployment visible through windscreen, indicating high-impact event.",
-  "Undercarriage scraping marks suggest vehicle left the road surface.",
-];
-
-const ROAD_CONDITIONS = [
-  "Road surface appears dry with clear lane markings visible.",
-  "Wet road surface with standing water visible near the collision point.",
-  "Debris field extends approximately 3 metres from the primary impact zone.",
-  "Skid marks visible on tarmac, estimated 12–18 metres in length.",
-  "Traffic cones and emergency markers visible in background.",
-];
-
-const VEHICLE_POSITIONS = [
-  "Vehicle is positioned at approximately 45 degrees to the kerb.",
-  "Both vehicles remain in the carriageway, partially blocking traffic.",
-  "Vehicle has come to rest on the pavement after impact.",
-  "Vehicles are interlocked at the front-left and rear-right corners.",
-];
-
-const INJURY_INDICATORS = [
-  "No visible occupant injuries apparent from exterior photos.",
-  "Deployed airbags suggest potential occupant impact forces.",
-  "Windscreen has spider-web fracture pattern consistent with head contact.",
-];
-
-const EVIDENCE_GAP_TEMPLATES = [
-  {
-    description:
-      "Rear bumper damage not captured — additional photo from rear angle required.",
-    evidenceType: "photo",
-    confidenceLevel: BigInt(75),
-  },
-  {
-    description:
-      "Road surface skid marks not fully documented — wider angle photo needed.",
-    evidenceType: "photo",
-    confidenceLevel: BigInt(80),
-  },
-  {
-    description:
-      "Traffic signal or road sign visibility not confirmed in current photos.",
-    evidenceType: "photo",
-    confidenceLevel: BigInt(70),
-  },
-  {
-    description:
-      "Interior cabin damage and airbag deployment not photographed.",
-    evidenceType: "photo",
-    confidenceLevel: BigInt(65),
-  },
-  {
-    description:
-      "Witness contact details not yet recorded — witness statement recommended.",
-    evidenceType: "witness_statement",
-    confidenceLevel: BigInt(85),
-  },
-  {
-    description:
-      "Dash cam footage not yet provided — video evidence would strengthen the report.",
-    evidenceType: "video",
-    confidenceLevel: BigInt(90),
-  },
-  {
-    description:
-      "GPS location data not confirmed — precise accident coordinates needed.",
-    evidenceType: "gps_data",
-    confidenceLevel: BigInt(60),
-  },
-];
-
-function pickRandom<T>(arr: T[]): T {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-
-function pickMultiple<T>(arr: T[], count: number): T[] {
-  const shuffled = [...arr].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, count);
-}
-
 function buildVehicleContextString(vehicle?: VehicleContext): string {
   if (!vehicle) return "";
   const parts: string[] = [];
@@ -112,71 +28,137 @@ function buildVehicleContextString(vehicle?: VehicleContext): string {
   return parts.length > 0 ? parts.join(" ") : "";
 }
 
+async function blobToBase64(blob: ExternalBlob): Promise<string> {
+  const bytes = await blob.getBytes();
+  let binary = "";
+  const len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
 export async function analyzePhotos(
   photos: ExternalBlob[],
   vehicleContext?: VehicleContext,
 ): Promise<PhotoAnalysisResult> {
-  // Simulate async processing delay
-  await new Promise((resolve) =>
-    setTimeout(resolve, 1500 + Math.random() * 1000),
-  );
-
-  const photoCount = photos.length;
   const vehicleLabel = buildVehicleContextString(vehicleContext);
 
-  // Build a realistic description based on photo count
-  const descriptionParts: string[] = [];
+  const vehicleContextText = vehicleLabel
+    ? `Vehicle details: ${vehicleLabel}.`
+    : "Vehicle details: Not provided.";
 
-  descriptionParts.push(
-    `AI Photo Analysis — ${photoCount} image${photoCount !== 1 ? "s" : ""} reviewed.`,
-  );
+  const prompt = `You are a UK road traffic incident analyst with expertise in insurance claims and legal documentation. Analyse the attached accident scene photo(s) and provide a comprehensive formal assessment.
 
-  if (vehicleLabel) {
-    descriptionParts.push(
-      `Vehicle identified in report as a ${vehicleLabel}. Analysis is cross-referenced against this vehicle's characteristics.`,
-    );
+Please provide:
+1) A formal insurance/legal description covering: visible damage to vehicles (type, severity, location on vehicle), road surface conditions, vehicle positions and angles relative to the road, any traffic signs or signals visible, skid marks or debris, weather indicators from the scene, and any visible injury indicators.
+2) A JSON list of evidence gaps — specific recommendations for additional photos, videos, witness statements, or GPS data that would strengthen the legal and insurance claim.
+
+${vehicleContextText}
+
+IMPORTANT: Format your entire response as valid JSON with this exact structure:
+{
+  "description": "Your formal insurance/legal description here as a single paragraph",
+  "evidenceGaps": [
+    {
+      "description": "Specific recommendation for additional evidence",
+      "evidenceType": "photo|video|witness_statement|gps_data|description|third_party_info|traffic_signal|conditions",
+      "confidenceLevel": 75
+    }
+  ]
+}
+
+Use formal UK insurance/legal language in the description. The confidenceLevel should be an integer from 0 to 100 indicating how strongly this evidence gap would improve the claim.`;
+
+  // Convert all photos to base64
+  const base64Images = await Promise.all(photos.map(blobToBase64));
+
+  // Build content array: text prompt + all images
+  const content: Array<
+    | { type: "text"; text: string }
+    | { type: "image_url"; image_url: { url: string } }
+  > = [{ type: "text", text: prompt }];
+
+  for (const b64 of base64Images) {
+    content.push({
+      type: "image_url",
+      image_url: { url: `data:image/jpeg;base64,${b64}` },
+    });
   }
 
-  descriptionParts.push(pickRandom(DAMAGE_DESCRIPTIONS));
-  descriptionParts.push(pickRandom(ROAD_CONDITIONS));
-  descriptionParts.push(pickRandom(VEHICLE_POSITIONS));
+  try {
+    const response = await fetch("/api/v1/chat/completions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "user",
+            content,
+          },
+        ],
+      }),
+    });
 
-  if (vehicleLabel) {
-    descriptionParts.push(
-      `Damage pattern observed is assessed in context of the reported ${vehicleLabel}. Visible damage zones should be compared against vehicle registration records where applicable.`,
-    );
+    if (!response.ok) {
+      throw new Error(`AI API responded with status ${response.status}`);
+    }
+
+    const data = await response.json();
+    const rawContent: string = data?.choices?.[0]?.message?.content ?? "";
+
+    // Attempt to parse the JSON response
+    try {
+      // Strip markdown code fences if present
+      const cleaned = rawContent
+        .replace(/^```json\s*/i, "")
+        .replace(/^```\s*/i, "")
+        .replace(/\s*```$/i, "")
+        .trim();
+
+      const parsed = JSON.parse(cleaned) as {
+        description?: string;
+        evidenceGaps?: Array<{
+          description: string;
+          evidenceType: string;
+          confidenceLevel: number;
+        }>;
+      };
+
+      const description =
+        parsed.description?.trim() ||
+        "Photo analysis completed. No formal description could be extracted.";
+
+      const evidenceGaps = (parsed.evidenceGaps ?? []).map((gap) => ({
+        description: gap.description,
+        evidenceType: gap.evidenceType,
+        confidenceLevel: BigInt(
+          Math.min(100, Math.max(0, Math.round(gap.confidenceLevel ?? 50))),
+        ),
+      }));
+
+      return { description, evidenceGaps };
+    } catch {
+      // JSON parse failed — use raw content as description
+      return {
+        description: rawContent.trim() || "Photo analysis completed.",
+        evidenceGaps: [],
+      };
+    }
+  } catch {
+    // Network or API failure — return a graceful fallback
+    const photoCount = photos.length;
+    return {
+      description: `Photo analysis could not be completed at this time (${photoCount} image${photoCount !== 1 ? "s" : ""} submitted). Please ensure you have a stable connection and retry the analysis.`,
+      evidenceGaps: [
+        {
+          description:
+            "AI photo analysis was unavailable. Manual review of submitted images is recommended.",
+          evidenceType: "photo",
+          confidenceLevel: BigInt(80),
+        },
+      ],
+    };
   }
-
-  if (photoCount >= 2) {
-    descriptionParts.push(pickRandom(INJURY_INDICATORS));
-  }
-
-  if (photoCount >= 3) {
-    descriptionParts.push(
-      "Multiple angles confirm the primary point of impact. Damage pattern is consistent across all submitted images.",
-    );
-  } else {
-    descriptionParts.push(
-      "Limited photo angles available. Additional images from different perspectives would improve analysis accuracy.",
-    );
-  }
-
-  const description = descriptionParts.join(" ");
-
-  // Determine evidence gaps based on photo count
-  let gapCount = 0;
-  if (photoCount === 1) {
-    gapCount = 3;
-  } else if (photoCount === 2) {
-    gapCount = 2;
-  } else if (photoCount >= 3) {
-    gapCount = Math.random() > 0.5 ? 1 : 0;
-  }
-
-  const evidenceGaps = pickMultiple(EVIDENCE_GAP_TEMPLATES, gapCount);
-
-  return {
-    description,
-    evidenceGaps,
-  };
 }
