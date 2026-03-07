@@ -1,9 +1,77 @@
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useParams } from "@tanstack/react-router";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Printer } from "lucide-react";
 import React from "react";
 import ReportDetail from "../components/ReportDetail";
 import { useGetReport } from "../hooks/useQueries";
+
+function PrintStyles() {
+  return (
+    <style>{`
+      @media print {
+        /* Hide navigation, header, footer, buttons */
+        [data-print-hide],
+        header,
+        footer,
+        nav {
+          display: none !important;
+        }
+
+        /* Clean layout */
+        body {
+          background: white !important;
+          color: black !important;
+          font-size: 12pt;
+          line-height: 1.5;
+        }
+
+        /* Remove shadows and backgrounds */
+        .shadow,
+        .shadow-sm,
+        .shadow-md,
+        .shadow-lg,
+        [class*="shadow"] {
+          box-shadow: none !important;
+        }
+
+        /* Force cards to white background */
+        [class*="card"],
+        [class*="Card"] {
+          background: white !important;
+          border: 1px solid #ccc !important;
+        }
+
+        /* Single column, full width */
+        .max-w-3xl {
+          max-width: 100% !important;
+        }
+
+        /* Expand all collapsible panels */
+        [data-state="closed"] > [data-radix-collapsible-content] {
+          display: block !important;
+          height: auto !important;
+        }
+
+        /* Page breaks before major sections */
+        .print-break-before {
+          break-before: page;
+          page-break-before: always;
+        }
+
+        /* Ensure text is black */
+        * {
+          color: black !important;
+        }
+
+        /* Page margins */
+        @page {
+          margin: 1.5cm;
+        }
+      }
+    `}</style>
+  );
+}
 
 export default function ReportDetailPage() {
   const { reportId } = useParams({ from: "/reports/$reportId" });
@@ -34,5 +102,27 @@ export default function ReportDetailPage() {
     );
   }
 
-  return <ReportDetail reportId={reportIdBigInt} report={report} />;
+  return (
+    <>
+      <PrintStyles />
+      <div className="max-w-3xl mx-auto space-y-4">
+        {/* Download PDF button */}
+        <div className="flex justify-end" data-print-hide>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            onClick={() => window.print()}
+            data-ocid="report.secondary_button"
+            data-print-hide
+          >
+            <Printer className="w-4 h-4" />
+            Download PDF
+          </Button>
+        </div>
+
+        <ReportDetail reportId={reportIdBigInt} report={report} />
+      </div>
+    </>
+  );
 }

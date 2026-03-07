@@ -45,6 +45,15 @@
     --dashcam-header-fg: oklch(0.95 0.02 160);
     --dashcam-surface: oklch(0.96 0.015 160);
     --dashcam-border: oklch(0.82 0.04 160);
+
+    /* Trust & credibility section */
+    --trust-accent: oklch(0.52 0.18 145);
+    --trust-surface: oklch(0.96 0.015 145);
+    --trust-border: oklch(0.8 0.06 145);
+    --trust-fg: oklch(0.25 0.08 145);
+    --trust-amber-surface: oklch(0.97 0.025 80);
+    --trust-amber-border: oklch(0.82 0.08 80);
+    --trust-amber-fg: oklch(0.45 0.12 75);
   }
 
   .dark {
@@ -87,6 +96,15 @@
     --dashcam-header-fg: oklch(0.92 0.03 160);
     --dashcam-surface: oklch(0.18 0.025 160);
     --dashcam-border: oklch(0.28 0.05 160);
+
+    /* Trust & credibility section */
+    --trust-accent: oklch(0.58 0.18 145);
+    --trust-surface: oklch(0.16 0.025 145);
+    --trust-border: oklch(0.28 0.06 145);
+    --trust-fg: oklch(0.82 0.08 145);
+    --trust-amber-surface: oklch(0.18 0.03 75);
+    --trust-amber-border: oklch(0.3 0.08 75);
+    --trust-amber-fg: oklch(0.78 0.12 75);
   }
 }
 

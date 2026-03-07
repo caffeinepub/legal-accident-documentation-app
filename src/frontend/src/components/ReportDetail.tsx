@@ -11,6 +11,7 @@ import {
   ChevronDown,
   ChevronUp,
   FileText,
+  Scale,
   ScanSearch,
   Video,
 } from "lucide-react";
@@ -23,6 +24,7 @@ import ContributoryNegligencePanel from "./ContributoryNegligencePanel";
 import DamageSeverityPanel from "./DamageSeverityPanel";
 import DashCamAnalysisPanel from "./DashCamAnalysisPanel";
 import DashCamGallery from "./DashCamGallery";
+import DemandLetterPanel from "./DemandLetterPanel";
 import DiscrepancyAlert from "./DiscrepancyAlert";
 import ExportReportPanel from "./ExportReportPanel";
 import FaultLikelihoodPanel from "./FaultLikelihoodPanel";
@@ -32,6 +34,9 @@ import LegalReferencePanel from "./LegalReferencePanel";
 import LiabilityDisplay from "./LiabilityDisplay";
 import NextStepsPanel from "./NextStepsPanel";
 import PhotoGallery from "./PhotoGallery";
+import PostIncidentChecklist from "./PostIncidentChecklist";
+import StatuteLimitationsPanel from "./StatuteLimitationsPanel";
+import SubmissionCredibilityBadge from "./SubmissionCredibilityBadge";
 import TrafficSignsDisplay from "./TrafficSignsDisplay";
 import ViolationsDisplay from "./ViolationsDisplay";
 
@@ -124,6 +129,12 @@ export default function ReportDetail({ reportId, report }: ReportDetailProps) {
         </div>
       </div>
 
+      {/* Trust & Credibility Badge */}
+      <SubmissionCredibilityBadge
+        witnessStatement={report.witnessStatement ?? ""}
+        timestamp={report.timestamp}
+      />
+
       {/* Export Claim Report */}
       <ExportReportPanel reportId={reportId} report={report} />
 
@@ -143,6 +154,23 @@ export default function ReportDetail({ reportId, report }: ReportDetailProps) {
         report={report}
         faultLikelihoodAssessment={report.faultLikelihoodAssessment}
       />
+
+      {/* Legal & Insurance Utility */}
+      <CollapsibleSection
+        title="Legal & Insurance Utility"
+        icon={Scale}
+        defaultOpen={false}
+      >
+        <div className="space-y-4">
+          <DemandLetterPanel report={report} />
+          <PostIncidentChecklist />
+          <StatuteLimitationsPanel
+            accidentDate={
+              report.timestamp ? new Date(Number(report.timestamp)) : undefined
+            }
+          />
+        </div>
+      </CollapsibleSection>
 
       {/* Photo AI Analysis */}
       {photoAnalysis && (

@@ -9,7 +9,10 @@ export default function Layout() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
-      <header className="border-b border-border bg-card sticky top-0 z-10">
+      <header
+        className="border-b border-border bg-card sticky top-0 z-10"
+        data-print-hide
+      >
         <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
           <button
             type="button"
@@ -69,7 +72,10 @@ export default function Layout() {
         <Outlet />
       </main>
 
-      <footer className="border-t border-border bg-card mt-auto">
+      <footer
+        className="border-t border-border bg-card mt-auto"
+        data-print-hide
+      >
         <div className="max-w-5xl mx-auto px-4 py-4 text-center text-xs text-muted-foreground">
           © {new Date().getFullYear()} AccidentReport · Built with{" "}
           <span className="text-red-500">♥</span> using{" "}

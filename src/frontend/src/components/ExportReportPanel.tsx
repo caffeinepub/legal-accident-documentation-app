@@ -281,7 +281,7 @@ export default function ExportReportPanel({
 
       <CardContent className="space-y-4 pt-0">
         {/* Action buttons */}
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex gap-2 flex-wrap" data-print-hide>
           <Button
             size="sm"
             className="gap-2 flex-1 sm:flex-none"

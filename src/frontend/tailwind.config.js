@@ -50,6 +50,14 @@ export default {
         "dashcam-header-fg": "var(--dashcam-header-fg)",
         "dashcam-surface": "var(--dashcam-surface)",
         "dashcam-border": "var(--dashcam-border)",
+        // Trust & credibility tokens
+        "trust-accent": "var(--trust-accent)",
+        "trust-surface": "var(--trust-surface)",
+        "trust-border": "var(--trust-border)",
+        "trust-fg": "var(--trust-fg)",
+        "trust-amber-surface": "var(--trust-amber-surface)",
+        "trust-amber-border": "var(--trust-amber-border)",
+        "trust-amber-fg": "var(--trust-amber-fg)",
       },
       borderRadius: {
         lg: "var(--radius)",
