@@ -13,6 +13,7 @@ import {
   FileText,
   Scale,
   ScanSearch,
+  Shield,
   Video,
 } from "lucide-react";
 import type React from "react";
@@ -35,10 +36,13 @@ import LiabilityDisplay from "./LiabilityDisplay";
 import NextStepsPanel from "./NextStepsPanel";
 import PhotoGallery from "./PhotoGallery";
 import PostIncidentChecklist from "./PostIncidentChecklist";
+import PreActionProtocolPanel from "./PreActionProtocolPanel";
+import RepairCostEstimatorPanel from "./RepairCostEstimatorPanel";
 import StatuteLimitationsPanel from "./StatuteLimitationsPanel";
 import SubmissionCredibilityBadge from "./SubmissionCredibilityBadge";
 import TrafficSignsDisplay from "./TrafficSignsDisplay";
 import ViolationsDisplay from "./ViolationsDisplay";
+import WhiplashClassifierPanel from "./WhiplashClassifierPanel";
 
 interface ReportDetailProps {
   reportId: bigint;
@@ -86,6 +90,35 @@ function CollapsibleSection({
   );
 }
 
+const POLICE_INFO_DELIMITER = "---POLICE_INFO---\n";
+
+function parsePoliceInfo(
+  accidentMarker: string,
+): { policeRef: string; officerName: string } | null {
+  const idx = accidentMarker.indexOf(POLICE_INFO_DELIMITER);
+  if (idx === -1) return null;
+  try {
+    const json = accidentMarker
+      .slice(idx + POLICE_INFO_DELIMITER.length)
+      .trim();
+    return JSON.parse(json) as { policeRef: string; officerName: string };
+  } catch {
+    return null;
+  }
+}
+
+function stripPoliceInfo(accidentMarker: string): string {
+  const idx = accidentMarker.indexOf(
+    `\n\n${POLICE_INFO_DELIMITER.trimStart()}`,
+  );
+  if (idx === -1) {
+    const idx2 = accidentMarker.indexOf(POLICE_INFO_DELIMITER);
+    if (idx2 === -1) return accidentMarker;
+    return accidentMarker.slice(0, idx2).trim();
+  }
+  return accidentMarker.slice(0, idx).trim();
+}
+
 export default function ReportDetail({ reportId, report }: ReportDetailProps) {
   const primaryViolation =
     report.violations && report.violations.length > 0
@@ -95,6 +128,13 @@ export default function ReportDetail({ reportId, report }: ReportDetailProps) {
   const photoAnalysis = report.aiAnalysisResult?.photoAnalysis ?? "";
   const dashCamAnalysisText = report.aiAnalysisResult?.dashCamAnalysis ?? "";
   const evidenceGaps = report.aiAnalysisResult?.evidenceGaps ?? [];
+
+  const policeInfo = report.accidentMarker
+    ? parsePoliceInfo(report.accidentMarker)
+    : null;
+  const cleanAccidentMarker = report.accidentMarker
+    ? stripPoliceInfo(report.accidentMarker)
+    : "";
 
   const evidenceTypeLabel = (type: string) => {
     const map: Record<string, string> = {
@@ -155,6 +195,16 @@ export default function ReportDetail({ reportId, report }: ReportDetailProps) {
         faultLikelihoodAssessment={report.faultLikelihoodAssessment}
       />
 
+      {/* AI Enhancements */}
+      <WhiplashClassifierPanel
+        reportId={reportId}
+        injuryDescription={report.damageDescription}
+      />
+      <RepairCostEstimatorPanel
+        damageSeverity={report.damageSeverity}
+        crashType={report.aiAnalysisResult?.inferredCrashType}
+      />
+
       {/* Legal & Insurance Utility */}
       <CollapsibleSection
         title="Legal & Insurance Utility"
@@ -163,6 +213,7 @@ export default function ReportDetail({ reportId, report }: ReportDetailProps) {
       >
         <div className="space-y-4">
           <DemandLetterPanel report={report} />
+          <PreActionProtocolPanel />
           <PostIncidentChecklist />
           <StatuteLimitationsPanel
             accidentDate={
@@ -292,7 +343,9 @@ export default function ReportDetail({ reportId, report }: ReportDetailProps) {
       <FaultMatrixPanel violationType={primaryViolation} />
 
       {/* Contributory Negligence */}
-      <ContributoryNegligencePanel />
+      <ContributoryNegligencePanel
+        faultLikelihoodAssessment={report.faultLikelihoodAssessment}
+      />
 
       {/* Next Steps */}
       <NextStepsPanel />
@@ -305,17 +358,19 @@ export default function ReportDetail({ reportId, report }: ReportDetailProps) {
             {report.vehicleInfo?.make} {report.vehicleInfo?.model}
           </div>
           <div className="text-muted-foreground">Colour</div>
-          <div>{report.vehicleInfo?.colour || "—"}</div>
+          <div>{report.vehicleInfo?.colour || "\u2014"}</div>
           <div className="text-muted-foreground">Licence Plate</div>
-          <div>{report.vehicleInfo?.licencePlate || "—"}</div>
+          <div>{report.vehicleInfo?.licencePlate || "\u2014"}</div>
           <div className="text-muted-foreground">Year</div>
           <div>
-            {report.vehicleInfo?.year ? Number(report.vehicleInfo.year) : "—"}
+            {report.vehicleInfo?.year
+              ? Number(report.vehicleInfo.year)
+              : "\u2014"}
           </div>
           <div className="text-muted-foreground">MOT</div>
-          <div>{report.vehicleInfo?.mot || "—"}</div>
+          <div>{report.vehicleInfo?.mot || "\u2014"}</div>
           <div className="text-muted-foreground">Registration</div>
-          <div>{report.vehicleInfo?.registration || "—"}</div>
+          <div>{report.vehicleInfo?.registration || "\u2014"}</div>
         </div>
       </CollapsibleSection>
 
@@ -328,13 +383,13 @@ export default function ReportDetail({ reportId, report }: ReportDetailProps) {
               {report.otherVehicle.make} {report.otherVehicle.model}
             </div>
             <div className="text-muted-foreground">Owner</div>
-            <div>{report.otherVehicle.ownerName || "—"}</div>
+            <div>{report.otherVehicle.ownerName || "\u2014"}</div>
             <div className="text-muted-foreground">Licence Plate</div>
-            <div>{report.otherVehicle.licencePlate || "—"}</div>
+            <div>{report.otherVehicle.licencePlate || "\u2014"}</div>
             <div className="text-muted-foreground">Insurer</div>
-            <div>{report.otherVehicle.insurer || "—"}</div>
+            <div>{report.otherVehicle.insurer || "\u2014"}</div>
             <div className="text-muted-foreground">Policy Number</div>
-            <div>{report.otherVehicle.insurancePolicyNumber || "—"}</div>
+            <div>{report.otherVehicle.insurancePolicyNumber || "\u2014"}</div>
           </div>
         </CollapsibleSection>
       )}
@@ -345,15 +400,15 @@ export default function ReportDetail({ reportId, report }: ReportDetailProps) {
           <div className="text-muted-foreground">Speed</div>
           <div>{Number(report.vehicleSpeed)} mph</div>
           <div className="text-muted-foreground">Weather</div>
-          <div>{report.surroundings?.weather || "—"}</div>
+          <div>{report.surroundings?.weather || "\u2014"}</div>
           <div className="text-muted-foreground">Road Condition</div>
-          <div>{report.surroundings?.roadCondition || "—"}</div>
+          <div>{report.surroundings?.roadCondition || "\u2014"}</div>
           <div className="text-muted-foreground">Visibility</div>
-          <div>{report.surroundings?.visibility || "—"}</div>
+          <div>{report.surroundings?.visibility || "\u2014"}</div>
           <div className="text-muted-foreground">Stop Location</div>
-          <div>{report.stopLocation || "—"}</div>
+          <div>{report.stopLocation || "\u2014"}</div>
           <div className="text-muted-foreground">Accident Marker</div>
-          <div>{report.accidentMarker || "—"}</div>
+          <div>{cleanAccidentMarker || "\u2014"}</div>
         </div>
         {report.damageDescription && (
           <div className="mt-3">
@@ -369,6 +424,30 @@ export default function ReportDetail({ reportId, report }: ReportDetailProps) {
               Witness Statement
             </p>
             <p className="text-sm">{report.witnessStatement}</p>
+          </div>
+        )}
+        {policeInfo && (policeInfo.policeRef || policeInfo.officerName) && (
+          <div className="mt-3 flex items-start gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2.5">
+            <Shield className="h-4 w-4 text-muted-foreground mt-0.5 shrink-0" />
+            <div className="space-y-1 text-sm">
+              <p className="font-medium text-foreground">Police Information</p>
+              {policeInfo.policeRef && (
+                <p className="text-muted-foreground">
+                  Reference:{" "}
+                  <span className="text-foreground font-mono">
+                    {policeInfo.policeRef}
+                  </span>
+                </p>
+              )}
+              {policeInfo.officerName && (
+                <p className="text-muted-foreground">
+                  Attending Officer:{" "}
+                  <span className="text-foreground">
+                    {policeInfo.officerName}
+                  </span>
+                </p>
+              )}
+            </div>
           </div>
         )}
       </CollapsibleSection>

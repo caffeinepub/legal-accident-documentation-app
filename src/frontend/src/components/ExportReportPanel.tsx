@@ -24,6 +24,32 @@ interface ExportReportPanelProps {
 }
 
 const PREVIEW_LENGTH = 500;
+const POLICE_INFO_DELIMITER = "---POLICE_INFO---\n";
+
+function parsePoliceInfoForExport(
+  accidentMarker: string,
+): { policeRef: string; officerName: string } | null {
+  const idx = accidentMarker.indexOf(POLICE_INFO_DELIMITER);
+  if (idx === -1) return null;
+  try {
+    const json = accidentMarker
+      .slice(idx + POLICE_INFO_DELIMITER.length)
+      .trim();
+    return JSON.parse(json) as { policeRef: string; officerName: string };
+  } catch {
+    return null;
+  }
+}
+
+function stripPoliceInfoForExport(accidentMarker: string): string {
+  const idx = accidentMarker.indexOf(POLICE_INFO_DELIMITER);
+  if (idx === -1) return accidentMarker;
+  // Walk back to remove the delimiter prefix (\n\n---) as well
+  const trimIdx = accidentMarker.lastIndexOf("\n", idx - 1);
+  return trimIdx > 0
+    ? accidentMarker.slice(0, trimIdx).trim()
+    : accidentMarker.slice(0, idx).trim();
+}
 
 function compileReport(reportId: bigint, report: AccidentReport): string {
   const generated = new Date().toLocaleString("en-GB", {
@@ -162,9 +188,24 @@ function compileReport(reportId: bigint, report: AccidentReport): string {
       lines.push(`  Recorded Speed: ${Number(report.vehicleSpeed)} mph`);
     if (report.stopLocation)
       lines.push(`  Stop Location: ${report.stopLocation}`);
-    if (report.accidentMarker)
-      lines.push(`  Accident Marker: ${report.accidentMarker}`);
+    if (report.accidentMarker) {
+      const cleanMarker = stripPoliceInfoForExport(report.accidentMarker);
+      if (cleanMarker) lines.push(`  Accident Marker: ${cleanMarker}`);
+    }
     lines.push("");
+  }
+
+  // 9a. POLICE INFORMATION
+  if (report.accidentMarker) {
+    const policeInfo = parsePoliceInfoForExport(report.accidentMarker);
+    if (policeInfo && (policeInfo.policeRef || policeInfo.officerName)) {
+      lines.push("9a. POLICE INFORMATION");
+      if (policeInfo.policeRef)
+        lines.push(`  Police Reference No.: ${policeInfo.policeRef}`);
+      if (policeInfo.officerName)
+        lines.push(`  Attending Officer: ${policeInfo.officerName}`);
+      lines.push("");
+    }
   }
 
   // 10. EVIDENCE GAPS

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Outlet, useLocation, useNavigate } from "@tanstack/react-router";
-import { Grid3X3, List, Plus, Scale, Shield } from "lucide-react";
+import { BookUser, Grid3X3, List, Plus, Scale, Shield } from "lucide-react";
 import React from "react";
 
 export default function Layout() {
@@ -63,6 +63,16 @@ export default function Layout() {
             >
               <Grid3X3 className="w-3.5 h-3.5" />
               Grid View
+            </Button>
+            <Button
+              variant={location.pathname === "/insurers" ? "default" : "ghost"}
+              size="sm"
+              onClick={() => navigate({ to: "/insurers" })}
+              className="gap-1.5"
+              data-ocid="nav.insurers.link"
+            >
+              <BookUser className="w-3.5 h-3.5" />
+              Insurers
             </Button>
           </nav>
         </div>

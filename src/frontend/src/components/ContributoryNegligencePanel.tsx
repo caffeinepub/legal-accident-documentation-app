@@ -1,8 +1,18 @@
+import type { FaultLikelihoodAssessment } from "@/backend";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { BookMarked, ChevronDown, ChevronUp, Info, Scale } from "lucide-react";
-import React, { useState } from "react";
+import {
+  BookMarked,
+  ChevronDown,
+  ChevronUp,
+  Info,
+  PoundSterling,
+  Scale,
+} from "lucide-react";
+import { useState } from "react";
 import { negligenceData } from "../data/negligenceData";
 import type {
   FaultSplitScenario,
@@ -96,7 +106,145 @@ function PrecedentCard({ precedent }: { precedent: NegligencePrecedent }) {
   );
 }
 
-export default function ContributoryNegligencePanel() {
+function formatCurrency(n: number): string {
+  return `\u00a3${n.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
+function CompensationCalculator({
+  faultLikelihoodAssessment,
+}: {
+  faultLikelihoodAssessment?: FaultLikelihoodAssessment;
+}) {
+  const initialPartyA = faultLikelihoodAssessment
+    ? Number(faultLikelihoodAssessment.partyAPercentage)
+    : 50;
+
+  const [totalClaim, setTotalClaim] = useState("");
+  const [partyAFault, setPartyAFault] = useState(String(initialPartyA));
+
+  const partyANum = Math.max(0, Math.min(100, Number(partyAFault) || 0));
+  const partyBNum = 100 - partyANum;
+  const totalNum = Number(totalClaim.replace(/,/g, "")) || 0;
+
+  // Under contributory negligence, a party's compensation is reduced by their own fault %
+  const partyAReceives = totalNum * ((100 - partyANum) / 100);
+  const partyBReceives = totalNum * ((100 - partyBNum) / 100);
+  const showResult = totalNum > 0;
+
+  return (
+    <div className="space-y-4" data-ocid="negligence.panel">
+      <div className="flex items-center gap-2">
+        <PoundSterling className="w-4 h-4 text-primary" />
+        <h3 className="text-sm font-semibold">Compensation Calculator</h3>
+        <Badge variant="outline" className="text-xs">
+          Illustrative
+        </Badge>
+      </div>
+
+      <div className="p-3 rounded-lg bg-primary/5 border border-primary/20 text-xs text-muted-foreground leading-relaxed">
+        Under the <strong>Law Reform (Contributory Negligence) Act 1945</strong>
+        , each party’s compensation is reduced in proportion to their own
+        contributory fault.
+      </div>
+
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="space-y-1.5">
+          <Label
+            htmlFor="total-claim"
+            className="text-xs font-medium text-muted-foreground"
+          >
+            Total Claim Value (£)
+          </Label>
+          <Input
+            id="total-claim"
+            type="number"
+            min="0"
+            placeholder="e.g. 10000"
+            value={totalClaim}
+            onChange={(e) => setTotalClaim(e.target.value)}
+            className="h-8 text-sm"
+            data-ocid="negligence.input"
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label
+            htmlFor="party-a-fault"
+            className="text-xs font-medium text-muted-foreground"
+          >
+            Party A fault %
+            {faultLikelihoodAssessment && (
+              <span className="ml-1 text-[10px] text-violet-500">
+                (pre-filled)
+              </span>
+            )}
+          </Label>
+          <Input
+            id="party-a-fault"
+            type="number"
+            min="0"
+            max="100"
+            value={partyAFault}
+            onChange={(e) => setPartyAFault(e.target.value)}
+            className="h-8 text-sm"
+            data-ocid="negligence.input"
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label className="text-xs font-medium text-muted-foreground">
+            Party B fault %
+          </Label>
+          <div className="h-8 flex items-center px-3 rounded-md border border-border bg-muted/40 text-sm font-medium">
+            {partyBNum}%
+          </div>
+        </div>
+      </div>
+
+      {showResult && (
+        <div className="grid grid-cols-2 gap-3">
+          <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800/40 space-y-1">
+            <p className="text-xs text-blue-600 dark:text-blue-400 font-medium uppercase tracking-wide">
+              Party A receives
+            </p>
+            <p className="text-xl font-bold text-blue-700 dark:text-blue-300">
+              {formatCurrency(partyAReceives)}
+            </p>
+            <p className="text-[10px] text-blue-500">
+              Reduced by {partyANum}% own fault
+            </p>
+          </div>
+          <div className="p-3 rounded-lg bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-800/40 space-y-1">
+            <p className="text-xs text-orange-600 dark:text-orange-400 font-medium uppercase tracking-wide">
+              Party B receives
+            </p>
+            <p className="text-xl font-bold text-orange-700 dark:text-orange-300">
+              {formatCurrency(partyBReceives)}
+            </p>
+            <p className="text-[10px] text-orange-500">
+              Reduced by {partyBNum}% own fault
+            </p>
+          </div>
+        </div>
+      )}
+
+      <div className="flex items-start gap-2 p-3 rounded-lg bg-muted/40 border border-border">
+        <Info className="w-3.5 h-3.5 text-muted-foreground shrink-0 mt-0.5" />
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          This calculator is <strong>illustrative only</strong>. Actual
+          compensation depends on specific case facts, medical evidence, and
+          judicial assessment. Consult a qualified solicitor.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+interface ContributoryNegligencePanelProps {
+  faultLikelihoodAssessment?: FaultLikelihoodAssessment;
+}
+
+export default function ContributoryNegligencePanel({
+  faultLikelihoodAssessment,
+}: ContributoryNegligencePanelProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -106,6 +254,7 @@ export default function ContributoryNegligencePanel() {
         className="w-full flex items-center justify-between px-4 py-3 h-auto rounded-none hover:bg-muted/50 transition-colors"
         onClick={() => setIsOpen((prev) => !prev)}
         aria-expanded={isOpen}
+        data-ocid="negligence.open_modal_button"
       >
         <div className="flex items-center gap-2">
           <Scale className="w-4 h-4 text-primary shrink-0" />
@@ -181,6 +330,15 @@ export default function ContributoryNegligencePanel() {
               ))}
             </div>
           </div>
+
+          <Separator />
+
+          {/* Compensation Calculator */}
+          <CompensationCalculator
+            faultLikelihoodAssessment={faultLikelihoodAssessment}
+          />
+
+          <Separator />
 
           {/* Disclaimer */}
           <div className="flex items-start gap-2 p-3 rounded-lg bg-muted/50 border">

@@ -3,6 +3,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useParams } from "@tanstack/react-router";
 import { AlertCircle, Printer } from "lucide-react";
 import React from "react";
+import InsurerContactsPanel from "../components/InsurerContactsPanel";
 import ReportDetail from "../components/ReportDetail";
 import { useGetReport } from "../hooks/useQueries";
 
@@ -121,6 +122,7 @@ export default function ReportDetailPage() {
           </Button>
         </div>
 
+        <InsurerContactsPanel reportId={reportIdBigInt} report={report} />
         <ReportDetail reportId={reportIdBigInt} report={report} />
       </div>
     </>

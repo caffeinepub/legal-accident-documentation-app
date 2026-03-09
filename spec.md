@@ -1,37 +1,35 @@
 # Legal Accident Documentation App
 
 ## Current State
-The app is a multi-step accident report wizard (5 steps: Media, Vehicle, Details, Parties, Review & Submit). Reports are stored on-chain and viewable in ReportDetail. There is auto-save/draft, PDF export, AI narrative, damage severity, fault likelihood, legal panels, multi-party support, and injury photo upload.
+A comprehensive UK road traffic accident documentation app with:
+- Multi-step wizard report creation
+- Photo/video/dash cam upload with AI analysis
+- AI accident narrative, damage severity scoring, fault likelihood assessment
+- Legal reference panel (Highway Code, case law, RTA citations)
+- Contributory negligence framework (informational, collapsible)
+- Legal & Insurance Utility panel (demand letter, post-incident checklist, statute of limitations)
+- Multi-party support, bird's eye grid view, injury photo upload
+- Insurer contacts, claim summary export, submission trust badge
 
 ## Requested Changes (Diff)
 
 ### Add
-- **SubmissionTrustPanel component**: shown at the bottom of StepReview (step 5) in AccidentReportForm, before the Submit button. Contains:
-  1. **Digital Signature field**: a typed name declaration input — "I, [name], confirm that the information in this report is accurate and complete to the best of my knowledge." with a checkbox to agree.
-  2. **Submission timestamp notice**: informational text explaining that the report will be timestamped at the exact moment of submission and the timestamp will be embedded in the report.
-  3. **Tamper-evident hash notice**: informational text explaining that a cryptographic fingerprint (SHA-256 hash) will be generated from the report data at submission and stored with the report, allowing any post-submission changes to be detected.
-- **SubmissionCredibilityBadge component**: shown in the ReportDetail header area (near the top, alongside the existing At Fault / No Fault badges). Displays:
-  - A green shield badge "Verified Submission" if the report has a stored hash.
-  - The submission timestamp in a human-readable format.
-  - The claimant's digital signature name (stored in the witnessStatement or a dedicated field).
-  - A truncated display of the SHA-256 hash (first 16 chars + "…") for reference.
-- **Hash generation logic**: at form submission time (handleSubmit in AccidentReportForm), compute a SHA-256 hash of the serialised report data (vehicle info, accident details, parties, timestamps) using the Web Crypto API. Store the hash and signatory name in the report's `witnessStatement` field using a well-defined delimiter (similar to the existing ADDITIONAL_PARTIES_DELIMITER pattern).
+- **WhiplashClassifierPanel**: A new component that maps injury descriptions/body regions to Whiplash Reform Protocol (WRP) Tariff amounts (UK, 2021). Displays injury duration bands (0–3 months, 3–6 months, 6–9 months, 9–12 months, 12–15 months, 15–18 months, 18–24 months) with corresponding tariff values, plus minor psychological injury uplift. Inputs: injury type selector and duration. Output: WRP tariff band, estimated compensation range, and legal notes. Displayed in ReportDetail as a collapsible section.
+- **RepairCostEstimatorPanel**: Estimates repair cost ranges (£) based on crash type (rear-end, head-on, side impact, rollover, multi-vehicle) and damage severity score from the existing DamageSeverityPanel. Uses lookup table approach: severity score + crash type → cost band (e.g. Minor rear-end: £500–£1,500; Critical head-on: £8,000–£25,000+). Also shows salvage/write-off threshold guidance. Displayed in ReportDetail as a collapsible section.
+- **PreActionProtocolPanel**: A checklist component mirroring the Pre-Action Protocol for Personal Injury Claims (CPR Part C). Covers: early notification letter, CNF (Claim Notification Form), medical evidence, Schedule of Loss, Letter of Claim, response period (3 months). Each step shows status (pending/done), time limit, and relevant CPR rule reference. Displayed in ReportDetail within the Legal & Insurance Utility collapsible.
+- **ContributoryNegligenceCalculator**: Enhances the existing ContributoryNegligencePanel with an interactive calculator tab. User inputs: total claim value (£), Party A fault % (pre-filled from FaultLikelihoodAssessment if available), Party B fault %. Output: apportioned compensation amounts for each party under the Law Reform (Contributory Negligence) Act 1945.
 
 ### Modify
-- **AccidentReportForm (StepReview)**: Add the SubmissionTrustPanel just above the Submit button. The submit button should be disabled until the digital signature checkbox is checked and a name is entered.
-- **ReportDetail**: Add the SubmissionCredibilityBadge near the report header to surface the trust indicators on saved reports.
+- **ReportDetail**: Add WhiplashClassifierPanel and RepairCostEstimatorPanel as new collapsible sections after the FaultLikelihoodPanel. Add PreActionProtocolPanel inside the existing Legal & Insurance Utility collapsible alongside DemandLetterPanel.
+- **ContributoryNegligencePanel**: Add a calculator tab/section that reads fault percentages from the report's faultLikelihoodAssessment if available.
 
 ### Remove
 - Nothing removed.
 
 ## Implementation Plan
-1. Create `SubmissionTrustPanel.tsx` — typed name input, agreement checkbox, hash/timestamp info notices.
-2. Add hash generation utility function using `window.crypto.subtle.digest` (SHA-256) in a helper file or inline in AccidentReportForm.
-3. Update `AccidentReportForm.handleSubmit` to:
-   - Generate SHA-256 hash of key report fields serialised to JSON.
-   - Append signature name and hash to witnessStatement using a delimiter `\n\n---TRUST_SEAL---\n`.
-   - Disable submit until signature is valid.
-4. Integrate `SubmissionTrustPanel` into StepReview content.
-5. Create `SubmissionCredibilityBadge.tsx` — parses witnessStatement for the trust seal, displays verified badge, timestamp, signatory, and truncated hash.
-6. Integrate `SubmissionCredibilityBadge` into `ReportDetail` near the header.
-7. Validate and build.
+1. Create `src/frontend/src/components/WhiplashClassifierPanel.tsx` — WRP tariff table, injury selector, duration selector, output display.
+2. Create `src/frontend/src/components/RepairCostEstimatorPanel.tsx` — crash type selector, uses damageSeverity score, lookup table, output display.
+3. Create `src/frontend/src/components/PreActionProtocolPanel.tsx` — step-by-step PAP checklist with CPR references and status toggles.
+4. Update `ContributoryNegligencePanel.tsx` — add interactive calculator that accepts total claim value and auto-fills fault percentages from report prop.
+5. Update `ReportDetail.tsx` — wire in all new components.
+6. Validate and fix any type/build errors.

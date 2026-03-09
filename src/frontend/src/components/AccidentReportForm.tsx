@@ -16,10 +16,14 @@ import {
   Camera,
   ChevronLeft,
   ChevronRight,
+  CloudSun,
   FileVideo,
   Loader2,
+  Mic,
+  MicOff,
   Plus,
   RotateCcw,
+  Shield,
   Users,
 } from "lucide-react";
 import type React from "react";
@@ -34,6 +38,7 @@ import SubmissionTrustPanel from "./SubmissionTrustPanel";
 import WizardProgress from "./WizardProgress";
 
 const ADDITIONAL_PARTIES_DELIMITER = "\n\n---ADDITIONAL_PARTIES---\n";
+const POLICE_INFO_DELIMITER = "\n\n---POLICE_INFO---\n";
 const DRAFT_KEY = "accident_draft_v1";
 
 const WIZARD_STEPS = [
@@ -84,6 +89,7 @@ interface DraftData {
   stopLocation: string;
   accidentMarker: string;
   weather: string;
+  weatherLocation: string;
   roadCondition: string;
   visibility: string;
   roadType: "urban" | "dualCarriageway" | "motorway";
@@ -91,6 +97,8 @@ interface DraftData {
   additionalParties: AdditionalParty[];
   photoAnalysisDescription: string;
   dashCamCrossAnalysisDescription: string;
+  policeRef: string;
+  officerName: string;
   savedAt: string;
 }
 
@@ -143,12 +151,51 @@ export default function AccidentReportForm() {
   const [stopLocation, setStopLocation] = useState("");
   const [accidentMarker, setAccidentMarker] = useState("");
   const [weather, setWeather] = useState("");
+  const [weatherLocation, setWeatherLocation] = useState("");
   const [roadCondition, setRoadCondition] = useState("");
   const [visibility, setVisibility] = useState("");
   const [roadType, setRoadType] = useState<
     "urban" | "dualCarriageway" | "motorway"
   >("urban");
   const [speedLimit, setSpeedLimit] = useState("30");
+
+  // Police incident reference
+  const [policeRef, setPoliceRef] = useState("");
+  const [officerName, setOfficerName] = useState("");
+
+  // Weather fetch state
+  const [weatherFetching, setWeatherFetching] = useState(false);
+  const [weatherError, setWeatherError] = useState("");
+
+  // Voice-to-text state
+  // SpeechRecognition is not in TypeScript's standard lib; use a local interface
+  interface SpeechRecognitionInstance {
+    continuous: boolean;
+    interimResults: boolean;
+    lang: string;
+    start: () => void;
+    stop: () => void;
+    onresult:
+      | ((event: {
+          resultIndex: number;
+          results: {
+            length: number;
+            [i: number]: { [j: number]: { transcript: string } };
+          };
+        }) => void)
+      | null;
+    onend: (() => void) | null;
+    onerror: (() => void) | null;
+  }
+  const [voiceTranscribing, setVoiceTranscribing] = useState(false);
+  const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
+  const speechSupported =
+    typeof window !== "undefined" &&
+    !!(
+      (window as Window & { SpeechRecognition?: unknown }).SpeechRecognition ||
+      (window as Window & { webkitSpeechRecognition?: unknown })
+        .webkitSpeechRecognition
+    );
 
   // Additional parties (multi-party support)
   const [additionalParties, setAdditionalParties] = useState<AdditionalParty[]>(
@@ -177,6 +224,7 @@ export default function AccidentReportForm() {
       stopLocation,
       accidentMarker,
       weather,
+      weatherLocation,
       roadCondition,
       visibility,
       roadType,
@@ -184,6 +232,8 @@ export default function AccidentReportForm() {
       additionalParties,
       photoAnalysisDescription,
       dashCamCrossAnalysisDescription,
+      policeRef,
+      officerName,
       savedAt: new Date().toISOString(),
     };
   }, [
@@ -200,6 +250,7 @@ export default function AccidentReportForm() {
     stopLocation,
     accidentMarker,
     weather,
+    weatherLocation,
     roadCondition,
     visibility,
     roadType,
@@ -207,6 +258,8 @@ export default function AccidentReportForm() {
     additionalParties,
     photoAnalysisDescription,
     dashCamCrossAnalysisDescription,
+    policeRef,
+    officerName,
   ]);
 
   const applyDraft = useCallback((draft: DraftData) => {
@@ -223,6 +276,7 @@ export default function AccidentReportForm() {
     setStopLocation(draft.stopLocation ?? "");
     setAccidentMarker(draft.accidentMarker ?? "");
     setWeather(draft.weather ?? "");
+    setWeatherLocation(draft.weatherLocation ?? "");
     setRoadCondition(draft.roadCondition ?? "");
     setVisibility(draft.visibility ?? "");
     setRoadType(draft.roadType ?? "urban");
@@ -232,6 +286,8 @@ export default function AccidentReportForm() {
     setDashCamCrossAnalysisDescription(
       draft.dashCamCrossAnalysisDescription ?? "",
     );
+    setPoliceRef(draft.policeRef ?? "");
+    setOfficerName(draft.officerName ?? "");
   }, []);
 
   const resetForm = useCallback(() => {
@@ -248,6 +304,7 @@ export default function AccidentReportForm() {
     setStopLocation("");
     setAccidentMarker("");
     setWeather("");
+    setWeatherLocation("");
     setRoadCondition("");
     setVisibility("");
     setRoadType("urban");
@@ -255,6 +312,8 @@ export default function AccidentReportForm() {
     setAdditionalParties([]);
     setPhotoAnalysisDescription("");
     setDashCamCrossAnalysisDescription("");
+    setPoliceRef("");
+    setOfficerName("");
     setPhotos([]);
     setDashCamClips([]);
     setPhotoEvidenceGaps([]);
@@ -435,12 +494,19 @@ export default function AccidentReportForm() {
     const TRUST_SEAL_DELIMITER = "\n\n---TRUST_SEAL---\n";
     const witnessStatementWithExtras = `${baseWitnessStatement}${TRUST_SEAL_DELIMITER}${trustSeal}`;
 
+    // Embed police info into accidentMarker using delimiter pattern
+    const policeInfoSuffix =
+      policeRef || officerName
+        ? `${POLICE_INFO_DELIMITER}${JSON.stringify({ policeRef, officerName })}`
+        : "";
+    const accidentMarkerWithPolice = `${accidentMarker}${policeInfoSuffix}`;
+
     await createReport.mutateAsync({
       vehicleSpeed: BigInt(vehicleSpeed || 0),
       witnessStatement: witnessStatementWithExtras,
       damageDescription,
       stopLocation,
-      accidentMarker,
+      accidentMarker: accidentMarkerWithPolice,
       timestamp: BigInt(Date.now()),
       roadType: roadTypeValue,
       photos: photoMetadata,
@@ -478,6 +544,132 @@ export default function AccidentReportForm() {
     localStorage.removeItem(DRAFT_KEY);
     navigate({ to: "/reports" });
   };
+
+  // ── Voice-to-text handlers ─────────────────────────────────────────────────
+
+  const handleStartVoice = useCallback(() => {
+    type SpeechRecognitionConstructor = new () => SpeechRecognitionInstance;
+    const SpeechRecognitionClass = ((
+      window as Window & { SpeechRecognition?: SpeechRecognitionConstructor }
+    ).SpeechRecognition ||
+      (
+        window as Window & {
+          webkitSpeechRecognition?: SpeechRecognitionConstructor;
+        }
+      ).webkitSpeechRecognition) as SpeechRecognitionConstructor | undefined;
+    if (!SpeechRecognitionClass) return;
+
+    const recognition = new SpeechRecognitionClass();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = "en-GB";
+
+    recognition.onresult = (event) => {
+      let transcript = "";
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        transcript += event.results[i][0].transcript;
+      }
+      setWitnessStatement((prev) =>
+        prev ? `${prev} ${transcript}` : transcript,
+      );
+    };
+
+    recognition.onend = () => {
+      setVoiceTranscribing(false);
+      recognitionRef.current = null;
+    };
+
+    recognition.onerror = () => {
+      setVoiceTranscribing(false);
+      recognitionRef.current = null;
+    };
+
+    recognition.start();
+    recognitionRef.current = recognition;
+    setVoiceTranscribing(true);
+  }, []);
+
+  const handleStopVoice = useCallback(() => {
+    recognitionRef.current?.stop();
+    setVoiceTranscribing(false);
+    recognitionRef.current = null;
+  }, []);
+
+  // ── Weather auto-fetch ─────────────────────────────────────────────────────
+
+  const handleFetchWeather = useCallback(async () => {
+    if (!weatherLocation.trim()) {
+      setWeatherError("Please enter a location.");
+      return;
+    }
+    setWeatherFetching(true);
+    setWeatherError("");
+    try {
+      const geoRes = await fetch(
+        `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(weatherLocation.trim())}&count=1&language=en&format=json`,
+      );
+      const geoData = (await geoRes.json()) as {
+        results?: { latitude: number; longitude: number }[];
+      };
+      const loc = geoData.results?.[0];
+      if (!loc) {
+        setWeatherError(
+          "Location not found. Try a different postcode or city.",
+        );
+        return;
+      }
+      const weatherRes = await fetch(
+        `https://api.open-meteo.com/v1/forecast?latitude=${loc.latitude}&longitude=${loc.longitude}&current_weather=true`,
+      );
+      const weatherData = (await weatherRes.json()) as {
+        current_weather?: {
+          temperature: number;
+          windspeed: number;
+          winddirection: number;
+          weathercode: number;
+        };
+      };
+      const cw = weatherData.current_weather;
+      if (!cw) {
+        setWeatherError("Could not retrieve weather data.");
+        return;
+      }
+      // Map WMO weather code to description
+      const wmoDescriptions: Record<number, string> = {
+        0: "Clear sky",
+        1: "Mainly clear",
+        2: "Partly cloudy",
+        3: "Overcast",
+        45: "Foggy",
+        48: "Icy fog",
+        51: "Light drizzle",
+        53: "Moderate drizzle",
+        55: "Dense drizzle",
+        61: "Light rain",
+        63: "Moderate rain",
+        65: "Heavy rain",
+        71: "Light snow",
+        73: "Moderate snow",
+        75: "Heavy snow",
+        77: "Snow grains",
+        80: "Light showers",
+        81: "Moderate showers",
+        82: "Heavy showers",
+        85: "Snow showers",
+        86: "Heavy snow showers",
+        95: "Thunderstorm",
+        96: "Thunderstorm with hail",
+        99: "Thunderstorm with heavy hail",
+      };
+      const desc = wmoDescriptions[cw.weathercode] ?? `Code ${cw.weathercode}`;
+      const formatted = `${desc}, ${Math.round(cw.temperature)}°C, Wind ${Math.round(cw.windspeed)} km/h`;
+      setWeather(formatted);
+    } catch {
+      setWeatherError("Failed to fetch weather. Please try again.");
+    } finally {
+      setWeatherFetching(false);
+    }
+  }, [weatherLocation]);
 
   // ── Step content ──────────────────────────────────────────────────────────
 
@@ -661,16 +853,6 @@ export default function AccidentReportForm() {
             />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="weather">Weather</Label>
-            <Input
-              id="weather"
-              value={weather}
-              onChange={(e) => setWeather(e.target.value)}
-              placeholder="e.g. Clear"
-              data-ocid="details.weather.input"
-            />
-          </div>
-          <div className="space-y-1">
             <Label htmlFor="roadCondition">Road Condition</Label>
             <Input
               id="roadCondition"
@@ -690,7 +872,96 @@ export default function AccidentReportForm() {
               data-ocid="details.visibility.input"
             />
           </div>
+          {/* Police Reference Fields */}
+          <div className="space-y-1">
+            <Label htmlFor="policeRef" className="flex items-center gap-1.5">
+              <Shield className="h-3.5 w-3.5 text-muted-foreground" />
+              Police Reference No.
+            </Label>
+            <Input
+              id="policeRef"
+              value={policeRef}
+              onChange={(e) => setPoliceRef(e.target.value)}
+              placeholder="e.g. URN 21/12345"
+              data-ocid="details.policeRef.input"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="officerName" className="flex items-center gap-1.5">
+              <Shield className="h-3.5 w-3.5 text-muted-foreground" />
+              Attending Officer Name
+            </Label>
+            <Input
+              id="officerName"
+              value={officerName}
+              onChange={(e) => setOfficerName(e.target.value)}
+              placeholder="e.g. PC Smith"
+              data-ocid="details.officerName.input"
+            />
+          </div>
         </div>
+
+        {/* Weather auto-fetch */}
+        <div className="space-y-2">
+          <Label className="flex items-center gap-1.5">
+            <CloudSun className="h-3.5 w-3.5 text-muted-foreground" />
+            Location at time of accident (postcode/city)
+          </Label>
+          <div className="flex gap-2">
+            <Input
+              value={weatherLocation}
+              onChange={(e) => {
+                setWeatherLocation(e.target.value);
+                if (weatherError) setWeatherError("");
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  void handleFetchWeather();
+                }
+              }}
+              placeholder="e.g. SW1A 1AA or Manchester"
+              className="flex-1"
+              data-ocid="weather.location.input"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => void handleFetchWeather()}
+              disabled={weatherFetching || !weatherLocation.trim()}
+              className="shrink-0 gap-1.5"
+              data-ocid="weather.fetch.button"
+            >
+              {weatherFetching ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <CloudSun className="h-3.5 w-3.5" />
+              )}
+              {weatherFetching ? "Fetching…" : "Fetch Weather"}
+            </Button>
+          </div>
+          {weatherError && (
+            <p
+              className="text-xs text-destructive"
+              data-ocid="weather.error_state"
+            >
+              {weatherError}
+            </p>
+          )}
+        </div>
+
+        <div className="space-y-1">
+          <Label htmlFor="weather">Weather Conditions</Label>
+          <Input
+            id="weather"
+            value={weather}
+            onChange={(e) => setWeather(e.target.value)}
+            placeholder="e.g. Clear, 12°C — or use Fetch Weather above"
+            data-ocid="details.weather.input"
+          />
+        </div>
+
         <div className="space-y-1">
           <Label htmlFor="stopLocation">Stop Location</Label>
           <Input
@@ -722,14 +993,53 @@ export default function AccidentReportForm() {
             data-ocid="details.damageDescription.textarea"
           />
         </div>
+
+        {/* Voice-to-text witness statement */}
         <div className="space-y-1">
-          <Label htmlFor="witnessStatement">Witness Statement</Label>
+          <div className="flex items-center justify-between gap-2">
+            <Label htmlFor="witnessStatement">Witness Statement</Label>
+            {speechSupported && (
+              <div className="flex items-center gap-2">
+                {voiceTranscribing && (
+                  <span className="flex items-center gap-1.5 text-xs text-destructive font-medium">
+                    <span className="h-2 w-2 rounded-full bg-destructive animate-pulse" />
+                    Recording…
+                  </span>
+                )}
+                {voiceTranscribing ? (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleStopVoice}
+                    className="h-7 px-2 gap-1 text-xs border-destructive text-destructive hover:bg-destructive/10"
+                    data-ocid="voice.cancel_button"
+                  >
+                    <MicOff className="h-3.5 w-3.5" />
+                    Stop
+                  </Button>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleStartVoice}
+                    className="h-7 px-2 gap-1 text-xs"
+                    data-ocid="voice.toggle"
+                  >
+                    <Mic className="h-3.5 w-3.5" />
+                    Dictate
+                  </Button>
+                )}
+              </div>
+            )}
+          </div>
           <Textarea
             id="witnessStatement"
             value={witnessStatement}
             onChange={(e) => setWitnessStatement(e.target.value)}
-            rows={3}
-            placeholder="Any witness accounts of the incident…"
+            rows={4}
+            placeholder="Any witness accounts of the incident — or use the Dictate button to speak your statement…"
             data-ocid="details.witnessStatement.textarea"
           />
         </div>
@@ -911,6 +1221,18 @@ export default function AccidentReportForm() {
                 <span className="text-muted-foreground/60 italic">—</span>
               )}
             </span>
+            {policeRef && (
+              <>
+                <span className="text-muted-foreground">Police Ref.</span>
+                <span>{policeRef}</span>
+              </>
+            )}
+            {officerName && (
+              <>
+                <span className="text-muted-foreground">Officer</span>
+                <span>{officerName}</span>
+              </>
+            )}
           </div>
           {damageDescription && (
             <div className="mt-2 p-3 bg-muted/30 rounded-md text-xs text-muted-foreground leading-relaxed">
