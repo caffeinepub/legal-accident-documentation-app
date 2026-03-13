@@ -1,4 +1,5 @@
-import { Fingerprint, ShieldCheck, UserCheck } from "lucide-react";
+import { Fingerprint, Hash, ShieldCheck, UserCheck } from "lucide-react";
+import { formatClaimId } from "../utils/claimId";
 
 const TRUST_SEAL_DELIMITER = "---TRUST_SEAL---\n";
 
@@ -24,10 +25,13 @@ function parseTrustSeal(witnessStatement: string): TrustSeal | null {
 interface SubmissionCredibilityBadgeProps {
   witnessStatement: string;
   timestamp: bigint;
+  reportId?: bigint;
 }
 
 export default function SubmissionCredibilityBadge({
   witnessStatement,
+  timestamp,
+  reportId,
 }: SubmissionCredibilityBadgeProps) {
   const seal = parseTrustSeal(witnessStatement);
   if (!seal) return null;
@@ -47,7 +51,8 @@ export default function SubmissionCredibilityBadge({
     }
   })();
 
-  const shortHash = `${seal.hash.slice(0, 16)}…`;
+  const shortHash = `${seal.hash.slice(0, 16)}\u2026`;
+  const claimId = reportId ? formatClaimId(reportId, timestamp) : null;
 
   return (
     <div
@@ -68,7 +73,9 @@ export default function SubmissionCredibilityBadge({
       </div>
 
       {/* Details grid */}
-      <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-3">
+      <div
+        className={`grid grid-cols-1 gap-1.5 ${claimId ? "sm:grid-cols-4" : "sm:grid-cols-3"}`}
+      >
         {/* Submitted at */}
         <div className="flex items-start gap-2 rounded-lg bg-background/60 px-3 py-2">
           <ShieldCheck className="h-3.5 w-3.5 shrink-0 mt-0.5 text-trust-accent" />
@@ -107,6 +114,21 @@ export default function SubmissionCredibilityBadge({
             </p>
           </div>
         </div>
+
+        {/* Claim ID */}
+        {claimId && (
+          <div className="flex items-start gap-2 rounded-lg bg-background/60 px-3 py-2">
+            <Hash className="h-3.5 w-3.5 shrink-0 mt-0.5 text-trust-accent" />
+            <div className="min-w-0">
+              <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-medium">
+                Claim ID
+              </p>
+              <p className="text-xs text-foreground font-mono truncate">
+                {claimId}
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

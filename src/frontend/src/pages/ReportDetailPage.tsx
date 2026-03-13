@@ -1,11 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useParams } from "@tanstack/react-router";
-import { AlertCircle, Printer } from "lucide-react";
+import { AlertCircle, Hash, Printer } from "lucide-react";
 import React from "react";
 import InsurerContactsPanel from "../components/InsurerContactsPanel";
 import ReportDetail from "../components/ReportDetail";
 import { useGetReport } from "../hooks/useQueries";
+import { formatClaimId } from "../utils/claimId";
 
 function PrintStyles() {
   return (
@@ -103,19 +104,29 @@ export default function ReportDetailPage() {
     );
   }
 
+  const claimId = formatClaimId(reportIdBigInt, report.timestamp);
+
   return (
     <>
       <PrintStyles />
       <div className="max-w-3xl mx-auto space-y-4">
-        {/* Download PDF button */}
-        <div className="flex justify-end" data-print-hide>
+        {/* Header bar with Download PDF and Claim ID */}
+        <div
+          className="flex items-center justify-between flex-wrap gap-2"
+          data-print-hide
+        >
+          <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-muted border border-border">
+            <Hash className="w-3.5 h-3.5 text-muted-foreground" />
+            <span className="font-mono text-xs text-foreground/80 font-medium">
+              {claimId}
+            </span>
+          </div>
           <Button
             variant="outline"
             size="sm"
             className="gap-2"
             onClick={() => window.print()}
             data-ocid="report.secondary_button"
-            data-print-hide
           >
             <Printer className="w-4 h-4" />
             Download PDF

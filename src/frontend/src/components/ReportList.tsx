@@ -3,9 +3,17 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate } from "@tanstack/react-router";
-import { Calendar, Car, ChevronRight, FileText, Plus } from "lucide-react";
+import {
+  Calendar,
+  Car,
+  ChevronRight,
+  FileText,
+  Hash,
+  Plus,
+} from "lucide-react";
 import React from "react";
 import { useGetAllReports } from "../hooks/useQueries";
+import { formatClaimId } from "../utils/claimId";
 
 function formatDate(timestamp: bigint): string {
   return new Date(Number(timestamp)).toLocaleString("en-GB", {
@@ -45,7 +53,10 @@ export default function ReportList() {
 
   if (sorted.length === 0) {
     return (
-      <div className="text-center py-16 space-y-4">
+      <div
+        className="text-center py-16 space-y-4"
+        data-ocid="reports.empty_state"
+      >
         <FileText className="w-12 h-12 text-muted-foreground mx-auto" />
         <div>
           <p className="text-lg font-semibold">No reports found</p>
@@ -63,7 +74,7 @@ export default function ReportList() {
 
   return (
     <div className="space-y-3">
-      {sorted.map(([id, report]) => (
+      {sorted.map(([id, report], idx) => (
         <Card
           key={id.toString()}
           className="cursor-pointer hover:shadow-md transition-shadow"
@@ -73,6 +84,7 @@ export default function ReportList() {
               params: { reportId: id.toString() },
             })
           }
+          data-ocid={`reports.item.${idx + 1}`}
         >
           <CardContent className="p-4 flex items-center justify-between gap-4">
             <div className="flex items-start gap-4 flex-1 min-w-0">
@@ -89,6 +101,11 @@ export default function ReportList() {
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="font-semibold text-sm">
                     Report #{id.toString()}
+                  </span>
+                  {/* Claim ID badge */}
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-muted border border-border font-mono text-[10px] text-muted-foreground">
+                    <Hash className="w-2.5 h-2.5" />
+                    {formatClaimId(id, report.timestamp)}
                   </span>
                   <Badge
                     variant={report.isAtFault ? "destructive" : "default"}

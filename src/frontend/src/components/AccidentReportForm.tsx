@@ -205,6 +205,9 @@ export default function AccidentReportForm() {
   // Trust & credibility state
   const [signatoryName, setSignatoryName] = useState("");
   const [trustAgreed, setTrustAgreed] = useState(false);
+  const [_witnessSignatureDataUrl, setWitnessSignatureDataUrl] = useState<
+    string | null
+  >(null);
 
   // Auto-save debounce ref
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -1277,6 +1280,7 @@ export default function AccidentReportForm() {
           onSignatoryNameChange={setSignatoryName}
           agreed={trustAgreed}
           onAgreedChange={setTrustAgreed}
+          onWitnessSignature={setWitnessSignatureDataUrl}
         />
 
         {createReport.isError && (

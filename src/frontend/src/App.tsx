@@ -9,6 +9,7 @@ import React from "react";
 import Layout from "./components/Layout";
 import BirdsEyeGridPage from "./pages/BirdsEyeGridPage";
 import FaultReferencePage from "./pages/FaultReferencePage";
+import FleetPage from "./pages/FleetPage";
 import InsurerContactsPage from "./pages/InsurerContactsPage";
 import NewReportPage from "./pages/NewReportPage";
 import ReportDetailPage from "./pages/ReportDetailPage";
@@ -54,6 +55,12 @@ const insurersRoute = createRoute({
   component: InsurerContactsPage,
 });
 
+const fleetRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/fleet",
+  component: FleetPage,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   reportsRoute,
@@ -61,6 +68,7 @@ const routeTree = rootRoute.addChildren([
   faultReferenceRoute,
   gridRoute,
   insurersRoute,
+  fleetRoute,
 ]);
 
 const router = createRouter({ routeTree });

@@ -3,17 +3,23 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   AlertCircle,
+  ChevronDown,
+  ChevronUp,
   Clock,
   Fingerprint,
   Lock,
+  PenLine,
   ShieldCheck,
 } from "lucide-react";
+import { useState } from "react";
+import SignatureCanvas from "./SignatureCanvas";
 
 interface SubmissionTrustPanelProps {
   signatoryName: string;
   onSignatoryNameChange: (name: string) => void;
   agreed: boolean;
   onAgreedChange: (v: boolean) => void;
+  onWitnessSignature?: (dataUrl: string | null) => void;
 }
 
 export default function SubmissionTrustPanel({
@@ -21,10 +27,21 @@ export default function SubmissionTrustPanel({
   onSignatoryNameChange,
   agreed,
   onAgreedChange,
+  onWitnessSignature,
 }: SubmissionTrustPanelProps) {
+  const [witnessSignatureOpen, setWitnessSignatureOpen] = useState(false);
+  const [witnessSignatureDataUrl, setWitnessSignatureDataUrl] = useState<
+    string | null
+  >(null);
+
   const declarationText = signatoryName.trim()
     ? `I, ${signatoryName.trim()}, confirm that the information in this report is accurate and complete to the best of my knowledge.`
     : "I confirm that the information in this report is accurate and complete to the best of my knowledge.";
+
+  const handleWitnessSignature = (dataUrl: string | null) => {
+    setWitnessSignatureDataUrl(dataUrl);
+    onWitnessSignature?.(dataUrl);
+  };
 
   return (
     <div
@@ -81,6 +98,58 @@ export default function SubmissionTrustPanel({
         >
           {declarationText}
         </Label>
+      </div>
+
+      {/* Witness Signature (Optional) */}
+      <div className="rounded-lg border border-border bg-background/40 overflow-hidden">
+        <button
+          type="button"
+          className="flex w-full items-center justify-between px-3.5 py-2.5 text-left"
+          onClick={() => setWitnessSignatureOpen((v) => !v)}
+          data-ocid="witness.toggle"
+        >
+          <div className="flex items-center gap-2">
+            <PenLine className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm font-medium text-foreground">
+              Witness Signature
+            </span>
+            <span className="text-xs text-muted-foreground">(Optional)</span>
+            {witnessSignatureDataUrl && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+                Captured
+              </span>
+            )}
+          </div>
+          {witnessSignatureOpen ? (
+            <ChevronUp className="h-4 w-4 text-muted-foreground" />
+          ) : (
+            <ChevronDown className="h-4 w-4 text-muted-foreground" />
+          )}
+        </button>
+
+        {witnessSignatureOpen && (
+          <div className="px-3.5 pb-3.5 space-y-3">
+            <p className="text-xs text-muted-foreground">
+              A witness may sign below using touch or mouse. The signature will
+              be embedded in the exported report.
+            </p>
+            <SignatureCanvas onSave={handleWitnessSignature} height={150} />
+            {witnessSignatureDataUrl && (
+              <div className="space-y-1">
+                <p className="text-xs font-medium text-muted-foreground">
+                  Preview:
+                </p>
+                <img
+                  src={witnessSignatureDataUrl}
+                  alt="Witness signature preview"
+                  className="rounded border border-border bg-white"
+                  style={{ maxHeight: 80, objectFit: "contain" }}
+                  data-ocid="witness.card"
+                />
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Info notices */}

@@ -173,6 +173,7 @@ export default function ReportDetail({ reportId, report }: ReportDetailProps) {
       <SubmissionCredibilityBadge
         witnessStatement={report.witnessStatement ?? ""}
         timestamp={report.timestamp}
+        reportId={reportId}
       />
 
       {/* Export Claim Report */}
