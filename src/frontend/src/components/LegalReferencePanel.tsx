@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
+  BookMarked,
   BookOpen,
   ChevronDown,
   ChevronUp,
@@ -16,6 +17,7 @@ import {
   type CaseLawEntry,
   GENERAL_LEGAL_REFERENCES,
   type HighwayCodeReference,
+  type OtherLegislationEntry,
   type RTAReference,
   getLegalReferencesForViolations,
 } from "../data/legalReferences";
@@ -62,6 +64,32 @@ function RTACard({ section }: { section: RTAReference }) {
         </span>
         <p className="text-sm text-muted-foreground leading-relaxed">
           {section.description}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function OtherLegislationCard({ entry }: { entry: OtherLegislationEntry }) {
+  return (
+    <div className="flex items-start gap-3 p-3 rounded-lg border border-teal-200 bg-teal-50/60 dark:border-teal-900/40 dark:bg-teal-950/20">
+      <div className="shrink-0 mt-0.5">
+        <BookMarked className="w-4 h-4 text-teal-700 dark:text-teal-400" />
+      </div>
+      <div className="flex-1 min-w-0 space-y-1">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-sm font-semibold text-foreground">
+            {entry.actName}
+          </span>
+          <Badge
+            variant="outline"
+            className="text-xs px-1.5 py-0 border-teal-400 text-teal-700 dark:border-teal-600 dark:text-teal-400"
+          >
+            {entry.sectionReference}
+          </Badge>
+        </div>
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          {entry.description}
         </p>
       </div>
     </div>
@@ -121,6 +149,7 @@ export default function LegalReferencePanel({
     }
   }
 
+  const otherLegislation = GENERAL_LEGAL_REFERENCES.otherLegislation ?? [];
   const hasViolations = violations.length > 0;
   const hasCaseLaw = caseLaw.length > 0;
 
@@ -160,7 +189,9 @@ export default function LegalReferencePanel({
             <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
             <p className="text-xs text-muted-foreground leading-relaxed">
               {hasViolations
-                ? `The following UK legal references apply to the ${violations.length} violation${violations.length > 1 ? "s" : ""} detected in this report, plus general post-incident obligations.`
+                ? `The following UK legal references apply to the ${violations.length} violation${
+                    violations.length > 1 ? "s" : ""
+                  } detected in this report, plus general post-incident obligations.`
                 : "No specific violations were recorded. The following general UK road traffic obligations apply to all incidents."}
             </p>
           </div>
@@ -198,6 +229,35 @@ export default function LegalReferencePanel({
               ))}
             </div>
           </div>
+
+          {/* Other Legislation section */}
+          {otherLegislation.length > 0 && (
+            <>
+              <Separator />
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <BookMarked className="w-4 h-4 text-teal-700 dark:text-teal-400" />
+                  <h3 className="text-sm font-semibold">Other Legislation</h3>
+                  <Badge
+                    variant="outline"
+                    className="text-xs ml-1 border-teal-400 text-teal-700 dark:border-teal-600 dark:text-teal-400"
+                  >
+                    {otherLegislation.length}{" "}
+                    {otherLegislation.length === 1 ? "Act" : "Acts"}
+                  </Badge>
+                </div>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Additional UK statutes relevant to road traffic accident
+                  claims and personal injury proceedings.
+                </p>
+                <div className="space-y-2">
+                  {otherLegislation.map((entry) => (
+                    <OtherLegislationCard key={entry.actName} entry={entry} />
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
 
           {/* Landmark Case Law section — only shown when violations are detected and case law exists */}
           {hasViolations && hasCaseLaw && (

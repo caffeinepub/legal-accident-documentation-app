@@ -33,6 +33,7 @@ import FaultMatrixPanel from "./FaultMatrixPanel";
 import InjuryAnalysisPanel from "./InjuryAnalysisPanel";
 import LegalReferencePanel from "./LegalReferencePanel";
 import LiabilityDisplay from "./LiabilityDisplay";
+import NegotiationLetterBuilder from "./NegotiationLetterBuilder";
 import NextStepsPanel from "./NextStepsPanel";
 import PhotoGallery from "./PhotoGallery";
 import PostIncidentChecklist from "./PostIncidentChecklist";
@@ -214,6 +215,7 @@ export default function ReportDetail({ reportId, report }: ReportDetailProps) {
       >
         <div className="space-y-4">
           <DemandLetterPanel report={report} />
+          <NegotiationLetterBuilder report={report} reportId={reportId} />
           <PreActionProtocolPanel />
           <PostIncidentChecklist />
           <StatuteLimitationsPanel

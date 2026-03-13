@@ -17,10 +17,17 @@ export interface CaseLawEntry {
   legalPrinciple: string;
 }
 
+export interface OtherLegislationEntry {
+  actName: string;
+  sectionReference: string;
+  description: string;
+}
+
 export interface LegalReference {
   highwayCode: HighwayCodeReference[];
   rta1988: RTAReference[];
   caseLaw: CaseLawEntry[];
+  otherLegislation?: OtherLegislationEntry[];
 }
 
 // Violation type keys used in the backend
@@ -488,6 +495,130 @@ export const VIOLATION_LEGAL_REFERENCES: Record<string, LegalReference> = {
       },
     ],
   },
+
+  duty_of_care: {
+    highwayCode: [
+      {
+        ruleNumber: "HC Rule 204",
+        description:
+          "The most vulnerable road users are pedestrians, cyclists, motorcyclists and horse riders. It is particularly important to be aware of children, older and disabled people, and be prepared to slow down and stop if necessary.",
+        isEnforceable: false,
+      },
+      {
+        ruleNumber: "HC Rule 144",
+        description:
+          "You MUST NOT drive dangerously. You must not drive in a way that falls far below the standard expected of a competent and careful driver and it would be obvious to a competent driver that driving in that way would be dangerous.",
+        isEnforceable: true,
+      },
+    ],
+    rta1988: [
+      {
+        sectionNumber: "s.2A",
+        description:
+          "Meaning of dangerous driving — a person is to be regarded as driving dangerously if the way they drive falls far below what would be expected of a competent and careful driver, and it would be obvious to a competent and careful driver that driving in that way would be dangerous.",
+      },
+      {
+        sectionNumber: "s.3",
+        description:
+          "Careless and inconsiderate driving — driving on a road or other public place without due care and attention, or without reasonable consideration for other persons using the road.",
+      },
+    ],
+    caseLaw: [
+      {
+        caseName: "Donoghue v Stevenson [1932] AC 562",
+        factualSummary:
+          "The claimant suffered illness after consuming ginger beer containing a decomposed snail. The House of Lords established the foundational principle of negligence in tort law, holding that a manufacturer owed a duty of care to the ultimate consumer. The 'neighbour principle' was formulated by Lord Atkin.",
+        legalPrinciple:
+          "A person owes a duty of care to those they could reasonably foresee might be harmed by their acts or omissions — the 'neighbour principle'. Applied in road traffic law: every driver owes a duty of care to all other road users whom they could reasonably foresee might be affected by their driving.",
+      },
+      {
+        caseName: "Caparo Industries plc v Dickman [1990] 2 AC 605",
+        factualSummary:
+          "The House of Lords considered when a duty of care arises in negligence, establishing a three-part test that has since governed all UK negligence claims. The case concerned auditors' liability but the test is universally applied, including in road traffic accident claims.",
+        legalPrinciple:
+          "The Caparo three-part test for duty of care: (1) the damage was reasonably foreseeable; (2) there was a relationship of proximity between claimant and defendant; (3) it is fair, just and reasonable to impose a duty. All three limbs must be satisfied. This governs all negligence claims in England and Wales.",
+      },
+      {
+        caseName: "Nettleship v Weston [1971] 2 QB 691",
+        factualSummary:
+          "The defendant was a learner driver who caused an accident injuring her instructor. She argued that the standard of care owed by a learner should be lower than that of an experienced driver. The Court of Appeal rejected this argument.",
+        legalPrinciple:
+          "A learner driver is held to the same objective standard of care as a competent and experienced driver. The standard of care in negligence is not subjective to the defendant's skill level or experience. Inexperience is not a defence to a negligence claim arising from a road traffic accident.",
+      },
+      {
+        caseName: "Wilsher v Essex Area Health Authority [1988] AC 1074",
+        factualSummary:
+          "The claimant suffered injury which might have been caused by any one of five different factors. The House of Lords considered whether the 'material contribution' test of causation applied where multiple potential causes existed.",
+        legalPrinciple:
+          "Causation must be established individually for each defendant. Where there are multiple potential causes of injury, a claimant must prove on the balance of probabilities that the defendant's specific breach caused or materially contributed to their loss. The mere existence of a breach is insufficient where multiple non-tortious causes could equally explain the damage.",
+      },
+    ],
+  },
+
+  contributory_negligence: {
+    highwayCode: [
+      {
+        ruleNumber: "HC Rule 97",
+        description:
+          "You MUST wear a seat belt if one is fitted, unless you are exempt. Failure to wear a seat belt can significantly affect the damages recoverable in a personal injury claim.",
+        isEnforceable: true,
+      },
+      {
+        ruleNumber: "HC Rule 126",
+        description:
+          "Drive at a speed that will allow you to stop safely within the distance you can see to be clear. The stopping distances shown are the minimum required. Following too closely is a common cause of rear-end collisions.",
+        isEnforceable: false,
+      },
+      {
+        ruleNumber: "HC Rule 160",
+        description:
+          "Once moving you should keep a safe distance between you and the vehicle in front. Allow at least a two-second gap between you and the vehicle in front on roads carrying faster moving traffic.",
+        isEnforceable: false,
+      },
+    ],
+    rta1988: [
+      {
+        sectionNumber: "s.14",
+        description:
+          "Seat belts: adults — it is an offence to drive or ride in a motor vehicle without wearing a seat belt. Failure to wear a seatbelt may amount to contributory negligence in civil proceedings.",
+      },
+      {
+        sectionNumber: "s.15",
+        description:
+          "Restriction on carrying children not wearing seat belts — the driver bears responsibility for ensuring children are properly restrained.",
+      },
+    ],
+    caseLaw: [
+      {
+        caseName: "Froom v Butcher [1976] QB 286",
+        factualSummary:
+          "The plaintiff sustained head and chest injuries in a road traffic accident caused by the defendant's negligence. The plaintiff was not wearing a seat belt. Lord Denning MR held that the plaintiff's failure to wear a belt was contributory negligence, setting out precise percentage reductions.",
+        legalPrinciple:
+          "Failure to wear a seat belt is contributory negligence. The standard deductions under Froom v Butcher are: 25% if wearing a belt would have prevented the injury entirely; 15% if it would have reduced the severity of injury. This remains the definitive authority on seatbelt contributory negligence in UK personal injury law.",
+      },
+      {
+        caseName: "Pitts v Hunt [1991] 1 QB 24",
+        factualSummary:
+          "The claimant, a passenger, encouraged the defendant to drive dangerously while under the influence of alcohol. The claimant was injured in the resulting accident and sought damages. The Court of Appeal considered whether the ex turpi causa principle barred the claim entirely.",
+        legalPrinciple:
+          "A claimant who actively encourages and participates in the defendant's dangerous and illegal driving may be found wholly or substantially contributorily negligent and may be denied any recovery under the ex turpi causa principle. Joint participation in an illegal enterprise can extinguish the duty of care owed between the parties.",
+      },
+      {
+        caseName: "Sayers v Harlow UDC [1958] 1 WLR 623",
+        factualSummary:
+          "The claimant became trapped in a public lavatory cubicle and, while attempting to escape, stood on the toilet roll holder which gave way, causing injury. The Court of Appeal considered whether her conduct in attempting to escape was contributorily negligent.",
+        legalPrinciple:
+          "A claimant is contributorily negligent if, following the defendant's initial breach, they take an unreasonable risk in attempting to extricate themselves from the situation created by the defendant. Damages were reduced by 25%. This principle is relevant in road traffic claims where a claimant's post-accident conduct aggravates their injury.",
+      },
+      {
+        caseName: "Jones v Livox Quarries Ltd [1952] 2 QB 608",
+        factualSummary:
+          "The plaintiff rode on the back of a traxcavator contrary to instructions, and was injured when another vehicle collided with it from behind. The Court of Appeal held that he was contributorily negligent even though the precise manner of injury was not the obvious risk of his conduct.",
+        legalPrinciple:
+          "A claimant is contributorily negligent if they unreasonably expose themselves to danger, even if the precise manner in which they are ultimately injured is not the most foreseeable consequence of their conduct. It is sufficient that their conduct was a contributory cause of the damage suffered.",
+      },
+    ],
+  },
 };
 
 // General references that apply to all incidents regardless of violation type
@@ -514,6 +645,26 @@ export const GENERAL_LEGAL_REFERENCES: LegalReference = {
     },
   ],
   caseLaw: [],
+  otherLegislation: [
+    {
+      actName: "Civil Liability Act 2018",
+      sectionReference: "s.1–3",
+      description:
+        "Introduces the Whiplash Injury Regulations tariff system. Minor whiplash claims (up to 2 years' duration) are fixed by statutory tariff and must be brought through the Official Injury Claim (OIC) portal. Psychological injuries may attract an uplift of up to 20% on the applicable tariff amount.",
+    },
+    {
+      actName: "Occupiers' Liability Act 1957",
+      sectionReference: "s.2",
+      description:
+        "Occupiers owe a 'common duty of care' to all lawful visitors to their premises. Relevant where an accident occurs on private land, car parks, forecourts, or roads controlled by a landowner rather than a public highway authority.",
+    },
+    {
+      actName: "Fatal Accidents Act 1976",
+      sectionReference: "s.1–4",
+      description:
+        "Enables dependants of a person killed by negligence to claim financial dependency losses. The statutory bereavement award (2023 rate: £15,120) is payable to a spouse, civil partner, or parents of an unmarried minor. Relevant in all fatal road traffic collisions where a negligence claim arises.",
+    },
+  ],
 };
 
 /**

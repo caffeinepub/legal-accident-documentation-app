@@ -1,43 +1,40 @@
-# Legal Accident Documentation App
+# iamthe.law — Legal Accident Documentation App
 
 ## Current State
-The Fleet Manager page (`FleetPage.tsx`) currently supports:
-- Adding/editing/deleting fleet vehicles (alias, registration, make, model, colour, driver name, status: Active/Inactive)
-- Summary stats: total vehicles, active vehicles, total incidents
-- Per-vehicle expansion showing linked incident reports (matched by registration plate)
-- Basic add/edit/delete dialog
+
+The app has a `legalReferences.ts` data file covering violations (speeding, dangerous driving, mobile phone, etc.) with Highway Code, Road Traffic Act 1988 sections, and case law. A `LegalReferencePanel` component renders these per-report based on violations detected.
+
+Scenario references (`scenarioReferences.ts`) cover 7 accident scenarios with case law per scenario.
+
+The `ReportDetail` component has a full legal & insurance utility panel with demand letter, post-incident checklist, statute of limitations countdown, pre-action protocol checklist, and contributory negligence calculator.
 
 ## Requested Changes (Diff)
 
 ### Add
-- **Tabbed layout** in FleetPage: Overview | Vehicles | Drivers | Maintenance (4 tabs)
-- **Overview tab**: fleet health scorecard (total vehicles, active, total incidents, drivers, vehicles with overdue maintenance, average risk score), fleet risk heat-map list (vehicles ranked by risk score with colour-coded badges), recent incidents feed (last 5 incidents across fleet with date, claim ID, vehicle alias, driver)
-- **Driver profiles** (new `DRIVERS_KEY` localStorage store): add/edit/delete drivers with fields: full name, licence number, licence expiry date, contact phone, contact email, assigned vehicle (select from fleet), notes. Driver list card shows name, licence expiry (colour-coded: red if <30 days, amber if <90 days, green otherwise), assigned vehicle, incident count (reports matching assigned vehicle registration)
-- **Maintenance records** on each vehicle (stored within the vehicle object): MOT due date, last service date, next service due date, insurance expiry date, tyre check status (OK / Due / Overdue), mileage, notes. Colour-coded expiry alerts: red if <14 days, amber if <30 days, green otherwise
-- **Maintenance tab**: consolidated list of all vehicles with their maintenance status, sorted by most urgent expiry. Each row shows vehicle alias/reg, MOT due, insurance expiry, tyre status, next service. Urgent items highlighted in red/amber
-- **Risk scoring** per vehicle: calculated from number of associated incidents (0=none: green Low, 1=amber Medium, 2+=red High). Displayed as a badge on each vehicle card and in the Overview
-- **Fleet-wide incident summary** on Overview: count of incidents by status (submitted, pending, resolved) if available, otherwise total count with breakdown per vehicle
-- **Extended vehicle form** in Add/Edit dialog: add MOT due date, insurance expiry date, last service date, next service due, tyre status, mileage fields alongside existing fields
-- **Vehicle type selector** on vehicle form: Car, Van, Truck/HGV, Motorbike (affects icon shown on card)
+- Landmark case law entries for **duty of care**: *Donoghue v Stevenson [1932]*, *Caparo Industries v Dickman [1990]*, *Nettleship v Weston [1971]*, *Wilsher v Essex Area Health Authority [1988]*
+- Landmark case law entries for **contributory negligence**: *Froom v Butcher [1976]*, *Pitts v Hunt [1991]*, *Sayers v Harlow UDC [1958]*, *Jones v Livox Quarries [1952]*
+- Additional statutes in the legal reference panel:
+  - Civil Liability Act 2018 (whiplash reforms, MedCo, tariff damages)
+  - Occupiers' Liability Act 1957 (duty of care on premises/roads)
+  - Fatal Accidents Act 1976 (bereavement damages, dependency claims)
+- A new **`duty_of_care`** and **`contributory_negligence`** entry in `VIOLATION_LEGAL_REFERENCES` in `legalReferences.ts` so these appear contextually in reports
+- A **Without-Prejudice Negotiation Letter Builder** component (`NegotiationLetterBuilder.tsx`) rendered inside the Legal & Insurance Utility collapsible panel in `ReportDetail`, after the demand letter section
+  - Auto-drafts a "WITHOUT PREJUDICE" negotiation offer letter from report data (claim ID, parties, fault split, estimated compensation)
+  - Includes settlement offer amount input (editable by user)
+  - Full letter text is editable in a textarea
+  - Copy to clipboard and print buttons
 
 ### Modify
-- `FleetVehicle` interface: extend with `vehicleType`, `motDue`, `insuranceExpiry`, `lastService`, `nextServiceDue`, `tyreStatus`, `mileage`, `maintenanceNotes` fields
-- Summary stat cards: replace basic 3-card row with 6-card grid (Total Vehicles, Active, Total Incidents, Drivers, Maintenance Alerts, Avg Risk)
-- Vehicle list (Vehicles tab): keep existing expand/collapse but add maintenance status row and risk badge to each card header
-- Expand section on vehicle card: add Maintenance sub-section alongside existing Associated Reports
+- `legalReferences.ts`: Add duty_of_care and contributory_negligence violation keys with their full legal entries (HC rules, Acts, case law)
+- `LegalReferencePanel.tsx`: Ensure new statutes (Civil Liability Act 2018, Occupiers' Liability, Fatal Accidents Act) are shown in a dedicated "Other Legislation" section below RTA 1988 when present
+- `ReportDetail.tsx`: Add the `NegotiationLetterBuilder` component inside the existing Legal & Insurance Utility panel
 
 ### Remove
-- Nothing removed; all existing functionality preserved
+- Nothing removed
 
 ## Implementation Plan
-1. Extend `FleetVehicle` interface with new maintenance and vehicle type fields
-2. Add `FleetDriver` interface and localStorage store (`DRIVERS_KEY`)
-3. Add risk score calculation utility function
-4. Add maintenance alert colour utility function (days-until expiry → colour/label)
-5. Rebuild `FleetPage` with 4-tab layout using shadcn Tabs component
-6. Build Overview tab: 6 stat cards, risk-ranked vehicle list, recent incidents feed
-7. Build Vehicles tab: existing list with extended vehicle cards (risk badge, maintenance row, expanded maintenance section)
-8. Extend Add/Edit vehicle dialog with new fields (vehicle type, MOT due, insurance expiry, service dates, tyre status, mileage)
-9. Build Drivers tab: driver list cards, add/edit/delete driver dialog
-10. Build Maintenance tab: consolidated urgency-sorted maintenance overview table
-11. Apply deterministic `data-ocid` markers to all new interactive elements
+
+1. Update `legalReferences.ts`: add `duty_of_care` and `contributory_negligence` violation keys; expand `CaseLawEntry` data for each; add new statute interface `OtherLegislationEntry` and entries for Civil Liability Act 2018, Occupiers' Liability Act 1957, Fatal Accidents Act 1976 to the `LegalReference` type and `VIOLATION_LEGAL_REFERENCES` general references
+2. Create `NegotiationLetterBuilder.tsx` component that auto-drafts a without-prejudice negotiation letter from report props, with editable textarea, settlement offer input, copy and print buttons
+3. Update `LegalReferencePanel.tsx` to render the new "Other Legislation" section if present
+4. Update `ReportDetail.tsx` to render `NegotiationLetterBuilder` inside the Legal & Insurance Utility collapsible panel
