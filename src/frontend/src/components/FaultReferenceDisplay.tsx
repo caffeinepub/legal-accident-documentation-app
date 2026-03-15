@@ -6,6 +6,7 @@ import {
   type ScenarioKey,
   scenarioReferences,
 } from "../data/scenarioReferences";
+import CrashScenarioDiagram from "./CrashScenarioDiagram";
 
 interface FaultReferenceDisplayProps {
   scenarioKey: ScenarioKey;
@@ -81,6 +82,9 @@ export default function FaultReferenceDisplay({
 
   return (
     <div className="space-y-5">
+      {/* Crash Scenario Diagram */}
+      <CrashScenarioDiagram scenarioKey={scenarioKey} />
+
       {/* Fault Percentage Breakdown */}
       <Card className="border-2 border-fault-accent/40 bg-fault-accent/5">
         <CardHeader className="pb-3">
