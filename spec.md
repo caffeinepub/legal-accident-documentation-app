@@ -1,27 +1,41 @@
-# iamthe.law — Legal Accident Documentation App
+# iamthe.law — Trust & Compliance + User Experience
 
 ## Current State
-The app has a Fault Reference section with crash scenario diagrams (bird's-eye SVG, Vehicle A amber / Vehicle B blue, directional arrows, impact zone, Highway Code label). These diagrams currently only appear in the Fault Reference section, not in the photo analysis flow.
+
+The app has:
+- Navigation with 7 pages (New Report, My Reports, Fault Reference, Legal Outputs, Grid View, Insurers, Fleet)
+- Legal disclaimer amber banner on the front page
+- SHA-256 fingerprint, digital signature, and timestamp on submitted reports
+- No dedicated privacy policy page
+- No multi-language support
+- No claim status tracker
+- No dark mode toggle
+- No GDPR data retention/deletion controls
 
 ## Requested Changes (Diff)
 
 ### Add
-- Crash scenario diagram displayed inline in the photo analysis results section, immediately after AI analysis completes
-- Editable crash type description field beneath the diagram (pre-filled by AI, user-correctable)
-- "More Photos Needed" prompt if AI cannot confidently determine crash type from current uploads
-- Fallback manual description input if additional photos still don't resolve crash type
-- Diagram updates/rearranges based on the manual description when AI confidence is low
+- **Privacy Policy page** (`/privacy`) — exclusive, dedicated page with full GDPR-compliant privacy policy covering: data collected, how it is used, retention periods, user rights (access, deletion, portability), cookie policy, third-party services disclosure, and contact information. Linked from the footer and nav.
+- **Multi-language support** — English (default), Spanish (es), and Polish (pl) with a language switcher in the header. All UI labels, nav items, headings, and key body text should be translatable. A `useTranslation` hook with a `translations.ts` file covering all three languages.
+- **Claim status tracker** — Each report gets a status field: Draft → Submitted → Under Review → Settled. Status is displayed as a colour-coded badge on the report list and report detail pages. Users can update the status manually from the report detail page.
+- **Dark mode toggle** — A sun/moon icon button in the header. Persists preference in localStorage. Uses Tailwind `dark:` classes with a `data-theme` attribute on `<html>`.
+- **GDPR data controls** — A "Data & Privacy" section accessible from the footer or a Settings page: data retention notice, option to delete all stored evidence (photos, dash cam clips) for a specific report, and a global "Delete All My Data" action.
 
 ### Modify
-- Photo analysis results panel: add diagram + editable description after AI analysis output
-- AI photo analysis logic: include crash type confidence scoring; if low confidence, trigger prompt for more photos
+- **Layout.tsx** — Add language switcher (globe icon + dropdown) and dark mode toggle to header. Add Privacy Policy link to footer.
+- **App.tsx** — Add `/privacy` route. Wrap app in a `LanguageProvider` context.
+- **ReportList / ReportDetail** — Add claim status badge and status update dropdown.
 
 ### Remove
-- Nothing removed
+- Nothing removed.
 
 ## Implementation Plan
-1. Extend crash type detection in photo analysis to output a confidence level (high/medium/low) alongside the inferred crash type
-2. In the photo analysis results panel, render the matching crash scenario SVG diagram after the AI description
-3. Add an editable text field below the diagram pre-filled with the AI's crash type label — user can correct if wrong
-4. If confidence is low/medium: show an amber prompt asking for additional photos to improve accuracy
-5. If user uploads more photos and confidence is still low: show a manual description input; map the description to the closest crash scenario and update the diagram accordingly
+
+1. Create `src/frontend/src/i18n/translations.ts` with English, Spanish, and Polish strings for all nav labels, page headings, common actions, and key UI text.
+2. Create `src/frontend/src/contexts/LanguageContext.tsx` providing current language and `t()` translation function.
+3. Create `src/frontend/src/contexts/ThemeContext.tsx` providing dark/light mode toggle with localStorage persistence.
+4. Create `src/frontend/src/pages/PrivacyPolicyPage.tsx` — full GDPR privacy policy, translated.
+5. Update `Layout.tsx` — integrate language switcher dropdown and dark mode toggle in header; add Privacy Policy footer link.
+6. Update `App.tsx` — add `/privacy` route, wrap in `LanguageProvider` and `ThemeProvider`.
+7. Update `src/frontend/src/pages/ReportsPage.tsx` and `ReportDetail.tsx` — add claim status badge (colour-coded) and status update control.
+8. Add GDPR data controls panel to report detail page (delete evidence for this report) and a global section in a new Settings/Data page or within the report list page.

@@ -7,11 +7,15 @@ import {
 } from "@tanstack/react-router";
 import React from "react";
 import Layout from "./components/Layout";
+import { LanguageProvider } from "./contexts/LanguageContext";
+import { ThemeProvider } from "./contexts/ThemeContext";
 import BirdsEyeGridPage from "./pages/BirdsEyeGridPage";
 import FaultReferencePage from "./pages/FaultReferencePage";
 import FleetPage from "./pages/FleetPage";
 import InsurerContactsPage from "./pages/InsurerContactsPage";
+import LegalOutputsPage from "./pages/LegalOutputsPage";
 import NewReportPage from "./pages/NewReportPage";
+import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import ReportDetailPage from "./pages/ReportDetailPage";
 import ReportsPage from "./pages/ReportsPage";
 
@@ -43,6 +47,12 @@ const faultReferenceRoute = createRoute({
   component: FaultReferencePage,
 });
 
+const legalOutputsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/legal-outputs",
+  component: LegalOutputsPage,
+});
+
 const gridRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/grid",
@@ -61,14 +71,22 @@ const fleetRoute = createRoute({
   component: FleetPage,
 });
 
+const privacyRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/privacy",
+  component: PrivacyPolicyPage,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   reportsRoute,
   reportDetailRoute,
   faultReferenceRoute,
+  legalOutputsRoute,
   gridRoute,
   insurersRoute,
   fleetRoute,
+  privacyRoute,
 ]);
 
 const router = createRouter({ routeTree });
@@ -81,8 +99,12 @@ declare module "@tanstack/react-router" {
 
 export default function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>
+    <ThemeProvider>
+      <LanguageProvider>
+        <QueryClientProvider client={queryClient}>
+          <RouterProvider router={router} />
+        </QueryClientProvider>
+      </LanguageProvider>
+    </ThemeProvider>
   );
 }

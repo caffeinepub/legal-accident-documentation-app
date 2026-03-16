@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Collapsible,
@@ -6,19 +7,45 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   AlertTriangle,
   Camera,
   ChevronDown,
   ChevronUp,
   FileText,
+  Lock,
   Scale,
   ScanSearch,
   Shield,
+  Trash2,
   Video,
 } from "lucide-react";
 import type React from "react";
 import { useState } from "react";
 import type { AccidentReport } from "../backend";
+import { useLanguage } from "../contexts/LanguageContext";
+import {
+  type ClaimStatus,
+  STATUS_CONFIG,
+  getReportStatus,
+  setReportStatus,
+} from "../utils/reportStatus";
+import AIConsistencyChecker from "./AIConsistencyChecker";
 import AccidentNarrativePanel from "./AccidentNarrativePanel";
 import ClaimSummaryPanel from "./ClaimSummaryPanel";
 import ContributoryNegligencePanel from "./ContributoryNegligencePanel";
@@ -31,6 +58,7 @@ import ExportReportPanel from "./ExportReportPanel";
 import FaultLikelihoodPanel from "./FaultLikelihoodPanel";
 import FaultMatrixPanel from "./FaultMatrixPanel";
 import InjuryAnalysisPanel from "./InjuryAnalysisPanel";
+import InjuryProgressionTracker from "./InjuryProgressionTracker";
 import LegalReferencePanel from "./LegalReferencePanel";
 import LiabilityDisplay from "./LiabilityDisplay";
 import NegotiationLetterBuilder from "./NegotiationLetterBuilder";
@@ -120,7 +148,169 @@ function stripPoliceInfo(accidentMarker: string): string {
   return accidentMarker.slice(0, idx).trim();
 }
 
+// ─── Status Badge ───────────────────────────────────────────────────────────
+function StatusBadge({ status }: { status: ClaimStatus }) {
+  const cfg = STATUS_CONFIG[status];
+  return (
+    <span
+      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${cfg.color}`}
+    >
+      {cfg.label}
+    </span>
+  );
+}
+
+// ─── GDPR / Data & Privacy Panel ─────────────────────────────────────────────
+function GdprPanel({ reportId }: { reportId: string }) {
+  const { t } = useLanguage();
+  const [evidenceDeleted, setEvidenceDeleted] = useState(false);
+  const [reportDeleted, setReportDeleted] = useState(false);
+  const [evidenceDialogOpen, setEvidenceDialogOpen] = useState(false);
+  const [reportDialogOpen, setReportDialogOpen] = useState(false);
+
+  const handleDeleteEvidence = () => {
+    // Clear photo/dashcam blobs from localStorage for this report key
+    const keys = Object.keys(localStorage).filter(
+      (k) =>
+        k.startsWith(`report_${reportId}_photo`) ||
+        k.startsWith(`report_${reportId}_dashcam`) ||
+        k.startsWith(`injury_photos_${reportId}`) ||
+        k.includes(`injuryPhotos_${reportId}`),
+    );
+    for (const k of keys) localStorage.removeItem(k);
+    setEvidenceDeleted(true);
+    setEvidenceDialogOpen(false);
+  };
+
+  const handleDeleteReport = () => {
+    // Remove all keys related to this report
+    const keys = Object.keys(localStorage).filter((k) => k.includes(reportId));
+    for (const k of keys) localStorage.removeItem(k);
+    setReportDeleted(true);
+    setReportDialogOpen(false);
+  };
+
+  if (reportDeleted) {
+    return (
+      <div className="text-center py-4 text-sm text-muted-foreground">
+        Report deleted from local storage.
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Storage notice */}
+      <div className="rounded-lg border border-border bg-muted/30 px-4 py-3 text-sm space-y-1">
+        <div className="flex items-start gap-2">
+          <Lock className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
+          <div>
+            <p className="font-medium text-foreground">{t("gdpr.title")}</p>
+            <p className="text-muted-foreground mt-1">
+              {t("gdpr.data_stored_locally")}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div className="flex flex-wrap gap-3">
+        {/* Delete evidence files */}
+        <Dialog open={evidenceDialogOpen} onOpenChange={setEvidenceDialogOpen}>
+          <DialogTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5 text-amber-700 border-amber-300 hover:bg-amber-50 dark:text-amber-300 dark:border-amber-700 dark:hover:bg-amber-950/30"
+              disabled={evidenceDeleted}
+              data-ocid="gdpr.delete_evidence.button"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              {evidenceDeleted ? "Evidence Cleared" : t("gdpr.delete_evidence")}
+            </Button>
+          </DialogTrigger>
+          <DialogContent data-ocid="gdpr.delete_evidence.dialog">
+            <DialogHeader>
+              <DialogTitle>{t("gdpr.delete_evidence")}</DialogTitle>
+              <DialogDescription>
+                {t("gdpr.delete_evidence_confirm")}
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setEvidenceDialogOpen(false)}
+                data-ocid="gdpr.delete_evidence.cancel_button"
+              >
+                {t("action.cancel")}
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleDeleteEvidence}
+                data-ocid="gdpr.delete_evidence.confirm_button"
+              >
+                {t("action.delete")}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete entire report */}
+        <Dialog open={reportDialogOpen} onOpenChange={setReportDialogOpen}>
+          <DialogTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5 text-destructive border-destructive/40 hover:bg-destructive/10"
+              data-ocid="gdpr.delete_report.button"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              {t("gdpr.delete_report")}
+            </Button>
+          </DialogTrigger>
+          <DialogContent data-ocid="gdpr.delete_report.dialog">
+            <DialogHeader>
+              <DialogTitle>{t("gdpr.delete_report")}</DialogTitle>
+              <DialogDescription>
+                {t("gdpr.delete_report_confirm")}
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setReportDialogOpen(false)}
+                data-ocid="gdpr.delete_report.cancel_button"
+              >
+                {t("action.cancel")}
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleDeleteReport}
+                data-ocid="gdpr.delete_report.confirm_button"
+              >
+                {t("action.delete")}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </div>
+  );
+}
+
 export default function ReportDetail({ reportId, report }: ReportDetailProps) {
+  const { t } = useLanguage();
+  const reportIdStr = reportId.toString();
+
+  const [status, setStatusState] = useState<ClaimStatus>(() =>
+    getReportStatus(reportIdStr),
+  );
+
+  const handleStatusChange = (val: ClaimStatus) => {
+    setStatusState(val);
+    setReportStatus(reportIdStr, val);
+  };
+
   const primaryViolation =
     report.violations && report.violations.length > 0
       ? report.violations[0].violationType
@@ -152,14 +342,16 @@ export default function ReportDetail({ reportId, report }: ReportDetailProps) {
   return (
     <div className="space-y-4 max-w-3xl mx-auto">
       {/* Report header */}
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold">Report #{reportId.toString()}</h2>
           <p className="text-sm text-muted-foreground">
             {new Date(Number(report.timestamp)).toLocaleString("en-GB")}
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2 items-center">
+          {/* Claim status badge */}
+          <StatusBadge status={status} />
           {report.isAtFault && <Badge variant="destructive">At Fault</Badge>}
           {report.isRedLightViolation && (
             <Badge variant="destructive">Red Light</Badge>
@@ -169,6 +361,62 @@ export default function ReportDetail({ reportId, report }: ReportDetailProps) {
           )}
         </div>
       </div>
+
+      {/* Claim Status Tracker */}
+      <Card>
+        <CardContent className="py-3 px-4">
+          <div className="flex items-center gap-3 flex-wrap">
+            <span className="text-sm font-medium text-muted-foreground shrink-0">
+              {t("status.label")}:
+            </span>
+            <Select
+              value={status}
+              onValueChange={(v) => handleStatusChange(v as ClaimStatus)}
+            >
+              <SelectTrigger
+                className="w-40 h-8 text-xs"
+                data-ocid="report.status.select"
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="draft">{t("status.draft")}</SelectItem>
+                <SelectItem value="submitted">
+                  {t("status.submitted")}
+                </SelectItem>
+                <SelectItem value="under_review">
+                  {t("status.under_review")}
+                </SelectItem>
+                <SelectItem value="settled">{t("status.settled")}</SelectItem>
+              </SelectContent>
+            </Select>
+            {/* Visual pipeline */}
+            <div className="hidden sm:flex items-center gap-1 text-xs text-muted-foreground">
+              {(
+                [
+                  "draft",
+                  "submitted",
+                  "under_review",
+                  "settled",
+                ] as ClaimStatus[]
+              ).map((s, i) => (
+                <span key={s} className="flex items-center gap-1">
+                  {i > 0 && <span className="text-border">›</span>}
+                  <span
+                    className={`px-1.5 py-0.5 rounded ${
+                      s === status
+                        ? "bg-primary/10 text-primary font-semibold"
+                        : ""
+                    }`}
+                  >
+                    {STATUS_CONFIG[s].label}
+                  </span>
+                </span>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Trust & Credibility Badge */}
       <SubmissionCredibilityBadge
@@ -277,7 +525,7 @@ export default function ReportDetail({ reportId, report }: ReportDetailProps) {
         </CollapsibleSection>
       )}
 
-      {/* Claim Summary — uses reportId + aiAnalysisResult */}
+      {/* Claim Summary */}
       <ClaimSummaryPanel
         reportId={reportId}
         aiAnalysisResult={report.aiAnalysisResult}
@@ -296,12 +544,12 @@ export default function ReportDetail({ reportId, report }: ReportDetailProps) {
         <ViolationsDisplay violations={report.violations} />
       )}
 
-      {/* Traffic Signs — prop is `signs` */}
+      {/* Traffic Signs */}
       {report.trafficSigns && report.trafficSigns.length > 0 && (
         <TrafficSignsDisplay signs={report.trafficSigns} />
       )}
 
-      {/* Discrepancy Alert — requires isRedLightViolation */}
+      {/* Discrepancy Alert */}
       {report.trafficSignalState && (
         <DiscrepancyAlert
           trafficSignalState={report.trafficSignalState}
@@ -309,7 +557,7 @@ export default function ReportDetail({ reportId, report }: ReportDetailProps) {
         />
       )}
 
-      {/* Photos — requires both photos and imageData */}
+      {/* Photos */}
       {((report.imageData && report.imageData.length > 0) ||
         (report.photos && report.photos.length > 0)) && (
         <CollapsibleSection
@@ -321,14 +569,14 @@ export default function ReportDetail({ reportId, report }: ReportDetailProps) {
         </CollapsibleSection>
       )}
 
-      {/* Dash Cam Footage — prop is `footage` */}
+      {/* Dash Cam Footage */}
       {hasFootage && (
         <CollapsibleSection title="Dash Cam Footage" icon={Video} defaultOpen>
           <DashCamGallery footage={report.dashCamFootage} />
         </CollapsibleSection>
       )}
 
-      {/* Dash Cam Analysis Panel — uses correct props */}
+      {/* Dash Cam Analysis Panel */}
       <DashCamAnalysisPanel
         analysis={report.dashCamAnalysis ?? null}
         hasFootage={!!hasFootage}
@@ -336,13 +584,14 @@ export default function ReportDetail({ reportId, report }: ReportDetailProps) {
         onAnalyse={() => {}}
       />
 
-      {/* Injury Analysis — only accepts reportId */}
+      {/* Injury Analysis */}
       <InjuryAnalysisPanel reportId={reportId} />
+      <InjuryProgressionTracker reportId={reportId} />
 
       {/* Legal Reference */}
       <LegalReferencePanel violations={report.violations} />
 
-      {/* Fault Matrix — only accepts violationType */}
+      {/* Fault Matrix */}
       <FaultMatrixPanel violationType={primaryViolation} />
 
       {/* Contributory Negligence */}
@@ -453,6 +702,15 @@ export default function ReportDetail({ reportId, report }: ReportDetailProps) {
             </div>
           </div>
         )}
+      </CollapsibleSection>
+
+      {/* Data & Privacy (GDPR) */}
+      <CollapsibleSection
+        title="Data & Privacy"
+        icon={Lock}
+        defaultOpen={false}
+      >
+        <GdprPanel reportId={reportIdStr} />
       </CollapsibleSection>
     </div>
   );
