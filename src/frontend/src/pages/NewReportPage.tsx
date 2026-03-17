@@ -1,12 +1,88 @@
-import { AlertTriangle, FileText, Scale, Shield, X } from "lucide-react";
+import {
+  AlertTriangle,
+  Camera,
+  CheckCircle2,
+  FileText,
+  Scale,
+  Shield,
+  X,
+} from "lucide-react";
 import React, { useState } from "react";
 import AccidentReportForm from "../components/AccidentReportForm";
 
 export default function NewReportPage() {
   const [disclaimerDismissed, setDisclaimerDismissed] = useState(false);
+  const [onboardingDismissed, setOnboardingDismissed] = useState(
+    () => !!localStorage.getItem("iatl_onboarded"),
+  );
+
+  const dismissOnboarding = () => {
+    localStorage.setItem("iatl_onboarded", "1");
+    setOnboardingDismissed(true);
+  };
 
   return (
     <div>
+      {/* Onboarding Banner */}
+      {!onboardingDismissed && (
+        <div
+          className="mb-5 rounded-xl border border-border bg-card shadow-sm px-5 py-4"
+          data-ocid="onboarding.panel"
+        >
+          <div className="flex items-start justify-between gap-3 mb-3">
+            <div>
+              <h2
+                className="text-lg font-bold tracking-tight"
+                style={{ fontFamily: "Fraunces, Georgia, serif" }}
+              >
+                Welcome to iamthe.law
+              </h2>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Your AI-powered accident documentation toolkit. Here's how it
+                works:
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={dismissOnboarding}
+              className="shrink-0 text-muted-foreground hover:text-foreground transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              aria-label="Dismiss welcome banner"
+              data-ocid="onboarding.close_button"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-2 mb-4">
+            <div className="flex-1 flex items-start gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2.5">
+              <Camera className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+              <span className="text-xs text-foreground leading-relaxed">
+                Upload photos &amp; dash cam footage for AI analysis
+              </span>
+            </div>
+            <div className="flex-1 flex items-start gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2.5">
+              <FileText className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+              <span className="text-xs text-foreground leading-relaxed">
+                Generate a formal accident narrative and fault assessment
+              </span>
+            </div>
+            <div className="flex-1 flex items-start gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2.5">
+              <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+              <span className="text-xs text-foreground leading-relaxed">
+                Export insurer-ready reports with legal references
+              </span>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={dismissOnboarding}
+            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            data-ocid="onboarding.close_button"
+          >
+            Got it
+          </button>
+        </div>
+      )}
+
       {/* Legal Disclaimer Banner */}
       {!disclaimerDismissed && (
         <div

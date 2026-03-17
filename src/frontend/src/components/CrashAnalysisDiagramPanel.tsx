@@ -42,6 +42,7 @@ export default function CrashAnalysisDiagramPanel({
     inferredKey ? scenarioDefaultDescription[inferredKey] : "",
   );
   const [showManualEntry, setShowManualEntry] = useState<boolean>(!inferredKey);
+  const [isFromGridFallback, setIsFromGridFallback] = useState<boolean>(false);
   const [manualDescription, setManualDescription] = useState("");
   const [photoDismissed, setPhotoDismissed] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -50,9 +51,28 @@ export default function CrashAnalysisDiagramPanel({
   // Re-infer if analysisText changes externally
   useEffect(() => {
     const key = inferCrashTypeFromText(analysisText);
-    setScenarioKey(key);
-    setDescription(key ? scenarioDefaultDescription[key] : "");
-    setShowManualEntry(!key);
+    if (key) {
+      setScenarioKey(key);
+      setDescription(scenarioDefaultDescription[key]);
+      setShowManualEntry(false);
+      setIsFromGridFallback(false);
+    } else {
+      // Fallback: check grid view stored scenario
+      const stored = localStorage.getItem(
+        "iatl_last_scenario",
+      ) as ScenarioKey | null;
+      if (stored) {
+        setScenarioKey(stored);
+        setDescription(scenarioDefaultDescription[stored] ?? "");
+        setShowManualEntry(false);
+        setIsFromGridFallback(true);
+      } else {
+        setScenarioKey(null);
+        setDescription("");
+        setShowManualEntry(true);
+        setIsFromGridFallback(false);
+      }
+    }
   }, [analysisText]);
 
   const handleManualDescriptionChange = (
@@ -98,7 +118,7 @@ export default function CrashAnalysisDiagramPanel({
             data-ocid="crash-diagram.success_state"
           >
             <CheckCircle2 className="w-3 h-3 mr-1" />
-            AI-Inferred
+            {isFromGridFallback ? "Scenario from Grid View" : "AI-Inferred"}
           </Badge>
         )}
       </div>

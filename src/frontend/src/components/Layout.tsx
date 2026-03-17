@@ -302,6 +302,15 @@ export default function Layout() {
             <span>&middot;</span>
             <button
               type="button"
+              onClick={() => navigate({ to: "/terms" })}
+              className="underline hover:text-foreground transition-colors"
+              data-ocid="footer.terms.link"
+            >
+              Terms of Service
+            </button>
+            <span>&middot;</span>
+            <button
+              type="button"
               onClick={() => navigate({ to: "/privacy" })}
               className="underline hover:text-foreground transition-colors"
               data-ocid="footer.data_privacy.link"

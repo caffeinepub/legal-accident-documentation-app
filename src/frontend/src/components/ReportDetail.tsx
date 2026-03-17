@@ -47,6 +47,7 @@ import {
 } from "../utils/reportStatus";
 import AIConsistencyChecker from "./AIConsistencyChecker";
 import AccidentNarrativePanel from "./AccidentNarrativePanel";
+import ClaimStatusTimeline from "./ClaimStatusTimeline";
 import ClaimSummaryPanel from "./ClaimSummaryPanel";
 import ContributoryNegligencePanel from "./ContributoryNegligencePanel";
 import DamageSeverityPanel from "./DamageSeverityPanel";
@@ -54,6 +55,7 @@ import DashCamAnalysisPanel from "./DashCamAnalysisPanel";
 import DashCamGallery from "./DashCamGallery";
 import DemandLetterPanel from "./DemandLetterPanel";
 import DiscrepancyAlert from "./DiscrepancyAlert";
+import EvidenceGapPanel from "./EvidenceGapPanel";
 import ExportReportPanel from "./ExportReportPanel";
 import FaultLikelihoodPanel from "./FaultLikelihoodPanel";
 import FaultMatrixPanel from "./FaultMatrixPanel";
@@ -364,7 +366,7 @@ export default function ReportDetail({ reportId, report }: ReportDetailProps) {
 
       {/* Claim Status Tracker */}
       <Card>
-        <CardContent className="py-3 px-4">
+        <CardContent className="py-3 px-4 space-y-3">
           <div className="flex items-center gap-3 flex-wrap">
             <span className="text-sm font-medium text-muted-foreground shrink-0">
               {t("status.label")}:
@@ -390,33 +392,16 @@ export default function ReportDetail({ reportId, report }: ReportDetailProps) {
                 <SelectItem value="settled">{t("status.settled")}</SelectItem>
               </SelectContent>
             </Select>
-            {/* Visual pipeline */}
-            <div className="hidden sm:flex items-center gap-1 text-xs text-muted-foreground">
-              {(
-                [
-                  "draft",
-                  "submitted",
-                  "under_review",
-                  "settled",
-                ] as ClaimStatus[]
-              ).map((s, i) => (
-                <span key={s} className="flex items-center gap-1">
-                  {i > 0 && <span className="text-border">›</span>}
-                  <span
-                    className={`px-1.5 py-0.5 rounded ${
-                      s === status
-                        ? "bg-primary/10 text-primary font-semibold"
-                        : ""
-                    }`}
-                  >
-                    {STATUS_CONFIG[s].label}
-                  </span>
-                </span>
-              ))}
-            </div>
           </div>
+          <ClaimStatusTimeline
+            currentStatus={status}
+            submittedAt={report.timestamp}
+          />
         </CardContent>
       </Card>
+
+      {/* Evidence Strength Check */}
+      <EvidenceGapPanel report={report} />
 
       {/* Trust & Credibility Badge */}
       <SubmissionCredibilityBadge

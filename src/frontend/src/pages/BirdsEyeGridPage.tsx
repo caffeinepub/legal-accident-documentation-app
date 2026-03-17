@@ -196,6 +196,9 @@ export default function BirdsEyeGridPage() {
     scenario: FaultMatrixEntry,
   ) => {
     const scenarioKey = SCENARIO_KEY_MAP[scenario.scenario] ?? null;
+    if (scenarioKey) {
+      localStorage.setItem("iatl_last_scenario", scenarioKey);
+    }
     setSelectedCell({ vehicleA, vehicleB, scenario, scenarioKey });
   };
 

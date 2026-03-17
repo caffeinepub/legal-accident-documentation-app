@@ -18,6 +18,7 @@ import NewReportPage from "./pages/NewReportPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import ReportDetailPage from "./pages/ReportDetailPage";
 import ReportsPage from "./pages/ReportsPage";
+import TermsOfServicePage from "./pages/TermsOfServicePage";
 
 const queryClient = new QueryClient();
 
@@ -71,6 +72,12 @@ const fleetRoute = createRoute({
   component: FleetPage,
 });
 
+const termsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/terms",
+  component: TermsOfServicePage,
+});
+
 const privacyRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/privacy",
@@ -87,6 +94,7 @@ const routeTree = rootRoute.addChildren([
   insurersRoute,
   fleetRoute,
   privacyRoute,
+  termsRoute,
 ]);
 
 const router = createRouter({ routeTree });
