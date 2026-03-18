@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import React, { useState } from "react";
 import type { Violation } from "../backend";
+import { useCountry } from "../contexts/CountryContext";
 import {
   type CaseLawEntry,
   GENERAL_LEGAL_REFERENCES,
@@ -21,6 +22,10 @@ import {
   type RTAReference,
   getLegalReferencesForViolations,
 } from "../data/legalReferences";
+import {
+  MALTA_GENERAL_LEGAL_REFERENCES,
+  getMaltaLegalReferencesForViolations,
+} from "../data/maltaLegalReferences";
 
 interface LegalReferencePanelProps {
   violations: Violation[];

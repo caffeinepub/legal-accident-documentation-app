@@ -32,6 +32,14 @@ import {
 import type React from "react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useCountry } from "../contexts/CountryContext";
+import {
+  MALTA_COURT_TRACKS,
+  MALTA_JCG_TABLE,
+  type MaltaInjuryKey,
+  type MaltaSeverityKey,
+  formatEUR,
+} from "../data/maltaLegalOutputs";
 
 // ─── Settlement Value Lookup ──────────────────────────────────────────────────
 type SeverityKey =
@@ -115,7 +123,7 @@ const SEVERITY_BANDS: SeverityKey[] = [
   "Very Severe",
 ];
 
-function formatCurrency(n: number): string {
+function formatCurrencyGBP(n: number): string {
   return `£${n.toLocaleString("en-GB")}`;
 }
 
@@ -222,6 +230,8 @@ ${fields.yourName || "[YOUR NAME]"}`;
 
 // ─── Section 1: Settlement Value Estimator ───────────────────────────────────
 function SettlementEstimator() {
+  const { country } = useCountry();
+  const isMalta = country === "mt";
   const [injuryCategory, setInjuryCategory] = useState<string>("");
   const [severityBand, setSeverityBand] = useState<string>("");
   const [result, setResult] = useState<
@@ -229,13 +239,24 @@ function SettlementEstimator() {
   >(null);
 
   const handleEstimate = () => {
-    const band = severityBand as SeverityKey;
-    const cat = injuryCategory as InjuryKey;
-    const entry = JCG_TABLE[cat]?.[band];
-    if (entry) {
-      setResult({ min: entry[0], max: entry[1], severity: band });
+    if (isMalta) {
+      const band = severityBand as MaltaSeverityKey;
+      const cat = injuryCategory as MaltaInjuryKey;
+      const entry = MALTA_JCG_TABLE[cat]?.[band];
+      if (entry) {
+        setResult({ min: entry[0], max: entry[1], severity: band });
+      } else {
+        setResult("none");
+      }
     } else {
-      setResult("none");
+      const band = severityBand as SeverityKey;
+      const cat = injuryCategory as InjuryKey;
+      const entry = JCG_TABLE[cat]?.[band];
+      if (entry) {
+        setResult({ min: entry[0], max: entry[1], severity: band });
+      } else {
+        setResult("none");
+      }
     }
   };
 
@@ -337,7 +358,9 @@ function SettlementEstimator() {
               className="text-3xl font-display font-bold text-primary tracking-tight"
               style={{ fontFamily: "Fraunces, Georgia, serif" }}
             >
-              {formatCurrency(result.min)} – {formatCurrency(result.max)}
+              {isMalta ? formatEUR(result.min) : formatCurrencyGBP(result.min)}{" "}
+              –{" "}
+              {isMalta ? formatEUR(result.max) : formatCurrencyGBP(result.max)}
             </div>
             <p className="text-xs text-muted-foreground mt-3 leading-relaxed">
               <strong>Note:</strong> These figures are indicative estimates
@@ -362,6 +385,8 @@ function SettlementEstimator() {
 
 // ─── Section 2: Legal Pathway Guide ──────────────────────────────────────────
 function LegalPathwayGuide() {
+  const { country } = useCountry();
+  const isMalta = country === "mt";
   const [claimValue, setClaimValue] = useState("");
   const [activeTrack, setActiveTrack] = useState<string | null>(null);
 
@@ -400,7 +425,9 @@ function LegalPathwayGuide() {
       <CardContent className="space-y-5">
         <div className="flex gap-3 flex-col sm:flex-row sm:items-end">
           <div className="space-y-1.5 flex-1">
-            <Label htmlFor="claim-value">Estimated Claim Value (£)</Label>
+            <Label htmlFor="claim-value">
+              Estimated Claim Value ({isMalta ? "€" : "£"})
+            </Label>
             <Input
               id="claim-value"
               type="number"

@@ -7,6 +7,8 @@ import {
 } from "@/components/ui/collapsible";
 import { AlarmClock, ChevronDown, ChevronUp, Info } from "lucide-react";
 import { useState } from "react";
+import { useCountry } from "../contexts/CountryContext";
+import { MALTA_PRESCRIPTION_ENTRIES } from "../data/maltaLegalOutputs";
 
 interface LimitationEntry {
   id: number;
@@ -148,6 +150,8 @@ export default function StatuteLimitationsPanel({
   accidentDate,
 }: StatuteLimitationsPanelProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const { country } = useCountry();
+  const isMalta = country === "mt";
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
@@ -161,7 +165,9 @@ export default function StatuteLimitationsPanel({
               <div className="flex items-center gap-2">
                 <AlarmClock className="h-4 w-4 text-violet-600 dark:text-violet-400 shrink-0" />
                 <CardTitle className="text-sm font-semibold">
-                  Statute of Limitations (UK)
+                  {isMalta
+                    ? "Prescription Periods (Malta)"
+                    : "Statute of Limitations (UK)"}
                 </CardTitle>
                 {accidentDate && (
                   <Badge
@@ -189,60 +195,81 @@ export default function StatuteLimitationsPanel({
             <div className="flex items-start gap-2 p-3 rounded-lg bg-violet-50/50 dark:bg-violet-950/10 border border-violet-200/60 dark:border-violet-800/30">
               <Info className="h-3.5 w-3.5 text-violet-600 dark:text-violet-400 shrink-0 mt-0.5" />
               <p className="text-xs text-muted-foreground leading-relaxed">
-                UK limitation periods under the{" "}
-                <strong className="text-foreground">Limitation Act 1980</strong>
-                . Missing a limitation deadline will ordinarily bar your claim.
-                {accidentDate
-                  ? " Countdowns are calculated from the reported accident date."
-                  : " Enter the accident date in the report to see live countdowns."}
+                {isMalta ? (
+                  <>
+                    Maltese prescription periods under{" "}
+                    <strong className="text-foreground">
+                      Civil Code Cap. 16, Art. 2153
+                    </strong>
+                    . Missing a prescription deadline extinguishes your right to
+                    claim.
+                    {accidentDate
+                      ? " Countdowns are calculated from the reported accident date."
+                      : " Enter the accident date in the report to see live countdowns."}
+                  </>
+                ) : (
+                  <>
+                    UK limitation periods under the{" "}
+                    <strong className="text-foreground">
+                      Limitation Act 1980
+                    </strong>
+                    . Missing a limitation deadline will ordinarily bar your
+                    claim.
+                    {accidentDate
+                      ? " Countdowns are calculated from the reported accident date."
+                      : " Enter the accident date in the report to see live countdowns."}
+                  </>
+                )}
               </p>
             </div>
 
             {/* Limitation entries */}
             <div className="space-y-2">
-              {LIMITATION_ENTRIES.map((entry, index) => {
-                const countdown = accidentDate
-                  ? computeCountdown(accidentDate, entry.periodDays)
-                  : null;
-                const dataIndex = index + 1;
+              {(isMalta ? MALTA_PRESCRIPTION_ENTRIES : LIMITATION_ENTRIES).map(
+                (entry, index) => {
+                  const countdown = accidentDate
+                    ? computeCountdown(accidentDate, entry.periodDays)
+                    : null;
+                  const dataIndex = index + 1;
 
-                return (
-                  <div
-                    key={entry.id}
-                    data-ocid={`limitations.item.${dataIndex}`}
-                    className={`p-3 rounded-lg border transition-colors ${
-                      countdown?.status === "expired"
-                        ? "bg-red-50/60 border-red-300/60 dark:bg-red-950/10 dark:border-red-800/30"
-                        : countdown?.status === "red"
-                          ? "bg-red-50/30 border-red-200/50 dark:bg-red-950/5 dark:border-red-900/20"
-                          : "bg-card border-border"
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-2 flex-wrap">
-                      <div className="flex-1 min-w-0 space-y-1">
-                        <p className="text-sm font-semibold text-foreground">
-                          {entry.name}
-                        </p>
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <Badge
-                            variant="secondary"
-                            className="text-xs font-semibold"
-                          >
-                            {entry.period}
-                          </Badge>
-                          <span className="text-xs text-muted-foreground font-mono">
-                            {entry.statute}
-                          </span>
+                  return (
+                    <div
+                      key={entry.id}
+                      data-ocid={`limitations.item.${dataIndex}`}
+                      className={`p-3 rounded-lg border transition-colors ${
+                        countdown?.status === "expired"
+                          ? "bg-red-50/60 border-red-300/60 dark:bg-red-950/10 dark:border-red-800/30"
+                          : countdown?.status === "red"
+                            ? "bg-red-50/30 border-red-200/50 dark:bg-red-950/5 dark:border-red-900/20"
+                            : "bg-card border-border"
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-2 flex-wrap">
+                        <div className="flex-1 min-w-0 space-y-1">
+                          <p className="text-sm font-semibold text-foreground">
+                            {entry.name}
+                          </p>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <Badge
+                              variant="secondary"
+                              className="text-xs font-semibold"
+                            >
+                              {entry.period}
+                            </Badge>
+                            <span className="text-xs text-muted-foreground font-mono">
+                              {entry.statute}
+                            </span>
+                          </div>
                         </div>
+                        {countdown && <CountdownBadge countdown={countdown} />}
                       </div>
-                      {countdown && <CountdownBadge countdown={countdown} />}
+                      <p className="text-xs text-muted-foreground leading-relaxed mt-2">
+                        {entry.notes}
+                      </p>
                     </div>
-                    <p className="text-xs text-muted-foreground leading-relaxed mt-2">
-                      {entry.notes}
-                    </p>
-                  </div>
-                );
-              })}
+                  );
+                },
+              )}
             </div>
 
             {/* Disclaimer */}

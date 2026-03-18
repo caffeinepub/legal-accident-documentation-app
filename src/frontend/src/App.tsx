@@ -7,6 +7,7 @@ import {
 } from "@tanstack/react-router";
 import React from "react";
 import Layout from "./components/Layout";
+import { CountryProvider } from "./contexts/CountryContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import BirdsEyeGridPage from "./pages/BirdsEyeGridPage";
@@ -108,11 +109,13 @@ declare module "@tanstack/react-router" {
 export default function App() {
   return (
     <ThemeProvider>
-      <LanguageProvider>
-        <QueryClientProvider client={queryClient}>
-          <RouterProvider router={router} />
-        </QueryClientProvider>
-      </LanguageProvider>
+      <CountryProvider>
+        <LanguageProvider>
+          <QueryClientProvider client={queryClient}>
+            <RouterProvider router={router} />
+          </QueryClientProvider>
+        </LanguageProvider>
+      </CountryProvider>
     </ThemeProvider>
   );
 }

@@ -1,9 +1,10 @@
-export type Language = "en" | "es" | "pl";
+export type Language = "en" | "es" | "pl" | "mt";
 
 export const LANGUAGES: { code: Language; label: string; flag: string }[] = [
   { code: "en", label: "English", flag: "🇬🇧" },
   { code: "es", label: "Español", flag: "🇪🇸" },
   { code: "pl", label: "Polski", flag: "🇵🇱" },
+  { code: "mt", label: "Malti", flag: "🇲🇹" },
 ];
 
 export type TranslationKey =
@@ -260,6 +261,68 @@ const translations: Translations = {
     "reports.empty.title": "Nie znaleziono raportów",
     "reports.empty.description": "Utwórz swój pierwszy raport, aby zacząć.",
     "reports.create_first": "Utwórz Raport",
+  },
+  mt: {
+    "nav.new_report": "Rapport Ġdid",
+    "nav.my_reports": "Ir-Rapporti Tiegħi",
+    "nav.fault_reference": "Riferiment għall-Ċolpa",
+    "nav.legal_outputs": "Riżultati Leġali",
+    "nav.grid_view": "Veduta tal-Ġrejja",
+    "nav.insurers": "Assiguraturi",
+    "nav.fleet": "Flotta",
+    "action.save": "Issejvja",
+    "action.submit": "Ibġħat",
+    "action.cancel": "Ikkanċella",
+    "action.delete": "Ħassar",
+    "action.export": "Esporta",
+    "action.add": "Žid",
+    "action.generate": "Ġenera",
+    "action.analyse": "Analizza",
+    "action.confirm": "Ikkonferma",
+    "action.close": "Agħlaq",
+    "action.copy": "Ikkopja",
+    "action.print": "Ipprintja",
+    "page.new_report.heading": "Rapport Ġdid tal-Inċident",
+    "page.new_report.subheading":
+      "Idokumenta l-inċident tiegħek bl-analisi tal-AI",
+    "page.reports.heading": "Ir-Rapporti Tiegħi",
+    "page.reports.subheading":
+      "Ara u mmaniġġja r-rapporti kollha tal-inċidenti salvati.",
+    "page.privacy.heading": "Politika tal-Ċirkolarità",
+    "page.privacy.subheading": "Kif iamthe.law jimmaniġġa d-dejta tiegħek",
+    "status.draft": "Abbozz",
+    "status.submitted": "Mibġħut",
+    "status.under_review": "Taħt Ir-Reviżjoni",
+    "status.settled": "Sodisfatt",
+    "status.label": "Status tal-Talba",
+    "footer.built_with": "Mibni bi",
+    "footer.privacy_policy": "Politika tal-Ċirkolarità",
+    "footer.data_privacy": "Dejta u Ċirkolarità",
+    "disclaimer.title": "Avviż Leġali Importanti",
+    "disclaimer.text":
+      "iamthe.law hija għodda ta' dokumentazzjoni assistita mill-AI. L-informazzjoni pprovduta ma tikkostitwixxix parir leġali. Dejjem ikkonsulta avukat kwalifikat għal gwida leġali.",
+    "gdpr.title": "Dejta u Ċirkolarità",
+    "gdpr.description":
+      "Id-dejta tar-rapport tiegħek hi maħzuna lokalment fil-browser tiegħek. L-ebda dejta ma titħabat lil partijiet terzi mingħajr il-kunsens espliċitu tiegħek.",
+    "gdpr.delete_evidence": "Ħassar il-Fajls tal-Evidenza",
+    "gdpr.delete_report": "Ħassar ir-Rapport Kollu",
+    "gdpr.delete_evidence_confirm":
+      "Dan se jħassar b’mod permanenti l-photos u l-fajls tal-dashcam kollha għal dan ir-rapport. Il-metadejta tar-rapport ser tinzaġħar. Inti Ďert?",
+    "gdpr.delete_report_confirm":
+      "Dan se jħassar b’mod permanenti r-rapport kollu mill-maħzenazzjoni lokali. Din l-azzjoni ma tistax tiġi revokata. Inti Ďert?",
+    "gdpr.data_stored_locally":
+      "Id-dejta tar-rapport kollha, inklużi l-photos, il-videos u d-dettalji personali, hi maħzuna biss fil-maħzenazzjoni lokali tal-browser tiegħek.",
+    "privacy.intro": "Introduzzjoni",
+    "privacy.data_collected": "Dejta li Niġbru",
+    "privacy.how_used": "Kif Tintuża d-Dejta Tiegħek",
+    "privacy.retention": "Retention tad-Dejta",
+    "privacy.your_rights": "Id-Drittijiet Tiegħek",
+    "privacy.cookies": "Cookies",
+    "privacy.contact": "Ikkuntattjana",
+    "privacy.updates": "Aġġornamenti tal-Politika",
+    "reports.empty.title": "L-ebda rapport ma nstab",
+    "reports.empty.description": "Oħloq l-ewwel rapport tiegħek biex tibda.",
+    "reports.create_first": "Oħloq Rapport",
   },
 };
 

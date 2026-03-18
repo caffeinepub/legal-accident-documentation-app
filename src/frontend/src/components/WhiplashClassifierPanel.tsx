@@ -18,6 +18,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { AlertCircle, Brain, ChevronDown, ChevronUp, Info } from "lucide-react";
 import { useState } from "react";
+import { useCountry } from "../contexts/CountryContext";
 
 interface WhiplashClassifierPanelProps {
   injuryDescription?: string;
@@ -54,12 +55,30 @@ const WRP_TARIFF: Record<DurationBand, number> = {
   "18_24": 4215,
 };
 
+// Malta soft tissue injury compensation bands (EUR)
+const MALTA_ST_TARIFF: Record<DurationBand, number> = {
+  "0_3": 1500,
+  "3_6": 2500,
+  "6_9": 4000,
+  "9_12": 6000,
+  "12_15": 8500,
+  "15_18": 11000,
+  "18_24": 14000,
+};
+
 function roundToNearest5(n: number): number {
   return Math.round(n / 5) * 5;
 }
 
-function formatCurrency(n: number): string {
+function formatCurrencyGBP(n: number): string {
   return `£${n.toLocaleString("en-GB")}`;
+}
+function formatCurrencyEUR(n: number): string {
+  return new Intl.NumberFormat("mt-MT", {
+    style: "currency",
+    currency: "EUR",
+    minimumFractionDigits: 0,
+  }).format(n);
 }
 
 export default function WhiplashClassifierPanel({
@@ -67,13 +86,16 @@ export default function WhiplashClassifierPanel({
   reportId: _reportId,
 }: WhiplashClassifierPanelProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const { country } = useCountry();
+  const isMalta = country === "mt";
   const [injuryType, setInjuryType] = useState<InjuryType>("whiplash_only");
   const [duration, setDuration] = useState<DurationBand | "">("");
   const [calculated, setCalculated] = useState<number | null>(null);
 
   const handleCalculate = () => {
     if (!duration) return;
-    const base = WRP_TARIFF[duration];
+    const activeTariff = isMalta ? MALTA_ST_TARIFF : WRP_TARIFF;
+    const base = activeTariff[duration];
     const result =
       injuryType === "whiplash_psychological"
         ? roundToNearest5(base * 1.1)
@@ -176,7 +198,10 @@ export default function WhiplashClassifierPanel({
                       <SelectItem key={band} value={band}>
                         {DURATION_LABELS[band]}
                         <span className="ml-2 text-muted-foreground text-xs">
-                          — {formatCurrency(WRP_TARIFF[band])}
+                          —{" "}
+                          {isMalta
+                            ? formatCurrencyEUR(MALTA_ST_TARIFF[band])
+                            : formatCurrencyGBP(WRP_TARIFF[band])}
                         </span>
                       </SelectItem>
                     ),
@@ -193,7 +218,7 @@ export default function WhiplashClassifierPanel({
               data-ocid="whiplash.primary_button"
             >
               <Brain size={14} />
-              Calculate WRP Tariff
+              {isMalta ? "Calculate Compensation" : "Calculate WRP Tariff"}
             </Button>
 
             {/* Result */}
@@ -207,7 +232,9 @@ export default function WhiplashClassifierPanel({
                         Indicative Tariff Value
                       </p>
                       <p className="text-3xl font-bold text-violet-700 dark:text-violet-300 mt-0.5">
-                        {formatCurrency(calculated)}
+                        {isMalta
+                          ? formatCurrencyEUR(calculated)
+                          : formatCurrencyGBP(calculated)}
                       </p>
                       {injuryType === "whiplash_psychological" && (
                         <p className="text-xs text-violet-500 mt-0.5">
@@ -221,7 +248,7 @@ export default function WhiplashClassifierPanel({
                     />
                   </div>
 
-                  {isAbovePortalThreshold && (
+                  {isAbovePortalThreshold && !isMalta && (
                     <div
                       className="flex items-start gap-2 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-300 dark:border-amber-700/40"
                       data-ocid="whiplash.error_state"
@@ -279,12 +306,20 @@ export default function WhiplashClassifierPanel({
                                   {DURATION_LABELS[band]}
                                 </td>
                                 <td className="px-2 py-1.5 text-right font-mono">
-                                  {formatCurrency(WRP_TARIFF[band])}
+                                  {isMalta
+                                    ? formatCurrencyEUR(MALTA_ST_TARIFF[band])
+                                    : formatCurrencyGBP(WRP_TARIFF[band])}
                                 </td>
                                 <td className="px-2 py-1.5 text-right font-mono text-violet-600">
-                                  {formatCurrency(
-                                    roundToNearest5(WRP_TARIFF[band] * 1.1),
-                                  )}
+                                  {isMalta
+                                    ? formatCurrencyEUR(
+                                        roundToNearest5(
+                                          MALTA_ST_TARIFF[band] * 1.1,
+                                        ),
+                                      )
+                                    : formatCurrencyGBP(
+                                        roundToNearest5(WRP_TARIFF[band] * 1.1),
+                                      )}
                                 </td>
                               </tr>
                             ),
@@ -304,11 +339,24 @@ export default function WhiplashClassifierPanel({
                 className="text-muted-foreground shrink-0 mt-0.5"
               />
               <p className="text-xs text-muted-foreground leading-relaxed">
-                This tool is <strong>informational only</strong> and applies the
-                UK Whiplash Reform Protocol (WRP) 2021 fixed tariff under the
-                Civil Liability Act 2018. Actual compensation depends on
-                individual case facts and medical evidence. Always consult a
-                qualified solicitor.
+                {isMalta ? (
+                  <>
+                    This tool is <strong>informational only</strong> and
+                    provides indicative soft tissue injury compensation bands
+                    under Maltese personal injury guidelines (Civil Code Cap.
+                    16). Actual awards depend on individual case facts, medical
+                    evidence, and judicial assessment. Always consult a Maltese
+                    advocate.
+                  </>
+                ) : (
+                  <>
+                    This tool is <strong>informational only</strong> and applies
+                    the UK Whiplash Reform Protocol (WRP) 2021 fixed tariff
+                    under the Civil Liability Act 2018. Actual compensation
+                    depends on individual case facts and medical evidence.
+                    Always consult a qualified solicitor.
+                  </>
+                )}
               </p>
             </div>
           </CardContent>

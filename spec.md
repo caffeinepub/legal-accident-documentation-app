@@ -1,41 +1,63 @@
-# iamthe.law — Trust & Compliance + User Experience
+# iamthe.law — Malta Version
 
 ## Current State
 
-The app has:
-- Navigation with 7 pages (New Report, My Reports, Fault Reference, Legal Outputs, Grid View, Insurers, Fleet)
-- Legal disclaimer amber banner on the front page
-- SHA-256 fingerprint, digital signature, and timestamp on submitted reports
-- No dedicated privacy policy page
-- No multi-language support
-- No claim status tracker
-- No dark mode toggle
-- No GDPR data retention/deletion controls
+The app is a UK-centric accident documentation tool with:
+- Legal references tied to UK law (Road Traffic Act 1988, Highway Code, Limitation Act 1980, WRP 2021, CPR)
+- Currency in GBP (£) with en-GB locale
+- Languages: English, Spanish, Polish
+- UK-specific court tracks (Small Claims/Fast Track/Multi-Track under CPR)
+- UK limitation periods (3-year personal injury, 6-year property)
+- UK landmark case law (Donoghue v Stevenson, Caparo, Nettleship v Weston, Froom v Butcher, Pitts v Hunt)
+- No country/jurisdiction context at the app level
 
 ## Requested Changes (Diff)
 
 ### Add
-- **Privacy Policy page** (`/privacy`) — exclusive, dedicated page with full GDPR-compliant privacy policy covering: data collected, how it is used, retention periods, user rights (access, deletion, portability), cookie policy, third-party services disclosure, and contact information. Linked from the footer and nav.
-- **Multi-language support** — English (default), Spanish (es), and Polish (pl) with a language switcher in the header. All UI labels, nav items, headings, and key body text should be translatable. A `useTranslation` hook with a `translations.ts` file covering all three languages.
-- **Claim status tracker** — Each report gets a status field: Draft → Submitted → Under Review → Settled. Status is displayed as a colour-coded badge on the report list and report detail pages. Users can update the status manually from the report detail page.
-- **Dark mode toggle** — A sun/moon icon button in the header. Persists preference in localStorage. Uses Tailwind `dark:` classes with a `data-theme` attribute on `<html>`.
-- **GDPR data controls** — A "Data & Privacy" section accessible from the footer or a Settings page: data retention notice, option to delete all stored evidence (photos, dash cam clips) for a specific report, and a global "Delete All My Data" action.
+- `CountryContext` / `useCountry` hook — jurisdiction state ("uk" | "mt") stored in localStorage, with a country switcher in the Layout header
+- `src/data/maltaLegalReferences.ts` — Malta-specific legal data:
+  - Traffic Regulation Ordinance (Cap. 65) refs replacing Highway Code
+  - Civil Code Cap. 16 refs replacing RTA 1988
+  - EU Motor Insurance Directives (2009/103/EC)
+  - Maltese landmark cases: Cassar v Grech, Camilleri v Mifsud (duty of care), contributory negligence cases
+  - Malta prescription periods: 2-year tort (Civil Code Art. 2153), 5-year contractual
+  - Fond tal-Kumpens (Motor Insurance Compensation Fund) replacing MIB entries
+- `src/data/maltaLegalOutputs.ts` — Malta court tracks:
+  - Magistrates' Court (< €5,000)
+  - Civil Court First Hall (€5,000–€50,000)
+  - Court of Appeal (> €50,000 or complex cases)
+- Maltese language ("mt") added to translations — all 71 keys translated
+- Malta flag (🇲🇹) and EUR (€) currency formatting throughout when Malta jurisdiction active
+- Malta-specific demand letter template citing Maltese law and Maltese court procedure
+- Malta-specific police fields: Malta Police Force (MPF) reference, district
+- Malta-specific insurer context: Maltese insurance companies (Mapfre Middlesea, GasanMamo, HSBC Life Malta, etc.)
+- A `MaltaLegalOutputsSection` component inside `LegalOutputsPage` shown when Malta jurisdiction is active
+- A `MaltaStatuteLimitationsPanel` variation (or prop-driven) for Malta prescription periods
 
 ### Modify
-- **Layout.tsx** — Add language switcher (globe icon + dropdown) and dark mode toggle to header. Add Privacy Policy link to footer.
-- **App.tsx** — Add `/privacy` route. Wrap app in a `LanguageProvider` context.
-- **ReportList / ReportDetail** — Add claim status badge and status update dropdown.
+- `App.tsx` — wrap app in `CountryProvider`; add country switcher UI in header area
+- `Layout.tsx` — add country selector (UK flag / Malta flag toggle) next to existing language switcher
+- `StatuteLimitationsPanel.tsx` — accept `country` prop; when "mt", use Malta prescription periods
+- `LegalOutputsPage.tsx` — conditionally render UK or Malta sections based on active jurisdiction
+- `DemandLetterPanel.tsx` — swap legal references based on jurisdiction (Malta uses Civil Code, not RTA)
+- `WhiplashClassifierPanel.tsx` — when Malta, replace WRP 2021 tariffs with Maltese compensation guidelines (general damages by injury severity)
+- `translations.ts` — add `"mt"` to Language type, LANGUAGES array, and full mt translation block
+- `ExportReportPanel.tsx` — use EUR/€ and Malta court references when Malta jurisdiction active
 
 ### Remove
-- Nothing removed.
+- Nothing removed; UK version remains fully intact alongside Malta version
 
 ## Implementation Plan
 
-1. Create `src/frontend/src/i18n/translations.ts` with English, Spanish, and Polish strings for all nav labels, page headings, common actions, and key UI text.
-2. Create `src/frontend/src/contexts/LanguageContext.tsx` providing current language and `t()` translation function.
-3. Create `src/frontend/src/contexts/ThemeContext.tsx` providing dark/light mode toggle with localStorage persistence.
-4. Create `src/frontend/src/pages/PrivacyPolicyPage.tsx` — full GDPR privacy policy, translated.
-5. Update `Layout.tsx` — integrate language switcher dropdown and dark mode toggle in header; add Privacy Policy footer link.
-6. Update `App.tsx` — add `/privacy` route, wrap in `LanguageProvider` and `ThemeProvider`.
-7. Update `src/frontend/src/pages/ReportsPage.tsx` and `ReportDetail.tsx` — add claim status badge (colour-coded) and status update control.
-8. Add GDPR data controls panel to report detail page (delete evidence for this report) and a global section in a new Settings/Data page or within the report list page.
+1. Create `CountryContext.tsx` with `useCountry()` hook, `CountryProvider`, and localStorage persistence
+2. Create `src/data/maltaLegalReferences.ts` with Malta violation references, landmark cases, statutes
+3. Create `src/data/maltaLegalOutputs.ts` with court tracks, prescription periods, demand letter template for Malta
+4. Add Maltese language "mt" to `translations.ts` with all 71 keys
+5. Update `App.tsx` to wrap in `CountryProvider`
+6. Update `Layout.tsx` to show country switcher (🇬🇧 / 🇲🇹 pill toggle) next to language switcher
+7. Update `StatuteLimitationsPanel.tsx` to accept country prop and show Malta prescription periods when "mt"
+8. Update `LegalOutputsPage.tsx` to render Malta-specific court tracks, settlement estimator in EUR, and Malta demand letter when jurisdiction is "mt"
+9. Update `DemandLetterPanel.tsx` to use Malta law references when jurisdiction is "mt"
+10. Update `WhiplashClassifierPanel.tsx` to show Malta compensation bands (soft tissue / moderate / severe) in EUR when "mt"
+11. Update `ExportReportPanel.tsx` to use Malta formatting and legal references when "mt"
+12. Validate and deploy

@@ -16,6 +16,8 @@ import {
   Printer,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useCountry } from "../contexts/CountryContext";
+import { buildMaltaDemandLetter } from "../data/maltaLegalOutputs";
 
 interface DemandLetterPanelProps {
   report: AccidentReport;
@@ -156,15 +158,63 @@ DISCLAIMER: This is a draft letter generated for documentation purposes only. It
 }
 
 export default function DemandLetterPanel({ report }: DemandLetterPanelProps) {
+  const { country } = useCountry();
+  const isMalta = country === "mt";
   const [isOpen, setIsOpen] = useState(false);
   const [letterText, setLetterText] = useState("");
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (isOpen && !letterText) {
-      setLetterText(generateDemandLetter(report));
+      if (isMalta) {
+        const accidentDate = report.timestamp
+          ? new Date(Number(report.timestamp))
+          : undefined;
+        const faultAssessment = report.faultLikelihoodAssessment;
+        const partyBFault = faultAssessment
+          ? `${Number(faultAssessment.partyBPercentage)}%`
+          : "primarily";
+        const maltaLetter = buildMaltaDemandLetter({
+          claimantName: undefined,
+          defendantName: report.otherVehicle?.ownerName || undefined,
+          accidentDate,
+          accidentLocation:
+            report.accidentMarker || report.stopLocation || undefined,
+          claimantVehicle: report.vehicleInfo
+            ? [
+                report.vehicleInfo.make,
+                report.vehicleInfo.model,
+                report.vehicleInfo.licencePlate
+                  ? `(${report.vehicleInfo.licencePlate})`
+                  : "",
+              ]
+                .filter(Boolean)
+                .join(" ")
+            : undefined,
+          defendantVehicle: report.otherVehicle
+            ? [
+                report.otherVehicle.make,
+                report.otherVehicle.model,
+                report.otherVehicle.licencePlate
+                  ? `(${report.otherVehicle.licencePlate})`
+                  : "",
+              ]
+                .filter(Boolean)
+                .join(" ")
+            : undefined,
+          defendantInsurer: report.otherVehicle?.insurer || undefined,
+          defendantPolicy:
+            report.otherVehicle?.insurancePolicyNumber || undefined,
+          incidentDescription: report.damageDescription || undefined,
+          partyBFaultPct: partyBFault,
+          injuryDescription: report.damageDescription || undefined,
+        });
+        setLetterText(maltaLetter);
+      } else {
+        setLetterText(generateDemandLetter(report));
+      }
     }
-  }, [isOpen, report, letterText]);
+  }, [isOpen, report, letterText, isMalta]);
 
   const handleCopy = async () => {
     try {

@@ -17,6 +17,7 @@ import {
   Printer,
 } from "lucide-react";
 import { useState } from "react";
+import { useCountry } from "../contexts/CountryContext";
 import { formatClaimId } from "../utils/claimId";
 import QRCodeDisplay from "./QRCodeDisplay";
 
@@ -57,6 +58,7 @@ function compileReport(
   reportId: bigint,
   report: AccidentReport,
   witnessSignatureDate?: string,
+  isMalta?: boolean,
 ): string {
   const generated = new Date().toLocaleString("en-GB", {
     dateStyle: "long",
@@ -66,7 +68,9 @@ function compileReport(
   const claimId = formatClaimId(reportId, report.timestamp);
 
   const lines: string[] = [
-    "ACCIDENT CLAIM REPORT",
+    isMalta
+      ? "RAPPORT TAL-IN\u010aIDENT \u2014 MALTA JURISDICTION"
+      : "ACCIDENT CLAIM REPORT",
     `Report Reference: ${claimId}`,
     `Generated: ${generated}`,
     "\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550",
@@ -276,11 +280,18 @@ export default function ExportReportPanel({
   witnessSignatureDate,
 }: ExportReportPanelProps) {
   const [copied, setCopied] = useState(false);
+  const { country } = useCountry();
+  const isMalta = country === "mt";
   const [previewOpen, setPreviewOpen] = useState(false);
   const [showFullPreview, setShowFullPreview] = useState(false);
 
   const claimId = formatClaimId(reportId, report.timestamp);
-  const reportText = compileReport(reportId, report, witnessSignatureDate);
+  const reportText = compileReport(
+    reportId,
+    report,
+    witnessSignatureDate,
+    isMalta,
+  );
   const previewText = showFullPreview
     ? reportText
     : reportText.slice(0, PREVIEW_LENGTH) +

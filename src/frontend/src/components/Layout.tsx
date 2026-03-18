@@ -22,6 +22,7 @@ import {
   Truck,
 } from "lucide-react";
 import React, { useState } from "react";
+import { useCountry } from "../contexts/CountryContext";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { LANGUAGES, type Language } from "../i18n/translations";
@@ -88,6 +89,7 @@ export default function Layout() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
   const { language, setLanguage, t } = useLanguage();
+  const { country, setCountry } = useCountry();
 
   const handleNav = (to: string) => {
     navigate({ to });
@@ -147,6 +149,22 @@ export default function Layout() {
 
           {/* Right controls: lang + theme + mobile menu */}
           <div className="flex items-center gap-1 shrink-0">
+            {/* Country switcher */}
+            <button
+              type="button"
+              onClick={() => setCountry(country === "uk" ? "mt" : "uk")}
+              className="flex items-center gap-1 px-2 py-1 rounded-md border border-border text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              aria-label="Switch jurisdiction"
+              data-ocid="header.country.toggle"
+              title={
+                country === "uk"
+                  ? "Switch to Malta jurisdiction"
+                  : "Switch to UK jurisdiction"
+              }
+            >
+              {country === "uk" ? "🇬🇧 UK" : "🇲🇹 MT"}
+            </button>
+
             {/* Language switcher */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -268,6 +286,16 @@ export default function Layout() {
           </div>
         </div>
       </header>
+
+      {country === "mt" && (
+        <div
+          className="bg-amber-50 dark:bg-amber-950/30 border-b border-amber-200 dark:border-amber-700/40 text-amber-800 dark:text-amber-300 text-xs text-center py-1.5 px-4"
+          data-print-hide
+        >
+          🇲🇹 <strong>Malta Jurisdiction Active</strong> — Legal references use
+          Maltese law (TRO Cap. 65, Civil Code Cap. 16)
+        </div>
+      )}
 
       <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-8">
         <Outlet />
