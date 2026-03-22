@@ -2,12 +2,15 @@ import { BookOpen, Info, Scale } from "lucide-react";
 import React, { useState } from "react";
 import FaultReferenceDisplay from "../components/FaultReferenceDisplay";
 import ScenarioSelector from "../components/ScenarioSelector";
+import { useCountry } from "../contexts/CountryContext";
 import type { ScenarioKey } from "../data/scenarioReferences";
 
 export default function FaultReferencePage() {
   const [selectedScenario, setSelectedScenario] = useState<ScenarioKey | null>(
     null,
   );
+  const { country } = useCountry();
+  const isMalta = country === "mt";
 
   return (
     <div className="space-y-8">
@@ -22,9 +25,9 @@ export default function FaultReferencePage() {
               Fault Reference Tool
             </h1>
             <p className="mt-1 text-fault-header-fg/80 text-sm leading-relaxed max-w-2xl">
-              Select an accident scenario to view the applicable Highway Code
-              rules, Road Traffic Act 1988 sections, landmark case law, and
-              insurer-style fault percentage breakdown for each party.
+              {isMalta
+                ? "Select an accident scenario to view the applicable Traffic Regulation Ordinance (Cap. 65) rules, Civil Code Cap. 16 provisions, Maltese case law, and fault percentage breakdown for each party."
+                : "Select an accident scenario to view the applicable Highway Code rules, Road Traffic Act 1988 sections, landmark case law, and insurer-style fault percentage breakdown for each party."}
             </p>
           </div>
         </div>
@@ -34,11 +37,9 @@ export default function FaultReferencePage() {
       <div className="flex items-start gap-3 p-4 rounded-lg bg-muted/60 border border-border text-sm text-muted-foreground">
         <Info className="w-4 h-4 shrink-0 mt-0.5 text-primary" />
         <p>
-          This tool provides general legal reference information based on UK law
-          and is intended for educational purposes only. It does not constitute
-          legal advice. Fault percentages are indicative insurer assessments and
-          may vary based on specific circumstances. Always consult a qualified
-          solicitor for advice on your specific situation.
+          {isMalta
+            ? "This tool provides general legal reference information based on Maltese law (Civil Code Cap. 16, TRO Cap. 65) and is intended for educational purposes only. It does not constitute legal advice. Fault percentages are indicative assessments and may vary based on specific circumstances. Always consult a qualified Maltese advocate (avukat) for advice on your specific situation."
+            : "This tool provides general legal reference information based on UK law and is intended for educational purposes only. It does not constitute legal advice. Fault percentages are indicative insurer assessments and may vary based on specific circumstances. Always consult a qualified solicitor for advice on your specific situation."}
         </p>
       </div>
 

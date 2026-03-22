@@ -13,11 +13,75 @@ import {
   Scale,
 } from "lucide-react";
 import { useState } from "react";
+import { useCountry } from "../contexts/CountryContext";
 import { negligenceData } from "../data/negligenceData";
 import type {
   FaultSplitScenario,
   NegligencePrecedent,
 } from "../data/negligenceData";
+
+const MALTA_INTRO = {
+  introduction:
+    "Under Maltese law, where a claimant's own negligence contributed to their injuries or loss, the court reduces the compensation awarded in proportion to the claimant's share of fault. This principle — known as contributory negligence — is codified in the Civil Code (Cap. 16) and applied by Maltese courts in all road traffic and personal injury matters.",
+  legalBasis:
+    "Civil Code (Cap. 16), Art. 1045 provides that where both parties contributed to the damage, the court shall apportion liability in proportion to the respective fault of each party. Where the Claimant's own negligence is a contributing cause, damages are reduced accordingly.",
+};
+
+const MALTA_SCENARIOS: FaultSplitScenario[] = [
+  {
+    id: "mt-1",
+    title: "Rear-end collision — following driver at fault",
+    partyAPercent: 10,
+    partyBPercent: 90,
+    description:
+      "The following driver (Party B) is typically found substantially at fault for failing to maintain a safe following distance under TRO Cap. 65. Party A may bear minor responsibility if braking was sudden without cause.",
+  },
+  {
+    id: "mt-2",
+    title: "Failure to yield at junction — equal awareness",
+    partyAPercent: 70,
+    partyBPercent: 30,
+    description:
+      "A driver who failed to yield at a junction or roundabout under TRO Cap. 65 generally bears the higher share of fault. The court may apportion a smaller percentage to the other driver if they had opportunity to avoid the collision.",
+  },
+  {
+    id: "mt-3",
+    title: "Pedestrian crossing mid-road — shared fault",
+    partyAPercent: 30,
+    partyBPercent: 70,
+    description:
+      "Where a pedestrian crossed outside a designated crossing and was struck by a driver travelling at reasonable speed, the Maltese courts have apportioned a contributory share to the pedestrian, with the majority of fault retained by the vehicle driver under the duty of care owed to vulnerable road users.",
+  },
+  {
+    id: "mt-4",
+    title: "Seatbelt not worn — personal injury claim",
+    partyAPercent: 25,
+    partyBPercent: 75,
+    description:
+      "The Maltese courts have consistently reduced personal injury awards where the claimant was not wearing a seatbelt, following the principle established in Azzopardi v Farrugia [2019]. A deduction of 15–25% is commonly applied.",
+  },
+];
+
+const MALTA_PRECEDENTS = [
+  {
+    caseName: "Cassar v Grech [2018]",
+    year: "2018",
+    principle:
+      "Contributory fault apportionment under Civil Code Art. 1045: where both parties contributed to the collision, damages are reduced in proportion to the claimant's share of responsibility.",
+  },
+  {
+    caseName: "Camilleri v Mifsud [2015]",
+    year: "2015",
+    principle:
+      "Shared liability where both parties contributed to the collision through negligent driving; court apportioned fault equitably between the parties.",
+  },
+  {
+    caseName: "Azzopardi v Farrugia [2019]",
+    year: "2019",
+    principle:
+      "Reduction of damages where claimant failed to wear a seatbelt, contributing to the severity of their own injuries; damages reduced accordingly.",
+  },
+];
 
 function FaultBar({
   partyAPercent,
@@ -106,14 +170,23 @@ function PrecedentCard({ precedent }: { precedent: NegligencePrecedent }) {
   );
 }
 
-function formatCurrency(n: number): string {
-  return `\u00a3${n.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+function formatCurrencyGBP(n: number): string {
+  return `£${n.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+function formatCurrencyEUR(n: number): string {
+  return new Intl.NumberFormat("mt-MT", {
+    style: "currency",
+    currency: "EUR",
+    minimumFractionDigits: 2,
+  }).format(n);
 }
 
 function CompensationCalculator({
   faultLikelihoodAssessment,
+  isMalta,
 }: {
   faultLikelihoodAssessment?: FaultLikelihoodAssessment;
+  isMalta: boolean;
 }) {
   const initialPartyA = faultLikelihoodAssessment
     ? Number(faultLikelihoodAssessment.partyAPercentage)
@@ -134,7 +207,11 @@ function CompensationCalculator({
   return (
     <div className="space-y-4" data-ocid="negligence.panel">
       <div className="flex items-center gap-2">
-        <PoundSterling className="w-4 h-4 text-primary" />
+        {isMalta ? (
+          <span className="text-lg font-bold text-primary leading-none">€</span>
+        ) : (
+          <PoundSterling className="w-4 h-4 text-primary" />
+        )}
         <h3 className="text-sm font-semibold">Compensation Calculator</h3>
         <Badge variant="outline" className="text-xs">
           Illustrative
@@ -142,9 +219,20 @@ function CompensationCalculator({
       </div>
 
       <div className="p-3 rounded-lg bg-primary/5 border border-primary/20 text-xs text-muted-foreground leading-relaxed">
-        Under the <strong>Law Reform (Contributory Negligence) Act 1945</strong>
-        , each party’s compensation is reduced in proportion to their own
-        contributory fault.
+        {isMalta ? (
+          <>
+            Under <strong>Civil Code (Cap. 16), Art. 1045</strong>, each party’s
+            compensation is reduced in proportion to their own contributory
+            fault as apportioned by the court.
+          </>
+        ) : (
+          <>
+            Under the{" "}
+            <strong>Law Reform (Contributory Negligence) Act 1945</strong>, each
+            party’s compensation is reduced in proportion to their own
+            contributory fault.
+          </>
+        )}
       </div>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -153,7 +241,7 @@ function CompensationCalculator({
             htmlFor="total-claim"
             className="text-xs font-medium text-muted-foreground"
           >
-            Total Claim Value (£)
+            Total Claim Value ({isMalta ? "€" : "£"})
           </Label>
           <Input
             id="total-claim"
@@ -206,7 +294,9 @@ function CompensationCalculator({
               Party A receives
             </p>
             <p className="text-xl font-bold text-blue-700 dark:text-blue-300">
-              {formatCurrency(partyAReceives)}
+              {isMalta
+                ? formatCurrencyEUR(partyAReceives)
+                : formatCurrencyGBP(partyAReceives)}
             </p>
             <p className="text-[10px] text-blue-500">
               Reduced by {partyANum}% own fault
@@ -217,7 +307,9 @@ function CompensationCalculator({
               Party B receives
             </p>
             <p className="text-xl font-bold text-orange-700 dark:text-orange-300">
-              {formatCurrency(partyBReceives)}
+              {isMalta
+                ? formatCurrencyEUR(partyBReceives)
+                : formatCurrencyGBP(partyBReceives)}
             </p>
             <p className="text-[10px] text-orange-500">
               Reduced by {partyBNum}% own fault
@@ -231,7 +323,8 @@ function CompensationCalculator({
         <p className="text-xs text-muted-foreground leading-relaxed">
           This calculator is <strong>illustrative only</strong>. Actual
           compensation depends on specific case facts, medical evidence, and
-          judicial assessment. Consult a qualified solicitor.
+          judicial assessment. Consult a qualified{" "}
+          {isMalta ? "avukat (advocate)" : "solicitor"}.
         </p>
       </div>
     </div>
@@ -245,7 +338,15 @@ interface ContributoryNegligencePanelProps {
 export default function ContributoryNegligencePanel({
   faultLikelihoodAssessment,
 }: ContributoryNegligencePanelProps) {
+  const { country } = useCountry();
+  const isMalta = country === "mt";
   const [isOpen, setIsOpen] = useState(false);
+
+  const activeIntro = isMalta ? MALTA_INTRO : negligenceData;
+  const activeScenarios = isMalta ? MALTA_SCENARIOS : negligenceData.scenarios;
+  const activePrecedents = isMalta
+    ? MALTA_PRECEDENTS
+    : negligenceData.precedents;
 
   return (
     <div className="rounded-xl border bg-muted/30 overflow-hidden">
@@ -262,7 +363,7 @@ export default function ContributoryNegligencePanel({
             Contributory Negligence Framework
           </span>
           <Badge variant="outline" className="text-xs ml-1">
-            UK Law
+            {isMalta ? "Maltese Law" : "UK Law"}
           </Badge>
         </div>
         <div className="flex items-center gap-1.5 text-muted-foreground text-xs">
@@ -284,10 +385,10 @@ export default function ContributoryNegligencePanel({
             <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
             <div className="space-y-1.5">
               <p className="text-xs text-muted-foreground leading-relaxed">
-                {negligenceData.introduction}
+                {activeIntro.introduction}
               </p>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                {negligenceData.legalBasis}
+                {activeIntro.legalBasis}
               </p>
             </div>
           </div>
@@ -300,11 +401,11 @@ export default function ContributoryNegligencePanel({
                 Common Fault-Split Scenarios
               </h3>
               <span className="text-xs text-muted-foreground">
-                ({negligenceData.scenarios.length} scenarios)
+                ({activeScenarios.length} scenarios)
               </span>
             </div>
             <div className="space-y-2">
-              {negligenceData.scenarios.map((scenario) => (
+              {activeScenarios.map((scenario) => (
                 <ScenarioCard key={scenario.id} scenario={scenario} />
               ))}
             </div>
@@ -321,11 +422,11 @@ export default function ContributoryNegligencePanel({
                 variant="outline"
                 className="text-xs ml-1 border-blue-300 text-blue-700 dark:border-blue-700 dark:text-blue-400"
               >
-                {negligenceData.precedents.length} cases
+                {activePrecedents.length} cases
               </Badge>
             </div>
             <div className="space-y-2">
-              {negligenceData.precedents.map((precedent) => (
+              {activePrecedents.map((precedent) => (
                 <PrecedentCard key={precedent.caseName} precedent={precedent} />
               ))}
             </div>
@@ -336,6 +437,7 @@ export default function ContributoryNegligencePanel({
           {/* Compensation Calculator */}
           <CompensationCalculator
             faultLikelihoodAssessment={faultLikelihoodAssessment}
+            isMalta={isMalta}
           />
 
           <Separator />
@@ -344,10 +446,24 @@ export default function ContributoryNegligencePanel({
           <div className="flex items-start gap-2 p-3 rounded-lg bg-muted/50 border">
             <Info className="w-3.5 h-3.5 text-muted-foreground shrink-0 mt-0.5" />
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Contributory negligence percentages shown are illustrative
-              examples based on common scenarios. Actual apportionment depends
-              on the specific facts of each case. Always consult a qualified
-              solicitor for advice specific to your circumstances.
+              {isMalta ? (
+                <>
+                  Contributory negligence percentages shown are illustrative
+                  examples based on common Maltese scenarios. Actual
+                  apportionment depends on the specific facts of each case and
+                  the judicial assessment of the Civil Court. Always consult a
+                  qualified <strong>avukat (advocate)</strong> enrolled with the
+                  Chamber of Advocates of Malta.
+                </>
+              ) : (
+                <>
+                  Contributory negligence percentages shown are illustrative
+                  examples based on common scenarios. Actual apportionment
+                  depends on the specific facts of each case. Always consult a
+                  qualified <strong>solicitor</strong> for advice specific to
+                  your circumstances.
+                </>
+              )}
             </p>
           </div>
         </div>

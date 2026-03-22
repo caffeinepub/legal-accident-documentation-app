@@ -55,6 +55,7 @@ import {
 } from "lucide-react";
 import type React from "react";
 import { useEffect, useState } from "react";
+import { useCountry } from "../contexts/CountryContext";
 import { useGetAllReports } from "../hooks/useQueries";
 import { formatClaimId } from "../utils/claimId";
 
@@ -307,6 +308,8 @@ const EMPTY_DRIVER_FORM: Omit<FleetDriver, "id"> = {
 // ── Main component ────────────────────────────────────────────────────────────
 export default function FleetPage() {
   const navigate = useNavigate();
+  const { country } = useCountry();
+  const isMalta = country === "mt";
 
   const [vehicles, setVehicles] = useState<FleetVehicle[]>(() =>
     loadFromStorage<FleetVehicle>(FLEET_VEHICLES_KEY),
@@ -870,7 +873,7 @@ export default function FleetPage() {
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                             <AlertBadge
                               days={daysUntil(v.motDue)}
-                              label="MOT"
+                              label={isMalta ? "Roadworthiness Test" : "MOT"}
                             />
                             <AlertBadge
                               days={daysUntil(v.insuranceExpiry)}
@@ -1192,7 +1195,10 @@ export default function FleetPage() {
                             </Button>
                           </div>
                           <div className="mt-2 flex flex-wrap gap-1.5">
-                            <AlertBadge days={motDays} label="MOT" />
+                            <AlertBadge
+                              days={motDays}
+                              label={isMalta ? "Roadworthiness" : "MOT"}
+                            />
                             <AlertBadge days={insDays} label="Insurance" />
                             <AlertBadge days={svcDays} label="Service" />
                             <TyreBadge status={v.tyreStatus} />
@@ -1200,7 +1206,7 @@ export default function FleetPage() {
                           {v.mileage && (
                             <p className="mt-1.5 text-xs text-muted-foreground flex items-center gap-1">
                               <Gauge className="w-3 h-3" />
-                              {v.mileage} miles
+                              {v.mileage} {isMalta ? "km" : "miles"}
                             </p>
                           )}
                         </CardContent>
@@ -1252,7 +1258,7 @@ export default function FleetPage() {
                     </Label>
                     <Input
                       id="v-reg"
-                      placeholder="AB12 CDE"
+                      placeholder={isMalta ? "ABC 123" : "AB12 CDE"}
                       value={vehicleForm.registration}
                       onChange={(e) =>
                         setVehicleForm((f) => ({
@@ -1341,7 +1347,9 @@ export default function FleetPage() {
                     />
                   </div>
                   <div className="grid gap-1.5">
-                    <Label htmlFor="v-mileage">Mileage</Label>
+                    <Label htmlFor="v-mileage">
+                      {isMalta ? "Mileage (km)" : "Mileage (miles)"}
+                    </Label>
                     <Input
                       id="v-mileage"
                       placeholder="45000"
@@ -1407,7 +1415,9 @@ export default function FleetPage() {
               <div className="grid gap-3">
                 <div className="grid grid-cols-2 gap-3">
                   <div className="grid gap-1.5">
-                    <Label htmlFor="v-mot">MOT Due</Label>
+                    <Label htmlFor="v-mot">
+                      {isMalta ? "Roadworthiness Test Due" : "MOT Due"}
+                    </Label>
                     <Input
                       id="v-mot"
                       type="date"
@@ -1588,7 +1598,7 @@ export default function FleetPage() {
                 </Label>
                 <Input
                   id="d-lic"
-                  placeholder="SMITH123456JS9AB"
+                  placeholder={isMalta ? "12345M" : "SMITH123456JS9AB"}
                   value={driverForm.licenceNumber}
                   onChange={(e) =>
                     setDriverForm((f) => ({
@@ -1621,7 +1631,7 @@ export default function FleetPage() {
                 <Label htmlFor="d-phone">Phone</Label>
                 <Input
                   id="d-phone"
-                  placeholder="07700 900000"
+                  placeholder={isMalta ? "+356 9999 9999" : "07700 900000"}
                   value={driverForm.phone}
                   onChange={(e) =>
                     setDriverForm((f) => ({ ...f, phone: e.target.value }))

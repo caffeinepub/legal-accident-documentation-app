@@ -276,11 +276,26 @@ export default function StatuteLimitationsPanel({
             <div className="flex items-start gap-2 p-3 rounded-lg bg-muted/40 border border-border">
               <Info className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-0.5" />
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Limitation periods may be extended or varied in certain
-                circumstances, including claims involving minors, lack of mental
-                capacity, fraud, or deliberate concealment. This tool provides
-                general guidance only and does not constitute legal advice.
-                Always consult a qualified solicitor before limitation expires.
+                {isMalta ? (
+                  <>
+                    Prescription periods may be interrupted or suspended in
+                    certain circumstances, including claims involving minors,
+                    lack of capacity, or fraud. This tool provides general
+                    guidance only and does not constitute legal advice. Always
+                    consult a qualified <strong>avukat (advocate)</strong>{" "}
+                    enrolled with the Chamber of Advocates of Malta before
+                    prescription expires.
+                  </>
+                ) : (
+                  <>
+                    Limitation periods may be extended or varied in certain
+                    circumstances, including claims involving minors, lack of
+                    mental capacity, fraud, or deliberate concealment. This tool
+                    provides general guidance only and does not constitute legal
+                    advice. Always consult a qualified{" "}
+                    <strong>solicitor</strong> before limitation expires.
+                  </>
+                )}
               </p>
             </div>
           </CardContent>

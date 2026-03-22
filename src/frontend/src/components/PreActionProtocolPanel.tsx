@@ -5,6 +5,7 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { CheckCircle2, Circle, Scale } from "lucide-react";
 import { useState } from "react";
+import { useCountry } from "../contexts/CountryContext";
 
 interface ProtocolStep {
   id: number;
@@ -15,7 +16,7 @@ interface ProtocolStep {
   urgency: "immediate" | "short" | "medium" | "ongoing";
 }
 
-const PROTOCOL_STEPS: ProtocolStep[] = [
+const UK_PROTOCOL_STEPS: ProtocolStep[] = [
   {
     id: 1,
     title: "Instruct a solicitor / notify insurer",
@@ -90,6 +91,83 @@ const PROTOCOL_STEPS: ProtocolStep[] = [
   },
 ];
 
+const MALTA_PROTOCOL_STEPS: ProtocolStep[] = [
+  {
+    id: 1,
+    title: "Instruct a Maltese Advocate (Avukat)",
+    description:
+      "Contact your insurer and instruct an advocate enrolled with the Chamber of Advocates of Malta as soon as possible. The 2-year prescription period under Civil Code Art. 2153 begins from the accident date.",
+    deadline: "As soon as possible",
+    cprRef: "Civil Code Cap. 16, Art. 2153",
+    urgency: "immediate",
+  },
+  {
+    id: 2,
+    title: "Notify Your Insurer and the Third Party's Insurer",
+    description:
+      "Report the accident to your own insurer and, where possible, notify the defendant's insurer directly. Malta applies the EU Motor Insurance Directive — cross-border claims use the Green Card system.",
+    deadline: "Within 24–48 hours",
+    cprRef:
+      "Motor Vehicles Insurance Ordinance Cap. 104 / EU Directive 2009/103/EC",
+    urgency: "immediate",
+  },
+  {
+    id: 3,
+    title: "Obtain a Medical Report",
+    description:
+      "Arrange a medical examination as soon as possible after the accident. A formal medical certificate or specialist report is required to establish the nature and extent of injuries in any Maltese court claim.",
+    deadline: "As soon as practicable",
+    cprRef: "Civil Code Cap. 16, Art. 1031 — evidential requirement",
+    urgency: "short",
+  },
+  {
+    id: 4,
+    title: "Prepare a Schedule of Damages",
+    description:
+      "Document all financial losses: vehicle repair or replacement costs, medical expenses, lost earnings, and any other out-of-pocket costs. Retain all receipts and supporting documents.",
+    deadline: "Before issuing formal demand",
+    cprRef: "Civil Code Cap. 16, Arts. 1031–1033",
+    urgency: "medium",
+  },
+  {
+    id: 5,
+    title: "Send Formal Letter of Demand (Talba)",
+    description:
+      "Send a written demand to the defendant and/or their insurer setting out the accident circumstances, the basis of liability, and the compensation sought. Allow 21 days for a response before filing in court.",
+    deadline: "21-day response period begins",
+    cprRef: "Civil Code Cap. 16, Arts. 1031–1033",
+    urgency: "medium",
+  },
+  {
+    id: 6,
+    title: "Await Response from Defendant / Insurer",
+    description:
+      "Allow 21 days for the defendant or their insurer to admit liability or make a settlement proposal. If disputed or no response, proceedings may be filed in the Magistrates' Court or Civil Court, First Hall.",
+    deadline: "21 days from formal demand",
+    cprRef: "Code of Organisation and Civil Procedure Cap. 12",
+    urgency: "ongoing",
+  },
+  {
+    id: 7,
+    title: "File Court Application (if required)",
+    description:
+      "If the matter is not resolved, file a sworn application (rikors) in the court of appropriate jurisdiction: Magistrates' Court (up to €5,000), Civil Court First Hall (up to €50,000), or Court of Appeal for higher-value claims.",
+    deadline: "Before 2-year prescription expires",
+    cprRef: "Code of Organisation and Civil Procedure Cap. 12, Art. 795",
+    urgency: "ongoing",
+  },
+  {
+    id: 8,
+    title: "Consider Settlement Offer (Ftehim)",
+    description:
+      "If a settlement offer is made by the insurer or defendant, consider it carefully with your advocate. A settlement can be reached at any stage before judgment. Ensure any agreement is documented in writing.",
+    deadline: "Before / during proceedings",
+    cprRef:
+      "Civil Code Cap. 16, Art. 1033 (contributory negligence considered in offers)",
+    urgency: "ongoing",
+  },
+];
+
 const URGENCY_STYLES: Record<
   ProtocolStep["urgency"],
   { badge: string; label: string }
@@ -117,6 +195,10 @@ const URGENCY_STYLES: Record<
 
 export default function PreActionProtocolPanel() {
   const [checked, setChecked] = useState<Set<number>>(new Set());
+  const { country } = useCountry();
+  const isMalta = country === "mt";
+
+  const PROTOCOL_STEPS = isMalta ? MALTA_PROTOCOL_STEPS : UK_PROTOCOL_STEPS;
 
   const toggle = (id: number) => {
     setChecked((prev) => {
@@ -135,9 +217,13 @@ export default function PreActionProtocolPanel() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Scale size={15} className="text-primary" />
-          <p className="text-sm font-semibold">Pre-Action Protocol Checklist</p>
+          <p className="text-sm font-semibold">
+            {isMalta
+              ? "Pre-Action Checklist (Malta)"
+              : "Pre-Action Protocol Checklist"}
+          </p>
           <Badge variant="outline" className="text-xs">
-            CPR
+            {isMalta ? "Civil Code Cap. 16" : "CPR"}
           </Badge>
         </div>
         <span className="text-xs text-muted-foreground">
@@ -242,8 +328,9 @@ export default function PreActionProtocolPanel() {
           data-ocid="protocol.success_state"
         >
           <CheckCircle2 size={14} className="shrink-0" />
-          All pre-action steps completed. You are ready to proceed with your
-          claim.
+          {isMalta
+            ? "All pre-action steps completed. You are ready to proceed with your claim in Malta."
+            : "All pre-action steps completed. You are ready to proceed with your claim."}
         </div>
       )}
     </div>

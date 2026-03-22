@@ -122,7 +122,7 @@ export default function WhiplashClassifierPanel({
                   variant="outline"
                   className="text-xs text-violet-600 border-violet-400"
                 >
-                  WRP 2021
+                  {isMalta ? "Civil Code Cap. 16" : "WRP 2021"}
                 </Badge>
               </CardTitle>
               <span className="text-muted-foreground group-hover:text-foreground transition-colors">
@@ -272,7 +272,9 @@ export default function WhiplashClassifierPanel({
                         size={12}
                         className="group-open:rotate-180 transition-transform"
                       />
-                      View full WRP 2021 tariff table
+                      {isMalta
+                        ? "View full Civil Code Cap. 16 compensation table"
+                        : "View full WRP 2021 tariff table"}
                     </summary>
                     <div className="mt-2 rounded-lg border border-border overflow-hidden text-xs">
                       <table className="w-full">

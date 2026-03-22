@@ -9,6 +9,7 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { ChevronDown, ChevronUp, ClipboardList } from "lucide-react";
 import { useState } from "react";
+import { useCountry } from "../contexts/CountryContext";
 
 interface ChecklistItem {
   id: number;
@@ -19,7 +20,7 @@ interface ChecklistItem {
   reference: string;
 }
 
-const CHECKLIST_ITEMS: ChecklistItem[] = [
+const UK_CHECKLIST_ITEMS: ChecklistItem[] = [
   {
     id: 1,
     title: "Call Police",
@@ -85,6 +86,84 @@ const CHECKLIST_ITEMS: ChecklistItem[] = [
   },
 ];
 
+const MALTA_CHECKLIST_ITEMS: ChecklistItem[] = [
+  {
+    id: 1,
+    title: "Report to Police (Pulizija)",
+    description:
+      "Where the accident involves personal injury or significant property damage, report to the nearest police station as soon as practicable. Obtain an incident reference number for insurance and legal purposes.",
+    timeLimit: "Immediate / as soon as practicable",
+    urgency: "immediate",
+    reference: "Traffic Regulation Ordinance Cap. 65, Art. 7",
+  },
+  {
+    id: 2,
+    title: "Exchange Details with All Parties",
+    description:
+      "All drivers involved are legally required to stop and exchange name, address, vehicle registration number, and insurance details with every other party and with any injured person.",
+    timeLimit: "Immediately at the scene",
+    urgency: "immediate",
+    reference: "TRO Cap. 65, Art. 6",
+  },
+  {
+    id: 3,
+    title: "Notify Your Insurer",
+    description:
+      "Report the incident to your insurance company promptly even if you do not intend to claim. Failure to notify within your policy's deadline may prejudice your cover or constitute a breach of contract.",
+    timeLimit: "Within 24–48 hours",
+    urgency: "urgent",
+    reference:
+      "Motor Vehicles Insurance (Third-Party Risks) Ordinance Cap. 104",
+  },
+  {
+    id: 4,
+    title: "Seek Medical Attention",
+    description:
+      "Visit a doctor or Mater Dei Hospital promptly. Ensure all injuries, symptoms, and treatments are documented. Early medical records are essential evidence in a personal injury claim before the Maltese courts.",
+    timeLimit: "Within 24–48 hours",
+    urgency: "urgent",
+    reference:
+      "Recommended for evidential purposes — Civil Code Cap. 16, Art. 1031",
+  },
+  {
+    id: 5,
+    title: "Gather Evidence",
+    description:
+      "Photograph the scene, vehicle damage, road conditions, traffic signs, and injuries. Collect witness names and contact details. Preserve dashcam footage immediately — it may be automatically overwritten.",
+    timeLimit: "Immediately at scene where possible",
+    urgency: "immediate",
+    reference: "Civil Code Cap. 16, Art. 1031 — evidential duty to mitigate",
+  },
+  {
+    id: 6,
+    title: "Contact a Maltese Advocate (Avukat)",
+    description:
+      "For personal injury or disputed liability claims, instruct an advocate enrolled with the Chamber of Advocates of Malta. Prescription periods in Malta are strict — do not delay.",
+    timeLimit: "As soon as possible (2-year prescription)",
+    urgency: "practicable",
+    reference: "Civil Code Cap. 16, Art. 2153 — prescription period",
+  },
+  {
+    id: 7,
+    title: "Notify Transport Malta (if required)",
+    description:
+      "If the vehicle is a commercial vehicle, bus, or HGV, or if the accident involves a government vehicle or public road defect, notify Transport Malta. Report write-offs and register a change of ownership where applicable.",
+    timeLimit: "As soon as practicable",
+    urgency: "practicable",
+    reference: "Transport Malta — Motor Vehicle Registration",
+  },
+  {
+    id: 8,
+    title: "Contact Fond tal-Kumpens (if uninsured driver)",
+    description:
+      "If the other driver was uninsured or fled the scene (hit and run), you may claim compensation from the Fond tal-Kumpens (Maltese Motor Insurers' Bureau). File as early as possible.",
+    timeLimit: "Within 2 years of the accident",
+    urgency: "practicable",
+    reference:
+      "Motor Vehicles Insurance (Third-Party Risks) Ordinance Cap. 104",
+  },
+];
+
 const URGENCY_BADGE: Record<
   ChecklistItem["urgency"],
   { label: string; className: string }
@@ -109,6 +188,10 @@ const URGENCY_BADGE: Record<
 export default function PostIncidentChecklist() {
   const [isOpen, setIsOpen] = useState(false);
   const [checked, setChecked] = useState<Record<number, boolean>>({});
+  const { country } = useCountry();
+  const isMalta = country === "mt";
+
+  const CHECKLIST_ITEMS = isMalta ? MALTA_CHECKLIST_ITEMS : UK_CHECKLIST_ITEMS;
 
   const checkedCount = Object.values(checked).filter(Boolean).length;
   const progressPercent = Math.round(

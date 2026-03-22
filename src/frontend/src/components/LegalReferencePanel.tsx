@@ -57,7 +57,10 @@ function HighwayCodeCard({ rule }: { rule: HighwayCodeReference }) {
   );
 }
 
-function RTACard({ section }: { section: RTAReference }) {
+function RTACard({
+  section,
+  isMalta,
+}: { section: RTAReference; isMalta: boolean }) {
   return (
     <div className="flex items-start gap-3 p-3 rounded-lg border bg-card">
       <div className="shrink-0 mt-0.5">
@@ -65,7 +68,9 @@ function RTACard({ section }: { section: RTAReference }) {
       </div>
       <div className="flex-1 min-w-0 space-y-1">
         <span className="text-sm font-semibold text-foreground">
-          Road Traffic Act 1988 — {section.sectionNumber}
+          {isMalta
+            ? section.sectionNumber
+            : `Road Traffic Act 1988 — ${section.sectionNumber}`}
         </span>
         <p className="text-sm text-muted-foreground leading-relaxed">
           {section.description}
@@ -131,36 +136,54 @@ export default function LegalReferencePanel({
   violations,
 }: LegalReferencePanelProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const { country } = useCountry();
+  const isMalta = country === "mt";
 
   const violationTypes = violations.map((v) => v.violationType);
-  const { highwayCode, rta1988, caseLaw } =
-    getLegalReferencesForViolations(violationTypes);
 
-  // Merge general references (deduplicated)
+  const violationRefs = isMalta
+    ? getMaltaLegalReferencesForViolations(violationTypes)
+    : getLegalReferencesForViolations(violationTypes);
+
+  const generalRefs = isMalta
+    ? MALTA_GENERAL_LEGAL_REFERENCES
+    : GENERAL_LEGAL_REFERENCES;
+
+  const { highwayCode, rta1988, caseLaw } = violationRefs;
+
   const allHC = [...highwayCode];
   const allRTA = [...rta1988];
 
   const seenHC = new Set(highwayCode.map((r) => r.ruleNumber));
   const seenRTA = new Set(rta1988.map((r) => r.sectionNumber));
 
-  for (const hc of GENERAL_LEGAL_REFERENCES.highwayCode) {
-    if (!seenHC.has(hc.ruleNumber)) {
-      allHC.push(hc);
-    }
+  for (const hc of generalRefs.highwayCode) {
+    if (!seenHC.has(hc.ruleNumber)) allHC.push(hc);
   }
-  for (const rta of GENERAL_LEGAL_REFERENCES.rta1988) {
-    if (!seenRTA.has(rta.sectionNumber)) {
-      allRTA.push(rta);
-    }
+  for (const rta of generalRefs.rta1988) {
+    if (!seenRTA.has(rta.sectionNumber)) allRTA.push(rta);
   }
 
-  const otherLegislation = GENERAL_LEGAL_REFERENCES.otherLegislation ?? [];
+  const allCaseLaw = [...caseLaw];
+  const seenCases = new Set(caseLaw.map((c) => c.caseName));
+  for (const cl of generalRefs.caseLaw ?? []) {
+    if (!seenCases.has(cl.caseName)) allCaseLaw.push(cl);
+  }
+
+  const otherLegislation = generalRefs.otherLegislation ?? [];
   const hasViolations = violations.length > 0;
-  const hasCaseLaw = caseLaw.length > 0;
+  const hasCaseLaw = allCaseLaw.length > 0;
+
+  const jurisdictionLabel = isMalta ? "Maltese Law" : "UK Law";
+  const trafficCodeLabel = isMalta
+    ? "Traffic Regulation Ordinance (Cap. 65)"
+    : "Highway Code Citations";
+  const primaryLawLabel = isMalta
+    ? "Civil Code Cap. 16 / TRO Cap. 65"
+    : "Road Traffic Act 1988";
 
   return (
     <div className="rounded-xl border bg-muted/30 overflow-hidden">
-      {/* Toggle header */}
       <Button
         variant="ghost"
         className="w-full flex items-center justify-between px-4 py-3 h-auto rounded-none hover:bg-muted/50 transition-colors"
@@ -171,7 +194,7 @@ export default function LegalReferencePanel({
           <ShieldAlert className="w-4 h-4 text-primary shrink-0" />
           <span className="text-sm font-semibold">Legal Reference</span>
           <Badge variant="outline" className="text-xs ml-1">
-            UK Law
+            {jurisdictionLabel}
           </Badge>
         </div>
         <div className="flex items-center gap-1.5 text-muted-foreground text-xs">
@@ -184,28 +207,25 @@ export default function LegalReferencePanel({
         </div>
       </Button>
 
-      {/* Collapsible content */}
       {isOpen && (
         <div className="px-4 pb-4 space-y-5">
           <Separator />
 
-          {/* Contextual note */}
           <div className="flex items-start gap-2 p-3 rounded-lg bg-primary/5 border border-primary/20">
             <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
             <p className="text-xs text-muted-foreground leading-relaxed">
               {hasViolations
-                ? `The following UK legal references apply to the ${violations.length} violation${
+                ? `The following ${jurisdictionLabel} references apply to the ${violations.length} violation${
                     violations.length > 1 ? "s" : ""
                   } detected in this report, plus general post-incident obligations.`
-                : "No specific violations were recorded. The following general UK road traffic obligations apply to all incidents."}
+                : `No specific violations were recorded. The following general ${jurisdictionLabel} road traffic obligations apply to all incidents.`}
             </p>
           </div>
 
-          {/* Highway Code section */}
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <BookOpen className="w-4 h-4 text-primary" />
-              <h3 className="text-sm font-semibold">Highway Code Citations</h3>
+              <h3 className="text-sm font-semibold">{trafficCodeLabel}</h3>
               <span className="text-xs text-muted-foreground">
                 ({allHC.length} rules)
               </span>
@@ -219,23 +239,25 @@ export default function LegalReferencePanel({
 
           <Separator />
 
-          {/* Road Traffic Act section */}
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <Scale className="w-4 h-4 text-primary" />
-              <h3 className="text-sm font-semibold">Road Traffic Act 1988</h3>
+              <h3 className="text-sm font-semibold">{primaryLawLabel}</h3>
               <span className="text-xs text-muted-foreground">
                 ({allRTA.length} sections)
               </span>
             </div>
             <div className="space-y-2">
               {allRTA.map((section) => (
-                <RTACard key={section.sectionNumber} section={section} />
+                <RTACard
+                  key={section.sectionNumber}
+                  section={section}
+                  isMalta={isMalta}
+                />
               ))}
             </div>
           </div>
 
-          {/* Other Legislation section */}
           {otherLegislation.length > 0 && (
             <>
               <Separator />
@@ -252,8 +274,9 @@ export default function LegalReferencePanel({
                   </Badge>
                 </div>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Additional UK statutes relevant to road traffic accident
-                  claims and personal injury proceedings.
+                  {isMalta
+                    ? "Additional Maltese legislation relevant to road traffic accident claims and civil proceedings."
+                    : "Additional UK statutes relevant to road traffic accident claims and personal injury proceedings."}
                 </p>
                 <div className="space-y-2">
                   {otherLegislation.map((entry) => (
@@ -264,27 +287,30 @@ export default function LegalReferencePanel({
             </>
           )}
 
-          {/* Landmark Case Law section — only shown when violations are detected and case law exists */}
-          {hasViolations && hasCaseLaw && (
+          {hasCaseLaw && (
             <>
               <Separator />
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
                   <Gavel className="w-4 h-4 text-amber-700 dark:text-amber-400" />
-                  <h3 className="text-sm font-semibold">Landmark Case Law</h3>
+                  <h3 className="text-sm font-semibold">
+                    {isMalta ? "Maltese Case Law" : "Landmark Case Law"}
+                  </h3>
                   <Badge
                     variant="outline"
                     className="text-xs ml-1 border-amber-300 text-amber-700 dark:border-amber-700 dark:text-amber-400"
                   >
-                    {caseLaw.length} {caseLaw.length === 1 ? "case" : "cases"}
+                    {allCaseLaw.length}{" "}
+                    {allCaseLaw.length === 1 ? "case" : "cases"}
                   </Badge>
                 </div>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  The following landmark cases establish the legal principles
-                  relevant to the violations detected in this report.
+                  {isMalta
+                    ? "The following Maltese cases establish the legal principles relevant to this report."
+                    : "The following landmark cases establish the legal principles relevant to the violations detected in this report."}
                 </p>
                 <div className="space-y-2">
-                  {caseLaw.map((entry) => (
+                  {allCaseLaw.map((entry) => (
                     <CaseLawCard key={entry.caseName} entry={entry} />
                   ))}
                 </div>
@@ -292,14 +318,12 @@ export default function LegalReferencePanel({
             </>
           )}
 
-          {/* GOV.UK disclaimer */}
           <div className="flex items-start gap-2 p-3 rounded-lg bg-muted/50 border">
             <Info className="w-3.5 h-3.5 text-muted-foreground shrink-0 mt-0.5" />
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Legal references are provided for informational purposes only and
-              do not constitute legal advice. Always consult a qualified
-              solicitor for advice specific to your circumstances. Highway Code
-              rules and case law summaries are based on UK law.
+              {isMalta
+                ? "Legal references are provided for informational purposes only and do not constitute legal advice. Always consult a qualified Maltese advocate (avukat) for advice specific to your circumstances. References are based on Maltese law (Civil Code Cap. 16, TRO Cap. 65)."
+                : "Legal references are provided for informational purposes only and do not constitute legal advice. Always consult a qualified solicitor for advice specific to your circumstances. Highway Code rules and case law summaries are based on UK law."}
             </p>
           </div>
         </div>

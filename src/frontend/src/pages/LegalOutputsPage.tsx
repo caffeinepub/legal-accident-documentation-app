@@ -35,13 +35,16 @@ import { toast } from "sonner";
 import { useCountry } from "../contexts/CountryContext";
 import {
   MALTA_COURT_TRACKS,
+  MALTA_INJURY_CATEGORIES,
   MALTA_JCG_TABLE,
+  MALTA_SEVERITY_BANDS,
   type MaltaInjuryKey,
   type MaltaSeverityKey,
+  buildMaltaDemandLetter,
   formatEUR,
 } from "../data/maltaLegalOutputs";
 
-// ─── Settlement Value Lookup ──────────────────────────────────────────────────
+// ─── Settlement Value Lookup ────────────────────────────────────────────
 type SeverityKey =
   | "Minor"
   | "Moderate"
@@ -127,7 +130,7 @@ function formatCurrencyGBP(n: number): string {
   return `£${n.toLocaleString("en-GB")}`;
 }
 
-// ─── Track data ───────────────────────────────────────────────────────────────
+// ─── Track data ───────────────────────────────────────────────────
 const TRACKS = [
   {
     id: "small",
@@ -179,13 +182,18 @@ const TRACKS = [
   },
 ];
 
-function getTrack(value: number) {
+function getTrack(value: number, isMalta = false) {
+  if (isMalta) {
+    if (value <= 5000) return "Magistrates' Court";
+    if (value <= 50000) return "Civil Court, First Hall";
+    return "Court of Appeal";
+  }
   if (value < 10000) return "small";
   if (value <= 25000) return "fast";
   return "multi";
 }
 
-// ─── Template builder ─────────────────────────────────────────────────────────
+// ─── Template builder ───────────────────────────────────────────────────
 function buildTemplate(fields: {
   yourName: string;
   opponentName: string;
@@ -228,7 +236,7 @@ Yours faithfully,
 ${fields.yourName || "[YOUR NAME]"}`;
 }
 
-// ─── Section 1: Settlement Value Estimator ───────────────────────────────────
+// ─── Section 1: Settlement Value Estimator ──────────────────────────────────────
 function SettlementEstimator() {
   const { country } = useCountry();
   const isMalta = country === "mt";
@@ -237,6 +245,11 @@ function SettlementEstimator() {
   const [result, setResult] = useState<
     { min: number; max: number; severity: string } | "none" | null
   >(null);
+
+  const activeCategories = isMalta
+    ? MALTA_INJURY_CATEGORIES
+    : INJURY_CATEGORIES;
+  const activeSeverityBands = isMalta ? MALTA_SEVERITY_BANDS : SEVERITY_BANDS;
 
   const handleEstimate = () => {
     if (isMalta) {
@@ -275,13 +288,16 @@ function SettlementEstimator() {
               Settlement Value Estimator
             </CardTitle>
             <CardDescription className="mt-1 text-sm">
-              Judicial College Guidelines (17th Edition) tariff bands
+              {isMalta
+                ? "Civil Code Cap. 16 / Maltese courts compensation reference bands"
+                : "Judicial College Guidelines (17th Edition) tariff bands"}
             </CardDescription>
           </div>
         </div>
         <p className="text-sm text-muted-foreground mt-3">
-          Estimate PSLA (Pain, Suffering &amp; Loss of Amenity) compensation
-          ranges based on Judicial College Guidelines tariff bands.
+          {isMalta
+            ? "Estimate indicative compensation ranges for pain, suffering and loss of amenity based on Maltese court practice and Civil Code Cap. 16."
+            : "Estimate PSLA (Pain, Suffering & Loss of Amenity) compensation ranges based on Judicial College Guidelines tariff bands."}
         </p>
       </CardHeader>
 
@@ -289,12 +305,18 @@ function SettlementEstimator() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1.5">
             <Label htmlFor="injury-category">Injury Category</Label>
-            <Select value={injuryCategory} onValueChange={setInjuryCategory}>
+            <Select
+              value={injuryCategory}
+              onValueChange={(v) => {
+                setInjuryCategory(v);
+                setResult(null);
+              }}
+            >
               <SelectTrigger id="injury-category" data-ocid="settlement.select">
                 <SelectValue placeholder="Select injury type" />
               </SelectTrigger>
               <SelectContent>
-                {INJURY_CATEGORIES.map((cat) => (
+                {activeCategories.map((cat) => (
                   <SelectItem key={cat} value={cat}>
                     {cat}
                   </SelectItem>
@@ -305,12 +327,18 @@ function SettlementEstimator() {
 
           <div className="space-y-1.5">
             <Label htmlFor="severity-band">Severity Band</Label>
-            <Select value={severityBand} onValueChange={setSeverityBand}>
+            <Select
+              value={severityBand}
+              onValueChange={(v) => {
+                setSeverityBand(v);
+                setResult(null);
+              }}
+            >
               <SelectTrigger id="severity-band" data-ocid="settlement.select">
                 <SelectValue placeholder="Select severity" />
               </SelectTrigger>
               <SelectContent>
-                {SEVERITY_BANDS.map((band) => (
+                {activeSeverityBands.map((band) => (
                   <SelectItem key={band} value={band}>
                     {band}
                   </SelectItem>
@@ -336,7 +364,9 @@ function SettlementEstimator() {
             data-ocid="settlement.error_state"
           >
             <AlertTriangle className="w-4 h-4 inline mr-2" />
-            Please select a valid injury category and severity band.
+            {isMalta
+              ? "No tariff data available for this combination. Not all injury/severity combinations have established Maltese court reference values."
+              : "Please select a valid injury category and severity band."}
           </div>
         )}
 
@@ -348,7 +378,9 @@ function SettlementEstimator() {
             <div className="flex items-center gap-2 mb-3">
               <CheckCircle2 className="w-5 h-5 text-primary" />
               <span className="font-semibold text-foreground">
-                Estimated PSLA Range
+                {isMalta
+                  ? "Indicative Compensation Range"
+                  : "Estimated PSLA Range"}
               </span>
               <Badge variant="secondary" className="ml-auto">
                 {result.severity}
@@ -363,27 +395,53 @@ function SettlementEstimator() {
               {isMalta ? formatEUR(result.max) : formatCurrencyGBP(result.max)}
             </div>
             <p className="text-xs text-muted-foreground mt-3 leading-relaxed">
-              <strong>Note:</strong> These figures are indicative estimates
-              based on Judicial College Guidelines 17th Edition. Actual awards
-              depend on individual circumstances, medical evidence, and judicial
-              assessment. This estimate covers PSLA only and excludes special
-              damages (loss of earnings, care costs, treatment).
+              {isMalta ? (
+                <>
+                  <strong>Note:</strong> These figures are indicative reference
+                  ranges based on Maltese court practice and Civil Code Cap. 16.
+                  Actual awards depend on individual circumstances, medical
+                  evidence, and the assessment of the competent Maltese court.
+                  Excludes special damages (loss of earnings, care costs,
+                  treatment expenses). Consult a qualified{" "}
+                  <strong>avukat (advocate)</strong> for case-specific advice.
+                </>
+              ) : (
+                <>
+                  <strong>Note:</strong> These figures are indicative estimates
+                  based on Judicial College Guidelines 17th Edition. Actual
+                  awards depend on individual circumstances, medical evidence,
+                  and judicial assessment. This estimate covers PSLA only and
+                  excludes special damages (loss of earnings, care costs,
+                  treatment).
+                </>
+              )}
             </p>
           </div>
         )}
 
         <div className="rounded-md bg-muted/50 border border-border px-4 py-3 text-xs text-muted-foreground">
           <BookOpen className="w-3.5 h-3.5 inline mr-1.5 mb-0.5" />
-          These figures are indicative estimates based on{" "}
-          <strong>Judicial College Guidelines 17th Edition</strong>. Actual
-          awards depend on individual circumstances and judicial assessment.
+          {isMalta ? (
+            <>
+              These figures are indicative reference ranges based on{" "}
+              <strong>Maltese court practice and Civil Code Cap. 16</strong>.
+              Actual awards depend on individual circumstances and the Maltese
+              court’s assessment.
+            </>
+          ) : (
+            <>
+              These figures are indicative estimates based on{" "}
+              <strong>Judicial College Guidelines 17th Edition</strong>. Actual
+              awards depend on individual circumstances and judicial assessment.
+            </>
+          )}
         </div>
       </CardContent>
     </Card>
   );
 }
 
-// ─── Section 2: Legal Pathway Guide ──────────────────────────────────────────
+// ─── Section 2: Legal Pathway Guide ────────────────────────────────────────────
 function LegalPathwayGuide() {
   const { country } = useCountry();
   const isMalta = country === "mt";
@@ -393,7 +451,7 @@ function LegalPathwayGuide() {
   const handleDetermine = () => {
     const val = Number.parseFloat(claimValue);
     if (!Number.isNaN(val) && val > 0) {
-      setActiveTrack(getTrack(val));
+      setActiveTrack(getTrack(val, isMalta));
     }
   };
 
@@ -412,7 +470,9 @@ function LegalPathwayGuide() {
               Legal Pathway Guide
             </CardTitle>
             <CardDescription className="mt-1 text-sm">
-              CPR Track Allocation
+              {isMalta
+                ? "Maltese Court Track Allocation"
+                : "CPR Track Allocation"}
             </CardDescription>
           </div>
         </div>
@@ -449,24 +509,32 @@ function LegalPathwayGuide() {
         </div>
 
         <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-          {TRACKS.map((track) => {
-            const isHighlighted = activeTrack === track.id;
+          {(isMalta ? MALTA_COURT_TRACKS : TRACKS).map((track: any) => {
+            const trackKey = track.id ?? track.name;
+            const isHighlighted = activeTrack === trackKey;
+            const trackColor =
+              track.color ?? "bg-primary/5 border-primary/20 text-foreground";
+            const badgeColor = track.badgeColor ?? "bg-primary/20 text-primary";
+            const trackRange = track.range ?? track.threshold;
+            const trackPoints = track.keyPoints ?? track.features ?? [];
+            const trackAuthority = track.cpr ?? track.reference;
+            const trackNote = track.note ?? track.description;
             return (
               <div
-                key={track.id}
+                key={trackKey}
                 className={[
                   "rounded-xl border-2 p-4 transition-all duration-300",
                   isHighlighted
-                    ? `${track.color} border-opacity-100 shadow-md scale-[1.02] ring-2 ring-offset-1 ring-primary/30`
+                    ? `${trackColor} border-opacity-100 shadow-md scale-[1.02] ring-2 ring-offset-1 ring-primary/30`
                     : "bg-card border-border opacity-70",
                 ].join(" ")}
-                data-ocid={`pathway.${track.id}.card`}
+                data-ocid="pathway.panel"
               >
                 <div className="flex items-center justify-between mb-2">
                   <span
-                    className={`text-xs font-semibold px-2 py-0.5 rounded-full ${isHighlighted ? track.badgeColor : "bg-muted text-muted-foreground"}`}
+                    className={`text-xs font-semibold px-2 py-0.5 rounded-full ${isHighlighted ? badgeColor : "bg-muted text-muted-foreground"}`}
                   >
-                    {track.range}
+                    {trackRange}
                   </span>
                   {isHighlighted && (
                     <Badge className="bg-primary text-primary-foreground text-xs">
@@ -476,7 +544,7 @@ function LegalPathwayGuide() {
                 </div>
                 <h3 className="font-semibold text-sm mb-2">{track.name}</h3>
                 <ul className="space-y-1 mb-3">
-                  {track.keyPoints.map((pt) => (
+                  {trackPoints.map((pt: string) => (
                     <li key={pt} className="text-xs flex items-start gap-1.5">
                       <span className="text-primary mt-0.5">•</span>
                       <span className="text-muted-foreground">{pt}</span>
@@ -484,19 +552,21 @@ function LegalPathwayGuide() {
                   ))}
                 </ul>
                 <Separator className="my-2" />
-                <div className="flex justify-between text-xs">
-                  <span className="text-muted-foreground">Timeline</span>
-                  <span className="font-medium">{track.timeline}</span>
-                </div>
+                {track.timeline && (
+                  <div className="flex justify-between text-xs">
+                    <span className="text-muted-foreground">Timeline</span>
+                    <span className="font-medium">{track.timeline}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-xs mt-1">
                   <span className="text-muted-foreground">Authority</span>
                   <span className="font-mono text-xs font-semibold">
-                    {track.cpr}
+                    {trackAuthority}
                   </span>
                 </div>
-                {isHighlighted && (
+                {isHighlighted && trackNote && (
                   <p className="text-xs mt-3 italic leading-relaxed border-t border-border/50 pt-2">
-                    {track.note}
+                    {trackNote}
                   </p>
                 )}
               </div>
@@ -508,8 +578,10 @@ function LegalPathwayGuide() {
   );
 }
 
-// ─── Section 3: Liability Dispute Response Template ──────────────────────────
+// ─── Section 3: Liability Dispute Response Template ──────────────────────────────
 function LiabilityDisputeTemplate() {
+  const { country } = useCountry();
+  const isMalta = country === "mt";
   const [fields, setFields] = useState({
     yourName: "",
     opponentName: "",
@@ -529,7 +601,22 @@ function LiabilityDisputeTemplate() {
     };
 
   const handleGenerate = () => {
-    setGenerated(buildTemplate(fields));
+    if (isMalta) {
+      setGenerated(
+        buildMaltaDemandLetter({
+          claimantName: fields.yourName,
+          defendantName: fields.opponentName,
+          accidentDate: fields.incidentDate
+            ? new Date(fields.incidentDate)
+            : undefined,
+          accidentLocation: fields.incidentLocation,
+          claimId: fields.claimRef,
+          incidentDescription: fields.keyEvidence,
+        }),
+      );
+    } else {
+      setGenerated(buildTemplate(fields));
+    }
     setCopied(false);
   };
 
@@ -560,7 +647,9 @@ function LiabilityDisputeTemplate() {
               Liability Dispute Response Template
             </CardTitle>
             <CardDescription className="mt-1 text-sm">
-              WITHOUT PREJUDICE response letter
+              {isMalta
+                ? "MINGĦAJR PREĠUDIZZJU — Without Prejudice response letter"
+                : "WITHOUT PREJUDICE response letter"}
             </CardDescription>
           </div>
         </div>
@@ -604,7 +693,11 @@ function LiabilityDisputeTemplate() {
             <Label htmlFor="incident-location">Incident Location</Label>
             <Input
               id="incident-location"
-              placeholder="e.g. A40 Westway, London"
+              placeholder={
+                isMalta
+                  ? "e.g. Triq il-Kbira, Valletta"
+                  : "e.g. A40 Westway, London"
+              }
               value={fields.incidentLocation}
               onChange={update("incidentLocation")}
             />
@@ -673,8 +766,9 @@ function LiabilityDisputeTemplate() {
   );
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
+// ─── Page ────────────────────────────────────────────────────────────────────────────────────
 export default function LegalOutputsPage() {
+  const { country } = useCountry();
   return (
     <div className="space-y-8" data-ocid="legal_outputs.page">
       {/* Header */}
@@ -691,7 +785,9 @@ export default function LegalOutputsPage() {
               Legal Outputs
             </h1>
             <p className="text-sm text-muted-foreground">
-              UK legal tools and templates for accident claims
+              {country === "mt"
+                ? "Maltese legal tools and templates for accident claims"
+                : "UK legal tools and templates for accident claims"}
             </p>
           </div>
         </div>

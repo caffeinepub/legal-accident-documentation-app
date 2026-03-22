@@ -24,6 +24,7 @@ import {
   Wrench,
 } from "lucide-react";
 import { useState } from "react";
+import { useCountry } from "../contexts/CountryContext";
 
 interface RepairCostEstimatorPanelProps {
   damageSeverity?: DamageSeverity;
@@ -97,6 +98,51 @@ const REPAIR_TABLE: Record<CrashTypeKey, Record<SeverityBand, CostRange>> = {
   },
 };
 
+const REPAIR_TABLE_MT: Record<CrashTypeKey, Record<SeverityBand, CostRange>> = {
+  rear_end: {
+    minor: "€450 – €1,400",
+    moderate: "€1,400 – €3,500",
+    severe: "€3,500 – €7,500",
+    critical: "€7,500 – €14,000",
+  },
+  head_on: {
+    minor: "€900 – €2,800",
+    moderate: "€2,800 – €7,500",
+    severe: "€7,500 – €17,000",
+    critical: "€17,000 – €32,000+",
+  },
+  side_impact: {
+    minor: "€700 – €2,300",
+    moderate: "€2,300 – €5,500",
+    severe: "€5,500 – €13,000",
+    critical: "€13,000 – €23,000+",
+  },
+  sideswipe: {
+    minor: "€280 – €900",
+    moderate: "€900 – €2,800",
+    severe: "€2,800 – €6,500",
+    critical: "€6,500 – €14,000",
+  },
+  rollover: {
+    minor: "€1,800 – €4,500",
+    moderate: "€4,500 – €11,000",
+    severe: "€11,000 – €20,000",
+    critical: "€20,000 – €37,000+",
+  },
+  multi_vehicle: {
+    minor: "€900 – €3,200",
+    moderate: "€3,200 – €8,500",
+    severe: "€8,500 – €18,500",
+    critical: "€18,500 – €32,000+",
+  },
+  low_speed: {
+    minor: "€200 – €800",
+    moderate: "€800 – €2,300",
+    severe: null,
+    critical: null,
+  },
+};
+
 const SEVERITY_COLORS: Record<SeverityBand, string> = {
   minor:
     "text-green-600 bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800/40",
@@ -136,6 +182,8 @@ export default function RepairCostEstimatorPanel({
   damageSeverity,
   crashType,
 }: RepairCostEstimatorPanelProps) {
+  const { country } = useCountry();
+  const isMalta = country === "mt";
   const [isOpen, setIsOpen] = useState(false);
 
   const detectedCrashKey = crashType ? normaliseCrashType(crashType) : null;
@@ -151,14 +199,15 @@ export default function RepairCostEstimatorPanel({
     autoSeverityBand ?? "",
   );
 
+  const activeTable = isMalta ? REPAIR_TABLE_MT : REPAIR_TABLE;
   const costRange =
     selectedCrash && selectedSeverity
-      ? REPAIR_TABLE[selectedCrash][selectedSeverity]
+      ? activeTable[selectedCrash][selectedSeverity]
       : null;
 
   const score = autoScore ?? (selectedSeverity ? 5 : null);
-  const showWriteOffSCatSN = score !== null && score >= 8;
-  const showWriteOffSCatAB = score !== null && score >= 9;
+  const showWriteOffHigh = score !== null && score >= 8;
+  const showWriteOffCritical = score !== null && score >= 9;
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
@@ -297,10 +346,10 @@ export default function RepairCostEstimatorPanel({
                   </div>
 
                   {/* Write-off guidance */}
-                  {showWriteOffSCatSN && (
+                  {showWriteOffHigh && (
                     <div
                       className={`flex items-start gap-2 p-3 rounded-lg border text-xs leading-relaxed ${
-                        showWriteOffSCatAB
+                        showWriteOffCritical
                           ? "bg-red-50 dark:bg-red-950/20 border-red-300 dark:border-red-700/40 text-red-800 dark:text-red-300"
                           : "bg-amber-50 dark:bg-amber-950/20 border-amber-300 dark:border-amber-700/40 text-amber-800 dark:text-amber-300"
                       }`}
@@ -308,8 +357,25 @@ export default function RepairCostEstimatorPanel({
                     >
                       <AlertTriangle size={14} className="shrink-0 mt-0.5" />
                       <div>
-                        <strong>Write-off risk:</strong>{" "}
-                        {showWriteOffSCatAB ? (
+                        {isMalta ? (
+                          showWriteOffCritical ? (
+                            <>
+                              <strong>Total loss risk (Telf Totali):</strong>{" "}
+                              Severity score ≥ 9 — the vehicle may be declared
+                              an economic total loss by the insurer under
+                              Maltese practice. Obtain a formal valuation from
+                              your insurer.
+                            </>
+                          ) : (
+                            <>
+                              <strong>Write-off risk:</strong> Severity score ≥
+                              8 — repair costs may approach or exceed the
+                              vehicle’s pre-accident market value. The insurer
+                              may declare a total loss (<em>telf totali</em>).
+                              Obtain a formal assessment.
+                            </>
+                          )
+                        ) : showWriteOffCritical ? (
                           <>
                             Severity score ≥ 9 — Category{" "}
                             <strong>A or B</strong> write-off is possible. The
@@ -331,7 +397,7 @@ export default function RepairCostEstimatorPanel({
 
             {selectedCrash &&
               selectedSeverity &&
-              REPAIR_TABLE[selectedCrash as CrashTypeKey][
+              activeTable[selectedCrash as CrashTypeKey][
                 selectedSeverity as SeverityBand
               ] === null && (
                 <div className="flex items-start gap-2 p-3 rounded-lg bg-muted/40 border border-border text-xs text-muted-foreground">
@@ -349,10 +415,16 @@ export default function RepairCostEstimatorPanel({
                 className="text-muted-foreground shrink-0 mt-0.5"
               />
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Estimates are indicative ranges based on typical UK repair costs
-                and are <strong>not a formal quotation</strong>. Always obtain
-                quotes from approved repairers. Figures may vary by region,
-                vehicle type, and parts availability.
+                {isMalta ? (
+                  "Estimates are indicative ranges based on typical Malta repair costs in EUR. Final costs depend on authorised repairer assessments and insurer approval."
+                ) : (
+                  <>
+                    Estimates are indicative ranges based on typical UK repair
+                    costs and are <strong>not a formal quotation</strong>.
+                    Always obtain quotes from approved repairers. Figures may
+                    vary by region, vehicle type, and parts availability.
+                  </>
+                )}
               </p>
             </div>
           </CardContent>

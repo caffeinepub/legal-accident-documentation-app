@@ -118,6 +118,24 @@ export type MaltaInjuryKey =
   | "Upper Limb"
   | "Multiple Injuries";
 
+export const MALTA_INJURY_CATEGORIES: MaltaInjuryKey[] = [
+  "Neck / Soft Tissue",
+  "Back",
+  "Head / Brain",
+  "Psychiatric / PTSD",
+  "Shoulder",
+  "Lower Limb",
+  "Upper Limb",
+  "Multiple Injuries",
+];
+
+export const MALTA_SEVERITY_BANDS: MaltaSeverityKey[] = [
+  "Minor",
+  "Moderate",
+  "Severe",
+  "Very Severe",
+];
+
 export const MALTA_JCG_TABLE: Partial<
   Record<MaltaInjuryKey, Partial<Record<MaltaSeverityKey, [number, number]>>>
 > = {
