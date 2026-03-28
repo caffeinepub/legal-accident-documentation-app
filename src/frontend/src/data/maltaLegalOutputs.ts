@@ -63,6 +63,9 @@ export interface MaltaCourtTrack {
   description: string;
   reference: string;
   features: string[];
+  color?: string;
+  badgeColor?: string;
+  timeline?: string;
 }
 
 export const MALTA_COURT_TRACKS: MaltaCourtTrack[] = [
@@ -78,6 +81,9 @@ export const MALTA_COURT_TRACKS: MaltaCourtTrack[] = [
       "Decisions usually within 12–18 months",
       "Enforceable judgments",
     ],
+    color: "bg-green-50 border-green-200",
+    badgeColor: "bg-green-100 text-green-800",
+    timeline: "6–12 months",
   },
   {
     name: "Civil Court, First Hall",
@@ -91,6 +97,9 @@ export const MALTA_COURT_TRACKS: MaltaCourtTrack[] = [
       "Interim injunctions available",
       "Costs may be awarded to the successful party",
     ],
+    color: "bg-amber-50 border-amber-200",
+    badgeColor: "bg-amber-100 text-amber-800",
+    timeline: "12–24 months",
   },
   {
     name: "Court of Appeal",
@@ -104,6 +113,9 @@ export const MALTA_COURT_TRACKS: MaltaCourtTrack[] = [
       "Legal representation mandatory",
       "Significant costs exposure",
     ],
+    color: "bg-blue-50 border-blue-200",
+    badgeColor: "bg-blue-100 text-blue-800",
+    timeline: "18–36 months",
   },
 ];
 
@@ -136,7 +148,8 @@ export const MALTA_SEVERITY_BANDS: MaltaSeverityKey[] = [
   "Very Severe",
 ];
 
-export const MALTA_JCG_TABLE: Partial<
+// Note: These are indicative reference bands based on Maltese court practice, NOT an official published tariff.
+export const MALTA_COMPENSATION_TABLE: Partial<
   Record<MaltaInjuryKey, Partial<Record<MaltaSeverityKey, [number, number]>>>
 > = {
   "Neck / Soft Tissue": {
@@ -235,8 +248,6 @@ export function buildMaltaDemandLetter(
 
 ${formatDate(todayDate)}
 
-IT-TRIBUNALI ĊIVILI — CIVIL COURTS OF MALTA
-
 TO:
 ${fields.defendantName || "The Defendant"}
 [Address of Defendant]
@@ -292,4 +303,67 @@ Claimant
 
 ────────────────────────────────────────
 This letter has been prepared using iamthe.law. It does not constitute legal advice under Maltese law. The Claimant is strongly advised to seek independent legal representation from an advocate enrolled with the Chamber of Advocates of Malta before commencing legal proceedings.`;
+}
+
+export function buildMaltaLiabilityDisputeTemplate(fields: {
+  claimantName: string;
+  claimantAddress: string;
+  defendantName: string;
+  defendantInsurer: string;
+  accidentDate: string;
+  claimId: string;
+  faultPercent: number;
+  settlementValue: number;
+}): string {
+  const todayDate = new Date().toLocaleDateString("en-MT", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+  return `MINGĦAJR PREĠUDIZZJU / WITHOUT PREJUDICE
+
+${todayDate}
+
+TO: ${fields.defendantInsurer || "[Insurer Name]"}
+    RE: ${fields.defendantName || "[Defendant Full Name]"}
+
+CLAIM REFERENCE: ${fields.claimId}
+ACCIDENT DATE: ${fields.accidentDate}
+
+RE: RESPONSE TO DENIAL OF LIABILITY — CIVIL CODE CAP. 16
+
+Dear Sir/Madam,
+
+We write in response to your denial of liability in respect of the above-referenced road traffic accident.
+
+We dispute your client's position on liability and maintain that the evidence supports the following fault apportionment: our client bears no more than ${100 - fields.faultPercent}% responsibility for the collision, with the balance attributable to your insured.
+
+Our position is founded upon the following:
+
+1. DUTY OF CARE
+   Under Civil Code (Cap. 16), Article 1031, every person is bound to exercise the standard of care of a reasonable and prudent driver. The evidence demonstrates that your insured fell below this standard.
+
+2. BREACH OF TRAFFIC REGULATIONS
+   The conduct of your insured constitutes a breach of the Traffic Regulation Ordinance (Cap. 65) and the Malta Road Code as published by Transport Malta.
+
+3. CONTRIBUTORY NEGLIGENCE
+   Even if any contributory negligence is established against our client (which is denied), such apportionment under Civil Code Art. 1033 does not extinguish liability entirely and does not justify a blanket denial.
+
+4. EVIDENCE
+   We are in possession of photographic and documentary evidence supporting our position. We are prepared to disclose this evidence in the context of any court proceedings or alternative dispute resolution.
+
+5. QUANTUM
+   Our client's claim is valued at approximately €${fields.settlementValue.toLocaleString("en-MT")} inclusive of general and special damages. We remain open to without-prejudice discussions.
+
+PRESCRIPTION WARNING: Please note that the applicable prescription period under Civil Code Art. 2153 is two (2) years from the date of the accident. We reserve the right to issue proceedings without further notice should this matter not be resolved within that period.
+
+We invite your client's insurer to reconsider its position within 21 days of the date of this letter. Failure to do so will result in this matter being referred to the competent Maltese court without further notice.
+
+Yours faithfully,
+
+${fields.claimantName || "[Claimant Name]"}
+[Claimant Address / Avukat Details]
+
+---
+DISCLAIMER: This letter is generated for informational purposes only and does not constitute legal advice. Please consult a qualified avukat (advocate) before sending or relying on this document.`;
 }

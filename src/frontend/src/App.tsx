@@ -11,6 +11,7 @@ import { CountryProvider } from "./contexts/CountryContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import BirdsEyeGridPage from "./pages/BirdsEyeGridPage";
+import DangerousRoadsPage from "./pages/DangerousRoadsPage";
 import FaultReferencePage from "./pages/FaultReferencePage";
 import FleetPage from "./pages/FleetPage";
 import InsurerContactsPage from "./pages/InsurerContactsPage";
@@ -85,6 +86,12 @@ const privacyRoute = createRoute({
   component: PrivacyPolicyPage,
 });
 
+const dangerousRoadsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/dangerous-roads",
+  component: DangerousRoadsPage,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   reportsRoute,
@@ -96,6 +103,7 @@ const routeTree = rootRoute.addChildren([
   fleetRoute,
   privacyRoute,
   termsRoute,
+  dangerousRoadsRoute,
 ]);
 
 const router = createRouter({ routeTree });

@@ -6,6 +6,8 @@ import {
   BookOpen,
   ChevronDown,
   ChevronUp,
+  Download,
+  ExternalLink,
   Gavel,
   Info,
   Scale,
@@ -132,6 +134,61 @@ function CaseLawCard({ entry }: { entry: CaseLawEntry }) {
   );
 }
 
+function MaltaRoadCodeCard() {
+  return (
+    <div className="rounded-lg border border-teal-300 bg-teal-50/70 dark:border-teal-700/50 dark:bg-teal-950/30 p-4 space-y-3">
+      <div className="flex items-start gap-3">
+        <div className="shrink-0 mt-0.5 p-1.5 rounded-md bg-teal-100 dark:bg-teal-900/50">
+          <BookOpen className="w-4 h-4 text-teal-700 dark:text-teal-400" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-sm font-bold text-teal-900 dark:text-teal-100">
+              Malta Road Code
+            </span>
+            <Badge
+              variant="outline"
+              className="text-xs px-1.5 py-0 border-teal-500 text-teal-700 dark:border-teal-500 dark:text-teal-300"
+            >
+              Official Reference
+            </Badge>
+          </div>
+          <p className="text-xs text-teal-700 dark:text-teal-400 mt-0.5">
+            Published by Transport Malta — Last updated July 2025
+          </p>
+        </div>
+        <ExternalLink className="w-4 h-4 text-teal-500 shrink-0 mt-0.5" />
+      </div>
+      <p className="text-sm text-teal-800 dark:text-teal-200 leading-relaxed">
+        The official practical guidance document for road users in Malta,
+        covering speed limits, road signs, right of way, and safe driving rules.
+      </p>
+      <div className="flex flex-wrap gap-2">
+        <a
+          href="https://www.transport.gov.mt/RoadCodeEN.pdf-f10821"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold bg-teal-600 text-white hover:bg-teal-700 transition-colors"
+          data-ocid="road_code.download_button"
+        >
+          <Download className="w-3.5 h-3.5" />
+          Download (English)
+        </a>
+        <a
+          href="https://www.transport.gov.mt/RoadCodeMT.pdf-f10820"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold bg-teal-100 text-teal-800 hover:bg-teal-200 dark:bg-teal-800/50 dark:text-teal-200 dark:hover:bg-teal-700/60 transition-colors border border-teal-300 dark:border-teal-600"
+          data-ocid="road_code_mt.download_button"
+        >
+          <Download className="w-3.5 h-3.5" />
+          Download (Malti)
+        </a>
+      </div>
+    </div>
+  );
+}
+
 export default function LegalReferencePanel({
   violations,
 }: LegalReferencePanelProps) {
@@ -176,7 +233,7 @@ export default function LegalReferencePanel({
 
   const jurisdictionLabel = isMalta ? "Maltese Law" : "UK Law";
   const trafficCodeLabel = isMalta
-    ? "Traffic Regulation Ordinance (Cap. 65)"
+    ? "Road Code & Traffic Regulation Ordinance (Cap. 65)"
     : "Highway Code Citations";
   const primaryLawLabel = isMalta
     ? "Civil Code Cap. 16 / TRO Cap. 65"
@@ -210,6 +267,8 @@ export default function LegalReferencePanel({
       {isOpen && (
         <div className="px-4 pb-4 space-y-5">
           <Separator />
+
+          {isMalta && <MaltaRoadCodeCard />}
 
           <div className="flex items-start gap-2 p-3 rounded-lg bg-primary/5 border border-primary/20">
             <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
@@ -322,7 +381,7 @@ export default function LegalReferencePanel({
             <Info className="w-3.5 h-3.5 text-muted-foreground shrink-0 mt-0.5" />
             <p className="text-xs text-muted-foreground leading-relaxed">
               {isMalta
-                ? "Legal references are provided for informational purposes only and do not constitute legal advice. Always consult a qualified Maltese advocate (avukat) for advice specific to your circumstances. References are based on Maltese law (Civil Code Cap. 16, TRO Cap. 65)."
+                ? "Legal references are provided for informational purposes only and do not constitute legal advice. Always consult a qualified Maltese advocate (avukat) for advice specific to your circumstances. References are based on Maltese law (Civil Code Cap. 16, TRO Cap. 65, Malta Road Code)."
                 : "Legal references are provided for informational purposes only and do not constitute legal advice. Always consult a qualified solicitor for advice specific to your circumstances. Highway Code rules and case law summaries are based on UK law."}
             </p>
           </div>

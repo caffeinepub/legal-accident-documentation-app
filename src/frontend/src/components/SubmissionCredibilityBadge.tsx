@@ -77,7 +77,7 @@ export default function SubmissionCredibilityBadge({
         className={`grid grid-cols-1 gap-1.5 ${claimId ? "sm:grid-cols-4" : "sm:grid-cols-3"}`}
       >
         {/* Submitted at */}
-        <div className="flex items-start gap-2 rounded-lg bg-background/60 px-3 py-2">
+        <div className="flex items-start gap-2 rounded-lg bg-card px-3 py-2">
           <ShieldCheck className="h-3.5 w-3.5 shrink-0 mt-0.5 text-trust-accent" />
           <div className="min-w-0">
             <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-medium">
@@ -90,7 +90,7 @@ export default function SubmissionCredibilityBadge({
         </div>
 
         {/* Signed by */}
-        <div className="flex items-start gap-2 rounded-lg bg-background/60 px-3 py-2">
+        <div className="flex items-start gap-2 rounded-lg bg-card px-3 py-2">
           <UserCheck className="h-3.5 w-3.5 shrink-0 mt-0.5 text-trust-accent" />
           <div className="min-w-0">
             <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-medium">
@@ -103,7 +103,7 @@ export default function SubmissionCredibilityBadge({
         </div>
 
         {/* Fingerprint */}
-        <div className="flex items-start gap-2 rounded-lg bg-background/60 px-3 py-2">
+        <div className="flex items-start gap-2 rounded-lg bg-card px-3 py-2">
           <Fingerprint className="h-3.5 w-3.5 shrink-0 mt-0.5 text-trust-accent" />
           <div className="min-w-0">
             <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-medium">
@@ -117,7 +117,7 @@ export default function SubmissionCredibilityBadge({
 
         {/* Claim ID */}
         {claimId && (
-          <div className="flex items-start gap-2 rounded-lg bg-background/60 px-3 py-2">
+          <div className="flex items-start gap-2 rounded-lg bg-card px-3 py-2">
             <Hash className="h-3.5 w-3.5 shrink-0 mt-0.5 text-trust-accent" />
             <div className="min-w-0">
               <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-medium">

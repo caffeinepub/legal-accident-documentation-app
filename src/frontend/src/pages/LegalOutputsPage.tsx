@@ -34,13 +34,14 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useCountry } from "../contexts/CountryContext";
 import {
+  MALTA_COMPENSATION_TABLE,
   MALTA_COURT_TRACKS,
   MALTA_INJURY_CATEGORIES,
-  MALTA_JCG_TABLE,
   MALTA_SEVERITY_BANDS,
   type MaltaInjuryKey,
   type MaltaSeverityKey,
   buildMaltaDemandLetter,
+  buildMaltaLiabilityDisputeTemplate,
   formatEUR,
 } from "../data/maltaLegalOutputs";
 
@@ -255,7 +256,7 @@ function SettlementEstimator() {
     if (isMalta) {
       const band = severityBand as MaltaSeverityKey;
       const cat = injuryCategory as MaltaInjuryKey;
-      const entry = MALTA_JCG_TABLE[cat]?.[band];
+      const entry = MALTA_COMPENSATION_TABLE[cat]?.[band];
       if (entry) {
         setResult({ min: entry[0], max: entry[1], severity: band });
       } else {
@@ -603,15 +604,15 @@ function LiabilityDisputeTemplate() {
   const handleGenerate = () => {
     if (isMalta) {
       setGenerated(
-        buildMaltaDemandLetter({
+        buildMaltaLiabilityDisputeTemplate({
           claimantName: fields.yourName,
+          claimantAddress: "",
           defendantName: fields.opponentName,
-          accidentDate: fields.incidentDate
-            ? new Date(fields.incidentDate)
-            : undefined,
-          accidentLocation: fields.incidentLocation,
-          claimId: fields.claimRef,
-          incidentDescription: fields.keyEvidence,
+          defendantInsurer: "",
+          accidentDate: fields.incidentDate || "[Date]",
+          claimId: fields.claimRef || "[Claim ID]",
+          faultPercent: 50,
+          settlementValue: 0,
         }),
       );
     } else {
@@ -665,7 +666,7 @@ function LiabilityDisputeTemplate() {
             <Label htmlFor="your-name">Your Full Name</Label>
             <Input
               id="your-name"
-              placeholder="e.g. John Smith"
+              placeholder={isMalta ? "e.g. Mario Borg" : "e.g. John Smith"}
               value={fields.yourName}
               onChange={update("yourName")}
               data-ocid="dispute.input"
@@ -675,7 +676,7 @@ function LiabilityDisputeTemplate() {
             <Label htmlFor="opponent-name">Opponent's Full Name</Label>
             <Input
               id="opponent-name"
-              placeholder="e.g. Jane Doe"
+              placeholder={isMalta ? "e.g. Maria Camilleri" : "e.g. Jane Doe"}
               value={fields.opponentName}
               onChange={update("opponentName")}
             />
@@ -716,7 +717,11 @@ function LiabilityDisputeTemplate() {
             <Textarea
               id="key-evidence"
               rows={3}
-              placeholder="e.g. dashcam footage timestamp 14:32, witness John Smith, photo of road markings"
+              placeholder={
+                isMalta
+                  ? "e.g. rikordjatura dashcam, xhud Mario Grech, ritratt tal-marki tat-triq"
+                  : "e.g. dashcam footage timestamp 14:32, witness John Smith, photo of road markings"
+              }
               value={fields.keyEvidence}
               onChange={update("keyEvidence")}
             />

@@ -84,7 +84,7 @@ export default function SubmissionTrustPanel({
       </div>
 
       {/* Agreement checkbox */}
-      <div className="flex items-start gap-3 rounded-lg border border-trust-border bg-background/60 p-3.5">
+      <div className="flex items-start gap-3 rounded-lg border border-trust-border bg-card p-3.5">
         <Checkbox
           id="trust-agreement"
           checked={agreed}
@@ -101,7 +101,7 @@ export default function SubmissionTrustPanel({
       </div>
 
       {/* Witness Signature (Optional) */}
-      <div className="rounded-lg border border-border bg-background/40 overflow-hidden">
+      <div className="rounded-lg border border-border bg-card overflow-hidden">
         <button
           type="button"
           className="flex w-full items-center justify-between px-3.5 py-2.5 text-left"

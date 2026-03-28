@@ -214,7 +214,7 @@ export default function BirdsEyeGridPage() {
             <h1 className="text-2xl font-bold tracking-tight">
               Bird's Eye Grid View
             </h1>
-            <p className="mt-1 text-fault-header-fg/80 text-sm leading-relaxed max-w-2xl">
+            <p className="mt-1 text-fault-header-fg text-sm leading-relaxed max-w-2xl">
               Interactive fault matrix overview across all accident scenarios
               and vehicle pairs. Click any cell to drill down into the full
               fault breakdown, Highway Code references, and case law.

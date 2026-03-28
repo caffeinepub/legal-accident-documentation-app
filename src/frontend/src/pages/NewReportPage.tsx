@@ -9,12 +9,15 @@ import {
 } from "lucide-react";
 import React, { useState } from "react";
 import AccidentReportForm from "../components/AccidentReportForm";
+import { useCountry } from "../contexts/CountryContext";
 
 export default function NewReportPage() {
   const [disclaimerDismissed, setDisclaimerDismissed] = useState(false);
   const [onboardingDismissed, setOnboardingDismissed] = useState(
     () => !!localStorage.getItem("iatl_onboarded"),
   );
+  const { country } = useCountry();
+  const isMalta = country === "mt";
 
   const dismissOnboarding = () => {
     localStorage.setItem("iatl_onboarded", "1");
@@ -95,7 +98,8 @@ export default function NewReportPage() {
             This application and its outputs do not constitute legal advice. All
             content is provided for informational and insurance documentation
             purposes only. You should seek independent legal advice from a
-            qualified solicitor before taking any legal action.
+            qualified{isMalta ? " avukat (advocate)" : " solicitor"} before
+            taking any legal action.
           </p>
           <button
             type="button"
@@ -118,7 +122,9 @@ export default function NewReportPage() {
           iamthe.law
         </h1>
         <p className="text-sm text-muted-foreground mb-4">
-          AI-powered accident documentation for UK roads
+          {isMalta
+            ? "AI-powered accident documentation for Maltese roads"
+            : "AI-powered accident documentation for UK roads"}
         </p>
         <div className="flex flex-wrap gap-2">
           <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/8 px-3 py-1 text-xs font-medium text-primary">

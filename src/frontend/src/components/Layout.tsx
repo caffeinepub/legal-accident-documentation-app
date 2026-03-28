@@ -8,6 +8,7 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Outlet, useLocation, useNavigate } from "@tanstack/react-router";
 import {
+  AlertTriangle,
   BookUser,
   Gavel,
   Globe,
@@ -26,6 +27,7 @@ import { useCountry } from "../contexts/CountryContext";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { LANGUAGES, type Language } from "../i18n/translations";
+import CookieConsentBanner from "./CookieConsentBanner";
 
 const NAV_ITEMS = [
   {
@@ -98,6 +100,8 @@ export default function Layout() {
 
   const currentLang = LANGUAGES.find((l) => l.code === language);
 
+  const dangerousRoadsActive = location.pathname === "/dangerous-roads";
+
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       <header
@@ -145,6 +149,22 @@ export default function Layout() {
                 </Button>
               );
             })}
+            {/* Dangerous Roads nav item */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate({ to: "/dangerous-roads" })}
+              className={[
+                "gap-1.5 px-3 relative",
+                dangerousRoadsActive
+                  ? "text-primary font-semibold after:absolute after:bottom-0 after:left-2 after:right-2 after:h-0.5 after:rounded-full after:bg-primary"
+                  : "text-muted-foreground hover:text-foreground",
+              ].join(" ")}
+              data-ocid="nav.dangerous_roads.link"
+            >
+              <AlertTriangle className="w-3.5 h-3.5" />
+              Dangerous Roads
+            </Button>
           </nav>
 
           {/* Right controls: lang + theme + mobile menu */}
@@ -258,6 +278,21 @@ export default function Layout() {
                       </button>
                     );
                   })}
+                  {/* Dangerous Roads mobile item */}
+                  <button
+                    type="button"
+                    onClick={() => handleNav("/dangerous-roads")}
+                    className={[
+                      "flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors text-left w-full",
+                      dangerousRoadsActive
+                        ? "bg-primary text-primary-foreground"
+                        : "text-foreground hover:bg-muted",
+                    ].join(" ")}
+                    data-ocid="nav.dangerous_roads.link"
+                  >
+                    <AlertTriangle className="w-4 h-4 shrink-0" />
+                    Dangerous Roads
+                  </button>
                   {/* Mobile lang row */}
                   <div className="mt-3 pt-3 border-t border-border flex items-center gap-2 px-3">
                     <Globe className="w-4 h-4 text-muted-foreground" />
@@ -352,6 +387,7 @@ export default function Layout() {
           </div>
         </div>
       </footer>
+      <CookieConsentBanner />
     </div>
   );
 }

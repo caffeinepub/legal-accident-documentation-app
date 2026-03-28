@@ -117,7 +117,7 @@ export default function ReportDetailPage() {
         >
           <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-muted border border-border">
             <Hash className="w-3.5 h-3.5 text-muted-foreground" />
-            <span className="font-mono text-xs text-foreground/80 font-medium">
+            <span className="font-mono text-xs text-foreground font-medium">
               {claimId}
             </span>
           </div>

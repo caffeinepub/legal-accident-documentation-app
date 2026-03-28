@@ -148,7 +148,7 @@ export default function GridCellDetail({
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">
               Rationale
             </p>
-            <p className="text-sm text-foreground/80 leading-relaxed">
+            <p className="text-sm text-foreground leading-relaxed">
               {scenario.rationale}
             </p>
           </div>
@@ -162,7 +162,7 @@ export default function GridCellDetail({
               {scenario.contributingFactors.map((factor) => (
                 <li
                   key={factor}
-                  className="flex items-start gap-2 text-sm text-foreground/80"
+                  className="flex items-start gap-2 text-sm text-foreground"
                 >
                   <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-fault-accent shrink-0" />
                   {factor}

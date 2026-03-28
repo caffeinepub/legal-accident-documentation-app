@@ -24,9 +24,9 @@ export default function FaultReferencePage() {
             <h1 className="text-2xl font-bold tracking-tight">
               Fault Reference Tool
             </h1>
-            <p className="mt-1 text-fault-header-fg/80 text-sm leading-relaxed max-w-2xl">
+            <p className="mt-1 text-fault-header-fg text-sm leading-relaxed max-w-2xl">
               {isMalta
-                ? "Select an accident scenario to view the applicable Traffic Regulation Ordinance (Cap. 65) rules, Civil Code Cap. 16 provisions, Maltese case law, and fault percentage breakdown for each party."
+                ? "Select an accident scenario to view the applicable Malta Road Code rules, Traffic Regulation Ordinance (Cap. 65) provisions, Civil Code Cap. 16, Maltese case law, and fault percentage breakdown for each party."
                 : "Select an accident scenario to view the applicable Highway Code rules, Road Traffic Act 1988 sections, landmark case law, and insurer-style fault percentage breakdown for each party."}
             </p>
           </div>
@@ -38,7 +38,7 @@ export default function FaultReferencePage() {
         <Info className="w-4 h-4 shrink-0 mt-0.5 text-primary" />
         <p>
           {isMalta
-            ? "This tool provides general legal reference information based on Maltese law (Civil Code Cap. 16, TRO Cap. 65) and is intended for educational purposes only. It does not constitute legal advice. Fault percentages are indicative assessments and may vary based on specific circumstances. Always consult a qualified Maltese advocate (avukat) for advice on your specific situation."
+            ? "This tool provides general legal reference information based on Maltese law (Civil Code Cap. 16, TRO Cap. 65, Malta Road Code) and is intended for educational purposes only. It does not constitute legal advice. Fault percentages are indicative assessments and may vary based on specific circumstances. Always consult a qualified Maltese advocate (avukat) for advice on your specific situation."
             : "This tool provides general legal reference information based on UK law and is intended for educational purposes only. It does not constitute legal advice. Fault percentages are indicative insurer assessments and may vary based on specific circumstances. Always consult a qualified solicitor for advice on your specific situation."}
         </p>
       </div>

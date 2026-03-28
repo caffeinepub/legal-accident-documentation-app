@@ -29,6 +29,7 @@ import {
 import type React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ExternalBlob } from "../backend";
+import { useCountry } from "../contexts/CountryContext";
 import { useCreateReport } from "../hooks/useQueries";
 import DashCamUpload, { type DashCamClip } from "./DashCamUpload";
 import PartyVehicleCard, { type AdditionalParty } from "./PartyVehicleCard";
@@ -116,6 +117,8 @@ function formatTime(isoString: string): string {
 export default function AccidentReportForm() {
   const navigate = useNavigate();
   const createReport = useCreateReport();
+  const { country } = useCountry();
+  const isMalta = country === "mt";
 
   // Wizard step (1-indexed)
   const [currentStep, setCurrentStep] = useState(1);
@@ -157,7 +160,7 @@ export default function AccidentReportForm() {
   const [roadType, setRoadType] = useState<
     "urban" | "dualCarriageway" | "motorway"
   >("urban");
-  const [speedLimit, setSpeedLimit] = useState("30");
+  const [speedLimit, setSpeedLimit] = useState(isMalta ? "50" : "30");
 
   // Police incident reference
   const [policeRef, setPoliceRef] = useState("");
@@ -265,33 +268,36 @@ export default function AccidentReportForm() {
     officerName,
   ]);
 
-  const applyDraft = useCallback((draft: DraftData) => {
-    setMake(draft.make ?? "");
-    setModel(draft.model ?? "");
-    setColour(draft.colour ?? "");
-    setLicencePlate(draft.licencePlate ?? "");
-    setYear(draft.year ?? "");
-    setMot(draft.mot ?? "");
-    setRegistration(draft.registration ?? "");
-    setVehicleSpeed(draft.vehicleSpeed ?? "");
-    setDamageDescription(draft.damageDescription ?? "");
-    setWitnessStatement(draft.witnessStatement ?? "");
-    setStopLocation(draft.stopLocation ?? "");
-    setAccidentMarker(draft.accidentMarker ?? "");
-    setWeather(draft.weather ?? "");
-    setWeatherLocation(draft.weatherLocation ?? "");
-    setRoadCondition(draft.roadCondition ?? "");
-    setVisibility(draft.visibility ?? "");
-    setRoadType(draft.roadType ?? "urban");
-    setSpeedLimit(draft.speedLimit ?? "30");
-    setAdditionalParties(draft.additionalParties ?? []);
-    setPhotoAnalysisDescription(draft.photoAnalysisDescription ?? "");
-    setDashCamCrossAnalysisDescription(
-      draft.dashCamCrossAnalysisDescription ?? "",
-    );
-    setPoliceRef(draft.policeRef ?? "");
-    setOfficerName(draft.officerName ?? "");
-  }, []);
+  const applyDraft = useCallback(
+    (draft: DraftData) => {
+      setMake(draft.make ?? "");
+      setModel(draft.model ?? "");
+      setColour(draft.colour ?? "");
+      setLicencePlate(draft.licencePlate ?? "");
+      setYear(draft.year ?? "");
+      setMot(draft.mot ?? "");
+      setRegistration(draft.registration ?? "");
+      setVehicleSpeed(draft.vehicleSpeed ?? "");
+      setDamageDescription(draft.damageDescription ?? "");
+      setWitnessStatement(draft.witnessStatement ?? "");
+      setStopLocation(draft.stopLocation ?? "");
+      setAccidentMarker(draft.accidentMarker ?? "");
+      setWeather(draft.weather ?? "");
+      setWeatherLocation(draft.weatherLocation ?? "");
+      setRoadCondition(draft.roadCondition ?? "");
+      setVisibility(draft.visibility ?? "");
+      setRoadType(draft.roadType ?? "urban");
+      setSpeedLimit(draft.speedLimit ?? (isMalta ? "50" : "30"));
+      setAdditionalParties(draft.additionalParties ?? []);
+      setPhotoAnalysisDescription(draft.photoAnalysisDescription ?? "");
+      setDashCamCrossAnalysisDescription(
+        draft.dashCamCrossAnalysisDescription ?? "",
+      );
+      setPoliceRef(draft.policeRef ?? "");
+      setOfficerName(draft.officerName ?? "");
+    },
+    [isMalta],
+  );
 
   const resetForm = useCallback(() => {
     setMake("");
@@ -565,7 +571,7 @@ export default function AccidentReportForm() {
     const recognition = new SpeechRecognitionClass();
     recognition.continuous = true;
     recognition.interimResults = true;
-    recognition.lang = "en-GB";
+    recognition.lang = isMalta ? "mt-MT" : "en-GB";
 
     recognition.onresult = (event) => {
       let transcript = "";
@@ -590,7 +596,7 @@ export default function AccidentReportForm() {
     recognition.start();
     recognitionRef.current = recognition;
     setVoiceTranscribing(true);
-  }, []);
+  }, [isMalta]);
 
   const handleStopVoice = useCallback(() => {
     recognitionRef.current?.stop();
@@ -776,7 +782,7 @@ export default function AccidentReportForm() {
               setLicencePlate(e.target.value);
               setRegistration(e.target.value); // keep registration in sync
             }}
-            placeholder="e.g. AB12 CDE"
+            placeholder={isMalta ? "e.g. ABC 123" : "e.g. AB12 CDE"}
             data-ocid="vehicle.licencePlate.input"
           />
         </div>
@@ -792,7 +798,11 @@ export default function AccidentReportForm() {
           />
         </div>
         <div className="space-y-1">
-          <Label htmlFor="mot">MOT Expiry</Label>
+          <Label htmlFor="mot">
+            {isMalta
+              ? "VRT Expiry (Vehicle Roadworthiness Test)"
+              : "MOT Expiry"}
+          </Label>
           <Input
             id="mot"
             value={mot}
@@ -816,13 +826,15 @@ export default function AccidentReportForm() {
       <CardContent className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1">
-            <Label htmlFor="vehicleSpeed">Vehicle Speed (mph)</Label>
+            <Label htmlFor="vehicleSpeed">
+              Vehicle Speed ({isMalta ? "km/h" : "mph"})
+            </Label>
             <Input
               id="vehicleSpeed"
               type="number"
               value={vehicleSpeed}
               onChange={(e) => setVehicleSpeed(e.target.value)}
-              placeholder="e.g. 30"
+              placeholder={isMalta ? "e.g. 50" : "e.g. 30"}
               data-ocid="details.vehicleSpeed.input"
             />
           </div>
@@ -845,13 +857,15 @@ export default function AccidentReportForm() {
             </Select>
           </div>
           <div className="space-y-1">
-            <Label htmlFor="speedLimit">Speed Limit (mph)</Label>
+            <Label htmlFor="speedLimit">
+              Speed Limit ({isMalta ? "km/h" : "mph"})
+            </Label>
             <Input
               id="speedLimit"
               type="number"
               value={speedLimit}
               onChange={(e) => setSpeedLimit(e.target.value)}
-              placeholder="e.g. 30"
+              placeholder={isMalta ? "e.g. 50" : "e.g. 30"}
               data-ocid="details.speedLimit.input"
             />
           </div>
@@ -885,7 +899,9 @@ export default function AccidentReportForm() {
               id="policeRef"
               value={policeRef}
               onChange={(e) => setPoliceRef(e.target.value)}
-              placeholder="e.g. URN 21/12345"
+              placeholder={
+                isMalta ? "e.g. PR/2024/001234" : "e.g. URN 21/12345"
+              }
               data-ocid="details.policeRef.input"
             />
           </div>
@@ -898,7 +914,11 @@ export default function AccidentReportForm() {
               id="officerName"
               value={officerName}
               onChange={(e) => setOfficerName(e.target.value)}
-              placeholder="e.g. PC Smith"
+              placeholder={
+                isMalta
+                  ? "e.g. Kuntistabbli Borg, Pulizija ta' Malta"
+                  : "e.g. PC Smith"
+              }
               data-ocid="details.officerName.input"
             />
           </div>
@@ -923,7 +943,11 @@ export default function AccidentReportForm() {
                   void handleFetchWeather();
                 }
               }}
-              placeholder="e.g. SW1A 1AA or Manchester"
+              placeholder={
+                isMalta
+                  ? "e.g. Triq ir-Repubblika, Valletta"
+                  : "e.g. SW1A 1AA or Manchester"
+              }
               className="flex-1"
               data-ocid="weather.location.input"
             />
@@ -981,7 +1005,11 @@ export default function AccidentReportForm() {
             id="accidentMarker"
             value={accidentMarker}
             onChange={(e) => setAccidentMarker(e.target.value)}
-            placeholder="e.g. Junction of High St and Mill Rd"
+            placeholder={
+              isMalta
+                ? "e.g. Triq il-Kbira, Birkirkara — ħdejn il-knisja"
+                : "e.g. Junction of High St and Mill Rd"
+            }
             data-ocid="details.accidentMarker.input"
           />
         </div>
@@ -1195,7 +1223,7 @@ export default function AccidentReportForm() {
             <span className="text-muted-foreground">Speed</span>
             <span>
               {vehicleSpeed ? (
-                `${vehicleSpeed} mph`
+                `${vehicleSpeed} ${isMalta ? "km/h" : "mph"}`
               ) : (
                 <span className="text-muted-foreground/60 italic">—</span>
               )}
@@ -1205,7 +1233,9 @@ export default function AccidentReportForm() {
               {roadType === "dualCarriageway" ? "Dual Carriageway" : roadType}
             </span>
             <span className="text-muted-foreground">Speed Limit</span>
-            <span>{speedLimit} mph</span>
+            <span>
+              {speedLimit} {isMalta ? "km/h" : "mph"}
+            </span>
             <span className="text-muted-foreground">Weather</span>
             <span>
               {weather || (

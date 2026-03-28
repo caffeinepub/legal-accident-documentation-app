@@ -2,6 +2,8 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertTriangle, BookOpen, Gavel, Scale, Users } from "lucide-react";
 import React from "react";
+import { useCountry } from "../contexts/CountryContext";
+import { maltaScenarioReferences } from "../data/maltaScenarioReferences";
 import {
   type ScenarioKey,
   scenarioReferences,
@@ -62,10 +64,127 @@ function FaultPercentageBar({
 export default function FaultReferenceDisplay({
   scenarioKey,
 }: FaultReferenceDisplayProps) {
-  const scenario = scenarioReferences[scenarioKey];
-  if (!scenario) return null;
+  const { country } = useCountry();
+  const isMalta = country === "mt";
+  const scenario = isMalta
+    ? maltaScenarioReferences[scenarioKey]
+    : scenarioReferences[scenarioKey];
 
-  const { faultData, highwayCode, rta1988, caseLaw } = scenario;
+  if (isMalta && scenario) {
+    // Malta mode: render Malta-specific scenario reference
+    const maltaScenario = scenario as (typeof maltaScenarioReferences)[string];
+    return (
+      <div className="space-y-5">
+        <CrashScenarioDiagram scenarioKey={scenarioKey} />
+
+        {/* Fault Weight */}
+        <Card className="border-2 border-fault-accent/40 bg-fault-accent/5">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Users className="w-5 h-5 text-fault-accent" />
+              <span>Fault Assessment</span>
+              <Badge className="ml-auto bg-fault-accent/20 text-fault-accent border-fault-accent/30 text-xs">
+                Maltese Law
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-foreground leading-relaxed">
+              {maltaScenario.faultWeight}
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Malta Road Code */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <BookOpen className="w-5 h-5 text-primary" />
+              Malta Road Code / TRO Cap. 65 References
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {maltaScenario.highwayCodCitations.map((ref) => (
+              <div
+                key={ref}
+                className="p-3 rounded-lg bg-muted/50 border border-border/50"
+              >
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {ref}
+                </p>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        {/* TRO / Civil Code */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Scale className="w-5 h-5 text-primary" />
+              Civil Code Cap. 16 / TRO Cap. 65
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {maltaScenario.rta1988.map((ref) => (
+              <div
+                key={ref}
+                className="p-3 rounded-lg bg-muted/50 border border-border/50"
+              >
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {ref}
+                </p>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        {/* Case Law */}
+        {maltaScenario.caselaw.length > 0 && (
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Gavel className="w-5 h-5 text-amber-600" />
+                <span className="text-amber-700 dark:text-amber-400">
+                  Maltese Case Law
+                </span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {maltaScenario.caselaw.map((c) => (
+                <div
+                  key={c.citation}
+                  className="p-3 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/40"
+                >
+                  <div className="flex items-start gap-2 mb-1 flex-wrap">
+                    <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                    <span className="text-sm font-semibold text-amber-900 dark:text-amber-200">
+                      {c.name}
+                    </span>
+                    <Badge
+                      variant="outline"
+                      className="text-xs font-mono border-amber-300 text-amber-700 dark:text-amber-400 ml-auto"
+                    >
+                      {c.citation}
+                    </Badge>
+                  </div>
+                  <p className="text-sm text-amber-800 dark:text-amber-300 leading-relaxed ml-6">
+                    {c.principle}
+                  </p>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    );
+  }
+
+  // UK mode (fallback for both non-Malta and missing Malta scenario)
+  const ukScenario = scenarioReferences[scenarioKey];
+  if (!ukScenario) return null;
+
+  const { faultData, highwayCode, rta1988, caseLaw } = ukScenario;
 
   const partyAColor =
     faultData.partyAFault >= 70
@@ -146,7 +265,7 @@ export default function FaultReferenceDisplay({
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">
               Rationale
             </p>
-            <p className="text-sm text-foreground/80 leading-relaxed">
+            <p className="text-sm text-foreground leading-relaxed">
               {faultData.rationale}
             </p>
           </div>
@@ -159,7 +278,7 @@ export default function FaultReferenceDisplay({
               {faultData.contributingFactors.map((factor) => (
                 <li
                   key={factor}
-                  className="flex items-start gap-2 text-sm text-foreground/80"
+                  className="flex items-start gap-2 text-sm text-foreground"
                 >
                   <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-fault-accent shrink-0" />
                   {factor}
@@ -175,7 +294,9 @@ export default function FaultReferenceDisplay({
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-base">
             <BookOpen className="w-5 h-5 text-primary" />
-            Highway Code Citations
+            {isMalta
+              ? "Malta Road Code / TRO Cap. 65 References"
+              : "Highway Code Citations"}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -188,7 +309,9 @@ export default function FaultReferenceDisplay({
                 <Badge variant="outline" className="text-xs font-mono">
                   {ref.rule}
                 </Badge>
-                <span className="text-sm font-semibold">{ref.title}</span>
+                <span className="text-sm font-semibold">
+                  {(ref as any).title ?? ""}
+                </span>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 {ref.description}
@@ -203,20 +326,26 @@ export default function FaultReferenceDisplay({
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-base">
             <Scale className="w-5 h-5 text-primary" />
-            Road Traffic Act 1988
+            {isMalta
+              ? "Civil Code Cap. 16 / TRO Cap. 65"
+              : "Road Traffic Act 1988"}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           {rta1988.map((ref) => (
             <div
-              key={ref.section}
+              key={String(
+                (ref as any).sectionNumber ?? (ref as any).section ?? "",
+              )}
               className="p-3 rounded-lg bg-muted/50 border border-border/50"
             >
               <div className="flex items-center gap-2 mb-1">
                 <Badge variant="outline" className="text-xs font-mono">
-                  {ref.section}
+                  {(ref as any).sectionNumber ?? (ref as any).section}
                 </Badge>
-                <span className="text-sm font-semibold">{ref.title}</span>
+                <span className="text-sm font-semibold">
+                  {(ref as any).title ?? ""}
+                </span>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 {ref.description}
@@ -248,12 +377,6 @@ export default function FaultReferenceDisplay({
                   <span className="text-sm font-semibold text-amber-900 dark:text-amber-200">
                     {c.name}
                   </span>
-                  <Badge
-                    variant="outline"
-                    className="text-xs font-mono border-amber-300 text-amber-700 dark:text-amber-400 ml-auto"
-                  >
-                    {c.citation}
-                  </Badge>
                 </div>
                 <p className="text-xs font-semibold text-amber-700 dark:text-amber-400 mb-1 ml-6">
                   Principle: {c.principle}

@@ -161,7 +161,7 @@ function ScenarioRow({
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5">
               Rationale
             </p>
-            <p className="text-sm text-foreground/80 leading-relaxed">
+            <p className="text-sm text-foreground leading-relaxed">
               {entry.rationale}
             </p>
           </div>
@@ -173,7 +173,7 @@ function ScenarioRow({
               {entry.contributingFactors.map((factor) => (
                 <li
                   key={factor}
-                  className="flex items-start gap-2 text-sm text-foreground/80"
+                  className="flex items-start gap-2 text-sm text-foreground"
                 >
                   <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-primary/60 shrink-0" />
                   {factor}
@@ -227,7 +227,7 @@ export default function FaultMatrixPanel({
               </span>
               <Badge
                 variant="outline"
-                className="text-xs border-fault-header-fg/40 text-fault-header-fg/80"
+                className="text-xs border-fault-header-fg/40 text-fault-header-fg"
               >
                 {faultMatrix.length} Scenarios
               </Badge>

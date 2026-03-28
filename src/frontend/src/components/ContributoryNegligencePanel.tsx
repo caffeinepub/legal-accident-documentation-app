@@ -24,7 +24,7 @@ const MALTA_INTRO = {
   introduction:
     "Under Maltese law, where a claimant's own negligence contributed to their injuries or loss, the court reduces the compensation awarded in proportion to the claimant's share of fault. This principle — known as contributory negligence — is codified in the Civil Code (Cap. 16) and applied by Maltese courts in all road traffic and personal injury matters.",
   legalBasis:
-    "Civil Code (Cap. 16), Art. 1045 provides that where both parties contributed to the damage, the court shall apportion liability in proportion to the respective fault of each party. Where the Claimant's own negligence is a contributing cause, damages are reduced accordingly.",
+    "Civil Code (Cap. 16), Arts. 1031–1033 provide that where both parties contributed to the damage, the court shall apportion liability in proportion to the respective fault of each party. Where the Claimant's own negligence is a contributing cause, damages are reduced accordingly.",
 };
 
 const MALTA_SCENARIOS: FaultSplitScenario[] = [
@@ -67,7 +67,7 @@ const MALTA_PRECEDENTS = [
     caseName: "Cassar v Grech [2018]",
     year: "2018",
     principle:
-      "Contributory fault apportionment under Civil Code Art. 1045: where both parties contributed to the collision, damages are reduced in proportion to the claimant's share of responsibility.",
+      "Contributory fault apportionment under Civil Code Arts. 1031–1033: where both parties contributed to the collision, damages are reduced in proportion to the claimant's share of responsibility.",
   },
   {
     caseName: "Camilleri v Mifsud [2015]",

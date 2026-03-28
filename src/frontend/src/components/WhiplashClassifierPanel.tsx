@@ -117,7 +117,9 @@ export default function WhiplashClassifierPanel({
             >
               <CardTitle className="text-sm flex items-center gap-2">
                 <Brain size={16} className="text-violet-500" />
-                Whiplash Injury Classifier
+                {isMalta
+                  ? "Soft Tissue Injury Estimator"
+                  : "Whiplash Injury Classifier"}
                 <Badge
                   variant="outline"
                   className="text-xs text-violet-600 border-violet-400"
@@ -273,7 +275,7 @@ export default function WhiplashClassifierPanel({
                         className="group-open:rotate-180 transition-transform"
                       />
                       {isMalta
-                        ? "View full Civil Code Cap. 16 compensation table"
+                        ? "View indicative soft tissue injury reference bands (Maltese court practice)"
                         : "View full WRP 2021 tariff table"}
                     </summary>
                     <div className="mt-2 rounded-lg border border-border overflow-hidden text-xs">

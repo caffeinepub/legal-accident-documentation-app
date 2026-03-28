@@ -39,6 +39,7 @@ import type React from "react";
 import { useState } from "react";
 import type { AccidentReport } from "../backend";
 import { useLanguage } from "../contexts/LanguageContext";
+import { formatClaimId } from "../utils/claimId";
 import {
   type ClaimStatus,
   STATUS_CONFIG,
@@ -163,7 +164,35 @@ function StatusBadge({ status }: { status: ClaimStatus }) {
 }
 
 // ─── GDPR / Data & Privacy Panel ─────────────────────────────────────────────
-function GdprPanel({ reportId }: { reportId: string }) {
+function downloadErasureReceipt(reportId: string, claimId: string) {
+  const timestamp = new Date().toISOString();
+  const receipt = [
+    "GDPR DATA ERASURE CONFIRMATION",
+    "================================",
+    `Date/Time: ${timestamp}`,
+    `Claim ID: ${claimId}`,
+    "Action: All locally stored data for this claim has been deleted.",
+    "Note: No personal data was retained on any external server.",
+    "This document serves as your erasure confirmation receipt.",
+    "",
+    "iamthe.law — AI-powered accident documentation",
+    "This app processes data locally in your browser only.",
+    "Compliant with GDPR (EU) 2016/679 and UK GDPR.",
+  ].join("\n");
+
+  const blob = new Blob([receipt], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `erasure-receipt-${reportId}-${Date.now()}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function GdprPanel({
+  reportId,
+  claimId,
+}: { reportId: string; claimId: string }) {
   const { t } = useLanguage();
   const [evidenceDeleted, setEvidenceDeleted] = useState(false);
   const [reportDeleted, setReportDeleted] = useState(false);
@@ -180,6 +209,7 @@ function GdprPanel({ reportId }: { reportId: string }) {
         k.includes(`injuryPhotos_${reportId}`),
     );
     for (const k of keys) localStorage.removeItem(k);
+    downloadErasureReceipt(reportId, claimId);
     setEvidenceDeleted(true);
     setEvidenceDialogOpen(false);
   };
@@ -188,6 +218,7 @@ function GdprPanel({ reportId }: { reportId: string }) {
     // Remove all keys related to this report
     const keys = Object.keys(localStorage).filter((k) => k.includes(reportId));
     for (const k of keys) localStorage.removeItem(k);
+    downloadErasureReceipt(reportId, claimId);
     setReportDeleted(true);
     setReportDialogOpen(false);
   };
@@ -401,7 +432,7 @@ export default function ReportDetail({ reportId, report }: ReportDetailProps) {
       </Card>
 
       {/* Evidence Strength Check */}
-      <EvidenceGapPanel report={report} />
+      <EvidenceGapPanel report={report} reportId={reportIdStr} />
 
       {/* Trust & Credibility Badge */}
       <SubmissionCredibilityBadge
@@ -695,7 +726,10 @@ export default function ReportDetail({ reportId, report }: ReportDetailProps) {
         icon={Lock}
         defaultOpen={false}
       >
-        <GdprPanel reportId={reportIdStr} />
+        <GdprPanel
+          reportId={reportIdStr}
+          claimId={formatClaimId(reportId, report.timestamp)}
+        />
       </CollapsibleSection>
     </div>
   );

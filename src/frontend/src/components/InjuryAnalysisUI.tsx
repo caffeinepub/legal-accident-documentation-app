@@ -69,7 +69,7 @@ function CrashTypeCard({
       {entries.map((entry, i) => (
         <div key={entry.explanation} className="space-y-1.5">
           {entries.length > 1 && i > 0 && <Separator className="opacity-30" />}
-          <p className="text-xs text-foreground/80 leading-relaxed">
+          <p className="text-xs text-foreground leading-relaxed">
             {entry.explanation}
           </p>
           <div className="flex items-start gap-1 mt-1">

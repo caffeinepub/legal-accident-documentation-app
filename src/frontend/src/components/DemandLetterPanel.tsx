@@ -275,9 +275,16 @@ export default function DemandLetterPanel({ report }: DemandLetterPanelProps) {
           <CardContent className="pt-0 pb-4 px-4 space-y-3">
             <p className="text-xs text-muted-foreground leading-relaxed bg-amber-50/60 dark:bg-amber-900/10 border border-amber-200/60 dark:border-amber-800/30 rounded-md px-3 py-2">
               <strong>Auto-generated draft</strong> based on report data. Review
-              and edit all details before sending. This letter follows standard
-              UK pre-action protocol formatting. Always seek qualified legal
-              advice before issuing.
+              and edit all details before sending.{" "}
+              {isMalta ? (
+                <>
+                  This letter follows Maltese civil law format (Civil Code Cap.
+                  16, TRO Cap. 65). Review all details before use. Always seek
+                  advice from a qualified <strong>avukat (advocate)</strong>.
+                </>
+              ) : (
+                "This letter follows standard UK pre-action protocol formatting. Always seek qualified legal advice before issuing."
+              )}
             </p>
 
             <Textarea

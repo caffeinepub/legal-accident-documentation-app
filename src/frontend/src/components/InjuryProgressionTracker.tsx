@@ -28,6 +28,15 @@ import {
 } from "lucide-react";
 import type React from "react";
 import { useEffect, useState } from "react";
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 interface MedicalEntry {
   id: string;
@@ -113,6 +122,82 @@ const emptyForm = {
   severity: 5,
 };
 
+function SeverityChart({ entries }: { entries: MedicalEntry[] }) {
+  const sorted = [...entries]
+    .filter((e) => e.date)
+    .sort((a, b) => a.date.localeCompare(b.date));
+
+  const data = sorted.map((e) => ({
+    date: new Date(e.date).toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "short",
+    }),
+    severity: e.severity,
+    type: e.appointmentType,
+  }));
+
+  return (
+    <div className="rounded-lg border border-border bg-card p-3 mb-4">
+      <p className="text-xs font-medium text-muted-foreground mb-2">
+        Pain / Severity Over Time
+      </p>
+      <ResponsiveContainer width="100%" height={180}>
+        <AreaChart
+          data={data}
+          margin={{ top: 4, right: 8, bottom: 0, left: -16 }}
+        >
+          <defs>
+            <linearGradient id="severityGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop
+                offset="5%"
+                stopColor="hsl(var(--primary))"
+                stopOpacity={0.3}
+              />
+              <stop
+                offset="95%"
+                stopColor="hsl(var(--primary))"
+                stopOpacity={0}
+              />
+            </linearGradient>
+          </defs>
+          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+          <XAxis
+            dataKey="date"
+            tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+            tickLine={false}
+          />
+          <YAxis
+            domain={[1, 10]}
+            ticks={[1, 3, 5, 7, 10]}
+            tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+            tickLine={false}
+            axisLine={false}
+          />
+          <Tooltip
+            contentStyle={{
+              backgroundColor: "hsl(var(--card))",
+              border: "1px solid hsl(var(--border))",
+              borderRadius: "6px",
+              fontSize: "12px",
+              color: "hsl(var(--foreground))",
+            }}
+            formatter={(value: number) => [`${value}/10`, "Severity"]}
+          />
+          <Area
+            type="monotone"
+            dataKey="severity"
+            stroke="hsl(var(--primary))"
+            strokeWidth={2}
+            fill="url(#severityGradient)"
+            dot={{ r: 4, fill: "hsl(var(--primary))", strokeWidth: 0 }}
+            activeDot={{ r: 5 }}
+          />
+        </AreaChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
 const InjuryProgressionTracker: React.FC<InjuryProgressionTrackerProps> = ({
   reportId,
 }) => {
@@ -141,6 +226,8 @@ const InjuryProgressionTracker: React.FC<InjuryProgressionTrackerProps> = ({
   const handleDelete = (id: string) => {
     setEntries((prev) => prev.filter((e) => e.id !== id));
   };
+
+  const chartEntries = entries.filter((e) => e.date);
 
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
@@ -171,6 +258,11 @@ const InjuryProgressionTracker: React.FC<InjuryProgressionTrackerProps> = ({
 
         <CollapsibleContent>
           <CardContent className="pt-0 space-y-4">
+            {/* Chart when 2+ entries */}
+            {chartEntries.length >= 2 && (
+              <SeverityChart entries={chartEntries} />
+            )}
+
             <Button
               type="button"
               size="sm"

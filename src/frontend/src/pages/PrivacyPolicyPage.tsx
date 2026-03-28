@@ -12,6 +12,7 @@ import {
   UserCheck,
 } from "lucide-react";
 import type React from "react";
+import { useCountry } from "../contexts/CountryContext";
 import { useLanguage } from "../contexts/LanguageContext";
 
 const LAST_UPDATED = "16 March 2026";
@@ -55,6 +56,8 @@ function Bullet({ children }: { children: React.ReactNode }) {
 
 export default function PrivacyPolicyPage() {
   const { t } = useLanguage();
+  const { country } = useCountry();
+  const isMalta = country === "mt";
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
@@ -99,8 +102,11 @@ export default function PrivacyPolicyPage() {
         </p>
         <p>
           This policy applies to all users of the iamthe.law web application and
-          complies with the UK General Data Protection Regulation (UK GDPR) and
-          the Data Protection Act 2018.
+          complies with the{" "}
+          {isMalta
+            ? "EU General Data Protection Regulation (EU GDPR, Regulation 2016/679) as implemented by the Data Protection Act (Cap. 586, Laws of Malta)"
+            : "UK General Data Protection Regulation (UK GDPR) and the Data Protection Act 2018"}
+          .
         </p>
         <p>
           The data controller for this application is iamthe.law. If you have
@@ -180,7 +186,11 @@ export default function PrivacyPolicyPage() {
             <strong>AI-Powered Analysis (Legitimate Interest):</strong> To apply
             rule-based and AI-assisted analysis to your uploaded evidence,
             providing crash type correlation, injury classification, and legal
-            references under the UK Highway Code and applicable statutes.
+            references under the{" "}
+            {isMalta
+              ? "Malta Road Code / TRO Cap. 65 and applicable Maltese statutes"
+              : "UK Highway Code and applicable UK statutes"}
+            .
           </Bullet>
           <Bullet>
             <strong>Local Storage Only:</strong> All data entered and generated
@@ -218,9 +228,19 @@ export default function PrivacyPolicyPage() {
             Files&rdquo; functions.
           </Bullet>
           <Bullet>
-            <strong>UK Limitation Act 1980:</strong> Personal injury claims in
-            the UK have a three-year limitation period. We recommend retaining
-            your accident reports for at least this period.
+            {isMalta ? (
+              <>
+                <strong>Civil Code Cap. 16, Art. 2153:</strong> Personal injury
+                claims in Malta prescribe within two (2) years. We recommend
+                retaining your accident reports for at least this period.
+              </>
+            ) : (
+              <>
+                <strong>UK Limitation Act 1980:</strong> Personal injury claims
+                in the UK have a three-year limitation period. We recommend
+                retaining your accident reports for at least this period.
+              </>
+            )}
           </Bullet>
           <Bullet>
             <strong>Special Category Data (Injury Photos):</strong> Photographs
@@ -239,8 +259,11 @@ export default function PrivacyPolicyPage() {
       {/* 5. Your Rights */}
       <Section id="your-rights" icon={Shield} title={t("privacy.your_rights")}>
         <p>
-          Under the UK GDPR and Data Protection Act 2018, you have the following
-          rights with respect to your personal data:
+          Under the{" "}
+          {isMalta
+            ? "EU GDPR and Data Protection Act (Cap. 586, Laws of Malta)"
+            : "UK GDPR and Data Protection Act 2018"}
+          , you have the following rights with respect to your personal data:
         </p>
         <ul className="space-y-2 mt-2">
           <Bullet>
@@ -278,18 +301,41 @@ export default function PrivacyPolicyPage() {
           </Bullet>
         </ul>
         <p className="mt-3 text-muted-foreground">
-          If you believe your rights have been infringed, you have the right to
-          lodge a complaint with the{" "}
-          <strong>Information Commissioner&apos;s Office (ICO)</strong> at{" "}
-          <a
-            href="https://ico.org.uk"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline text-primary hover:text-primary/80 transition-colors"
-          >
-            ico.org.uk
-          </a>{" "}
-          or by calling 0303 123 1113.
+          {isMalta ? (
+            <>
+              If you believe your rights have been infringed, you have the right
+              to lodge a complaint with the{" "}
+              <strong>
+                Office of the Information and Data Protection Commissioner
+                (IDPC)
+              </strong>{" "}
+              at{" "}
+              <a
+                href="https://idpc.org.mt"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline text-primary hover:text-primary/80 transition-colors"
+              >
+                idpc.org.mt
+              </a>
+              .
+            </>
+          ) : (
+            <>
+              If you believe your rights have been infringed, you have the right
+              to lodge a complaint with the{" "}
+              <strong>Information Commissioner&apos;s Office (ICO)</strong> at{" "}
+              <a
+                href="https://ico.org.uk"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline text-primary hover:text-primary/80 transition-colors"
+              >
+                ico.org.uk
+              </a>{" "}
+              or by calling 0303 123 1113.
+            </>
+          )}
         </p>
       </Section>
 
@@ -347,7 +393,8 @@ export default function PrivacyPolicyPage() {
         </div>
         <p className="mt-3 text-muted-foreground">
           We aim to respond to all privacy-related requests within{" "}
-          <strong>30 days</strong> in accordance with UK GDPR requirements.
+          <strong>30 days</strong> in accordance with applicable GDPR
+          requirements.
         </p>
       </Section>
 

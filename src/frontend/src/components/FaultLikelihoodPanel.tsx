@@ -315,7 +315,7 @@ export default function FaultLikelihoodPanel({
                               size={12}
                               className="text-green-500 mt-0.5 shrink-0"
                             />
-                            <span className="text-foreground/80">{factor}</span>
+                            <span className="text-foreground">{factor}</span>
                           </li>
                         ))}
                       </ul>
@@ -339,7 +339,7 @@ export default function FaultLikelihoodPanel({
                             <span className="text-amber-500 mt-0.5 shrink-0">
                               ⚠
                             </span>
-                            <span className="text-foreground/80">{factor}</span>
+                            <span className="text-foreground">{factor}</span>
                           </li>
                         ))}
                       </ul>
@@ -353,7 +353,7 @@ export default function FaultLikelihoodPanel({
                       <MapPin size={12} className="text-blue-500" />
                       Road Position Impact
                     </p>
-                    <p className="text-xs text-foreground/80 leading-relaxed p-3 bg-blue-50/50 dark:bg-blue-900/10 rounded-lg border border-blue-200/50 dark:border-blue-800/30">
+                    <p className="text-xs text-foreground leading-relaxed p-3 bg-blue-50/50 dark:bg-blue-900/10 rounded-lg border border-blue-200/50 dark:border-blue-800/30">
                       {localAssessment.roadPositionImpact}
                     </p>
                   </div>

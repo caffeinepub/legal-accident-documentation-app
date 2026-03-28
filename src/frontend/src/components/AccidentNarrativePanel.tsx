@@ -432,7 +432,7 @@ export default function AccidentNarrativePanel({
                                         : "Low"}
                                   </span>
                                 </div>
-                                <p className="text-xs text-foreground/80 leading-relaxed">
+                                <p className="text-xs text-foreground leading-relaxed">
                                   {gap.description}
                                 </p>
                               </div>

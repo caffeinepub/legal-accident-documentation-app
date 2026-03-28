@@ -619,6 +619,99 @@ export const VIOLATION_LEGAL_REFERENCES: Record<string, LegalReference> = {
       },
     ],
   },
+  Cycling: {
+    highwayCode: [
+      {
+        ruleNumber: "HC Rules 59–82",
+        description:
+          "Rules applying TO cyclists: Rule 60 — ride at least 0.5m from the kerb; Rule 66 — do not ride more than two abreast on narrow roads; Rule 72 — signal clearly at junctions; Rule 79 — approach junctions with care; Rule 81 — use lights at night (mandatory); Rule 82 — wear a helmet (advisory).",
+        isEnforceable: true,
+      },
+      {
+        ruleNumber: "HC Rule 212",
+        description:
+          "Give cyclists at least 1.5 metres of clearance when overtaking at speeds up to 30 mph; give more space at higher speeds. Do not overtake a cyclist just before you turn left.",
+        isEnforceable: true,
+      },
+      {
+        ruleNumber: "HC Rule 213",
+        description:
+          "Do not cut across a cyclist's path when turning. Be aware that cyclists may be travelling faster than you expect.",
+        isEnforceable: true,
+      },
+      {
+        ruleNumber: "HC Rule 214",
+        description:
+          "Be aware that cyclists may swerve to avoid road debris, drain covers, or hazards. Give them room to manoeuvre safely.",
+        isEnforceable: true,
+      },
+      {
+        ruleNumber: "HC Rule 215",
+        description:
+          "Give lorry and bus drivers space — they may not be able to see cyclists in their mirrors. Cyclists should not pass large vehicles on the inside.",
+        isEnforceable: true,
+      },
+    ],
+    rta1988: [
+      {
+        sectionNumber: "Road Traffic Act 1988, s.3",
+        description:
+          "Careless and inconsiderate driving. A driver who fails to give adequate space to a cyclist or cuts across a cyclist's path commits an offence under this section.",
+      },
+      {
+        sectionNumber: "Road Traffic Act 1988, s.2",
+        description:
+          "Dangerous driving. Applies where a motorist's conduct in relation to a cyclist falls far below what would be expected of a competent driver.",
+      },
+      {
+        sectionNumber: "Highways Act 1980, s.41",
+        description:
+          "Local authorities have a statutory duty to maintain the highway in a safe condition. Relevant in cycling accident claims caused by potholes, poorly maintained road surfaces, or defective cycling infrastructure.",
+      },
+      {
+        sectionNumber: "Active Travel (England) Act 2017",
+        description:
+          "Imposes obligations on local transport authorities to consider and invest in active travel infrastructure including cycling lanes. Relevant in claims involving inadequate cycling provision.",
+      },
+    ],
+    caseLaw: [
+      {
+        caseName: "Eagle v Chambers [2004] EWCA Civ 1033",
+        factualSummary:
+          "A pedestrian was walking in the road at night and was struck by a motorist. The court significantly reduced the contributory negligence attributed to the pedestrian as a vulnerable road user.",
+        legalPrinciple:
+          "Motorists owe a heightened duty of care to vulnerable road users including cyclists and pedestrians. Contributory negligence of a cyclist is often assessed at a lower level than that of a motorist. The greater the disparity in the potential for causing harm, the more responsibility falls on the motorist.",
+      },
+      {
+        caseName: "Gough v Thorne [1966] 1 WLR 1387",
+        factualSummary:
+          "A child cyclist followed an adult's signal to cross a road and was struck by a vehicle. The court held that a child cannot be held to the same standard of contributory negligence as an adult.",
+        legalPrinciple:
+          "The standard of care expected of a child cyclist is not the same as that of an adult. Age and vulnerability are relevant considerations in fault apportionment in cycling accident claims.",
+      },
+      {
+        caseName: "Phipps v Rochester Corporation [1955] 1 QB 450",
+        factualSummary:
+          "A child fell into a trench on a public site. The court established that occupiers and public authorities must consider the presence of children who may not appreciate dangers.",
+        legalPrinciple:
+          "Local authorities and highway occupiers must take account of the presence of cyclists (including child cyclists) when maintaining roads and infrastructure. Applied in road defect cycling accident cases to establish highway authority liability.",
+      },
+      {
+        caseName: "Lunt v Khelifa [2002] EWCA Civ 801",
+        factualSummary:
+          "A cyclist riding at night without lights was struck by a vehicle. The court found the cyclist contributorily negligent at 25% but held the motorist primarily liable.",
+        legalPrinciple:
+          "Cycling at night without lights constitutes contributory negligence and will reduce damages by an appropriate percentage. However, it does not remove the motorist's duty of care. Contributory negligence of 25% for no lights is a commonly applied benchmark.",
+      },
+      {
+        caseName: "Smith v Littlewoods Organisation Ltd [1987] AC 241",
+        factualSummary:
+          "The defendant failed to act on knowledge of foreseeable harm arising from inaction on their premises. The House of Lords considered the circumstances in which a failure to act gives rise to liability in negligence.",
+        legalPrinciple:
+          "A duty of care may arise from omission where the defendant knows or ought to know of a foreseeable risk of harm to road users including cyclists. Applied in claims against highway authorities who fail to address known road hazards.",
+      },
+    ],
+  },
 };
 
 // General references that apply to all incidents regardless of violation type

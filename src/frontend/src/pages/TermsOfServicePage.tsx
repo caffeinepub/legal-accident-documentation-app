@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { Clock } from "lucide-react";
 import type React from "react";
+import { useCountry } from "../contexts/CountryContext";
 
 const LAST_UPDATED = "16 March 2026";
 
@@ -56,6 +57,8 @@ function Bullet({ children }: { children: React.ReactNode }) {
 }
 
 export default function TermsOfServicePage() {
+  const { country } = useCountry();
+  const isMalta = country === "mt";
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       {/* Header */}
@@ -68,7 +71,7 @@ export default function TermsOfServicePage() {
             Terms of Service
           </h1>
           <Badge variant="outline" className="text-xs shrink-0">
-            England &amp; Wales
+            {isMalta ? "Malta" : "England & Wales"}
           </Badge>
         </div>
         <p className="text-muted-foreground">
@@ -88,7 +91,8 @@ export default function TermsOfServicePage() {
           generates do <strong>not</strong> constitute legal advice. All content
           is provided for informational and insurance documentation purposes
           only. You should seek independent legal advice from a qualified
-          solicitor before taking any legal action.
+          {isMalta ? "avukat (advocate)" : "solicitor"} before taking any legal
+          action.
         </p>
       </div>
 
@@ -120,7 +124,7 @@ export default function TermsOfServicePage() {
           iamthe.law is an AI-powered web application designed to assist users
           in documenting road traffic accidents, gathering evidence, and
           preparing insurer-ready reports for use in insurance claims and legal
-          proceedings in the United Kingdom.
+          proceedings in {isMalta ? "Malta" : "the United Kingdom"}.
         </p>
         <p>The Service provides the following functionality:</p>
         <ul className="space-y-2 mt-2">
@@ -140,8 +144,11 @@ export default function TermsOfServicePage() {
             Fleet management tools for small business vehicle operators.
           </Bullet>
           <Bullet>
-            Integration of UK legal references including Highway Code citations,
-            Road Traffic Act 1988, and landmark case law.
+            Integration of{" "}
+            {isMalta
+              ? "Malta Road Code, TRO Cap. 65, Civil Code Cap. 16, and curated Maltese case law"
+              : "UK legal references including Highway Code citations, Road Traffic Act 1988, and landmark case law"}
+            .
           </Bullet>
         </ul>
         <p className="mt-2">
@@ -213,8 +220,11 @@ export default function TermsOfServicePage() {
           </Bullet>
           <Bullet>
             In any way that violates applicable local, national, or
-            international law or regulation, including the Road Traffic Act 1988
-            and the Fraud Act 2006.
+            international law or regulation, including the{" "}
+            {isMalta
+              ? "TRO Cap. 65 and the Maltese Criminal Code (Cap. 9)"
+              : "Road Traffic Act 1988 and the Fraud Act 2006"}
+            .
           </Bullet>
           <Bullet>
             To transmit any unsolicited advertising, spam, or commercial
@@ -257,9 +267,10 @@ export default function TermsOfServicePage() {
         </ul>
         <p className="mt-2">
           Our total liability to you in connection with the Service shall not
-          exceed £100. Nothing in these Terms excludes or limits our liability
-          for fraud, death, or personal injury caused by our negligence, or any
-          other liability that cannot be excluded under English law.
+          exceed {isMalta ? "€100" : "£100"}. Nothing in these Terms excludes or
+          limits our liability for fraud, death, or personal injury caused by
+          our negligence, or any other liability that cannot be excluded under
+          English law.
         </p>
       </Section>
 
@@ -286,10 +297,12 @@ export default function TermsOfServicePage() {
           storage under your sole control.
         </p>
         <p>
-          We process personal data in accordance with the UK General Data
-          Protection Regulation (UK GDPR) and the Data Protection Act 2018. You
-          are responsible for ensuring that any third-party data you enter (such
-          as details of other drivers or witnesses) is provided with the
+          We process personal data in accordance with the{" "}
+          {isMalta
+            ? "EU General Data Protection Regulation (EU GDPR, Regulation 2016/679) as implemented by the Data Protection Act (Cap. 586, Laws of Malta)"
+            : "UK General Data Protection Regulation (UK GDPR) and the Data Protection Act 2018"}
+          . You are responsible for ensuring that any third-party data you enter
+          (such as details of other drivers or witnesses) is provided with the
           appropriate authority or consent.
         </p>
       </Section>
@@ -353,18 +366,33 @@ export default function TermsOfServicePage() {
       <Section
         id="governing-law"
         icon={Globe}
-        title="Governing Law &amp; Jurisdiction (England &amp; Wales)"
+        title={
+          isMalta
+            ? "Governing Law & Jurisdiction (Malta)"
+            : "Governing Law & Jurisdiction (England & Wales)"
+        }
       >
-        <p>
-          These Terms and any dispute or claim arising out of or in connection
-          with them shall be governed by and construed in accordance with the
-          law of <strong>England and Wales</strong>.
-        </p>
-        <p>
-          The courts of England and Wales shall have exclusive jurisdiction to
-          settle any dispute or claim arising out of or in connection with these
-          Terms or their subject matter or formation.
-        </p>
+        {isMalta ? (
+          <p>
+            These Terms shall be governed by and construed in accordance with
+            the laws of <strong>Malta</strong>. The courts of Malta shall have
+            exclusive jurisdiction to settle any dispute or claim arising from
+            or in connection with these Terms.
+          </p>
+        ) : (
+          <>
+            <p>
+              These Terms and any dispute or claim arising out of or in
+              connection with them shall be governed by and construed in
+              accordance with the law of <strong>England and Wales</strong>.
+            </p>
+            <p>
+              The courts of England and Wales shall have exclusive jurisdiction
+              to settle any dispute or claim arising out of or in connection
+              with these Terms or their subject matter or formation.
+            </p>
+          </>
+        )}
         <p>
           If any provision of these Terms is held to be invalid or
           unenforceable, the remaining provisions shall continue in full force

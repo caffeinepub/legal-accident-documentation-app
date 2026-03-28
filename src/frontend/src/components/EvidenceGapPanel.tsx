@@ -17,6 +17,7 @@ import {
 import type React from "react";
 import { useState } from "react";
 import type { AccidentReport } from "../backend";
+import { getReportStatus } from "../utils/reportStatus";
 
 type Severity = "critical" | "warning" | "tip";
 
@@ -29,6 +30,7 @@ interface GapItem {
 function detectGaps(report: AccidentReport): GapItem[] {
   const gaps: GapItem[] = [];
 
+  // ── Basic evidence gaps ────────────────────────────────────────────────────
   if (!report.photos || report.photos.length === 0) {
     gaps.push({
       key: "no-photos",
@@ -77,14 +79,7 @@ function detectGaps(report: AccidentReport): GapItem[] {
     });
   }
 
-  if (
-    !report.faultAnalysis ||
-    (typeof (report.faultAnalysis as { narrative?: string }).narrative ===
-      "string" &&
-      (
-        (report.faultAnalysis as { narrative?: string }).narrative ?? ""
-      ).trim() === "")
-  ) {
+  if (!report.faultAnalysis && !report.faultLikelihoodAssessment) {
     gaps.push({
       key: "no-fault",
       message:
@@ -109,6 +104,72 @@ function detectGaps(report: AccidentReport): GapItem[] {
     });
   }
 
+  // ── Smarter contextual checks ──────────────────────────────────────────────
+
+  // Disputed fault + no witness
+  const fla = report.faultLikelihoodAssessment;
+  if (fla) {
+    const partyA = Number(fla.partyAPercentage);
+    const partyB = Number(fla.partyBPercentage);
+    const isDisputed =
+      partyA >= 30 && partyA <= 70 && partyB >= 30 && partyB <= 70;
+    if (
+      isDisputed &&
+      (!report.witnessStatement || report.witnessStatement.trim() === "")
+    ) {
+      // Avoid duplicate no-witness message
+      const hasWitness = gaps.find((g) => g.key === "no-witness");
+      if (hasWitness) {
+        hasWitness.message =
+          "Disputed fault with no witness statement — this significantly weakens your claim position. An independent witness is critical when fault is contested between 30–70%.";
+        hasWitness.severity = "critical";
+      } else {
+        gaps.push({
+          key: "disputed-no-witness",
+          message:
+            "Disputed fault with no witness statement — this significantly weakens your claim position. An independent witness is critical when fault is contested between 30–70%.",
+          severity: "critical",
+        });
+      }
+    }
+
+    // No dash cam for contested fault
+    if (
+      isDisputed &&
+      (!report.dashCamFootage || report.dashCamFootage.length === 0)
+    ) {
+      const hasDashcam = gaps.find((g) => g.key === "no-dashcam");
+      if (hasDashcam) {
+        hasDashcam.message =
+          "No dash cam evidence for a contested fault case — dash cam footage can be decisive in resolving disputed liability. Consider obtaining CCTV or witness corroboration.";
+      } else {
+        gaps.push({
+          key: "contested-no-dashcam",
+          message:
+            "No dash cam evidence for a contested fault case — dash cam footage can be decisive in resolving disputed liability.",
+          severity: "warning",
+        });
+      }
+    }
+  }
+
+  // Injury description but no injury photos
+  const hasInjuryDescription =
+    report.damageDescription && report.damageDescription.trim() !== "";
+  const hasInjuryPhotos =
+    (report.imageData && report.imageData.length > 0) ||
+    (report.photos && report.photos.length > 0);
+  if (hasInjuryDescription && !hasInjuryPhotos) {
+    gaps.push({
+      key: "injury-no-photos",
+      message:
+        "Injury photos missing — insurers may challenge injury severity without visual evidence. Upload photos of visible injuries to support your claim.",
+      severity: "warning",
+    });
+  }
+
+  // (demand letter check handled at component level via reportId prop)
+
   return gaps;
 }
 
@@ -124,33 +185,53 @@ const SEVERITY_STYLES: Record<
   critical: {
     icon: XCircle,
     iconClass: "text-red-500",
-    rowClass:
-      "border-red-200 bg-red-50/60 dark:border-red-800 dark:bg-red-950/30",
+    rowClass: "border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/50",
     label: "Critical",
   },
   warning: {
     icon: AlertTriangle,
     iconClass: "text-amber-500",
     rowClass:
-      "border-amber-200 bg-amber-50/60 dark:border-amber-800 dark:bg-amber-950/30",
+      "border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/50",
     label: "Warning",
   },
   tip: {
     icon: Info,
     iconClass: "text-blue-500",
     rowClass:
-      "border-blue-200 bg-blue-50/60 dark:border-blue-800 dark:bg-blue-950/30",
+      "border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/50",
     label: "Tip",
   },
 };
 
 interface EvidenceGapPanelProps {
   report: AccidentReport;
+  reportId?: string;
 }
 
-export default function EvidenceGapPanel({ report }: EvidenceGapPanelProps) {
+export default function EvidenceGapPanel({
+  report,
+  reportId,
+}: EvidenceGapPanelProps) {
   const [open, setOpen] = useState(true);
-  const gaps = detectGaps(report);
+
+  // Add demand letter check if reportId is provided
+  const extraGaps: GapItem[] = [];
+  if (reportId) {
+    const claimStatus = getReportStatus(reportId);
+    const hasDemandLetter =
+      localStorage.getItem(`demand_letter_generated_${reportId}`) === "1";
+    if (claimStatus !== "draft" && !hasDemandLetter) {
+      extraGaps.push({
+        key: "submitted-no-demand",
+        message:
+          "No demand letter created yet — consider generating a formal demand letter before contacting your insurer to set out your position clearly.",
+        severity: "tip",
+      });
+    }
+  }
+
+  const gaps = [...detectGaps(report), ...extraGaps];
   const criticalCount = gaps.filter((g) => g.severity === "critical").length;
   const warningCount = gaps.filter((g) => g.severity === "warning").length;
 
@@ -216,7 +297,7 @@ export default function EvidenceGapPanel({ report }: EvidenceGapPanelProps) {
           <CardContent className="pt-0 pb-3 px-4">
             {gaps.length === 0 ? (
               <div
-                className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50/60 dark:border-emerald-800 dark:bg-emerald-950/30 px-3 py-2.5 text-sm text-emerald-700 dark:text-emerald-400"
+                className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-950/50 px-3 py-2.5 text-sm text-emerald-700 dark:text-emerald-400"
                 data-ocid="evidence-gap.success_state"
               >
                 <CheckCircle2 className="w-4 h-4 shrink-0" />
@@ -239,7 +320,7 @@ export default function EvidenceGapPanel({ report }: EvidenceGapPanelProps) {
                       <IconComp
                         className={`w-4 h-4 shrink-0 mt-0.5 ${cfg.iconClass}`}
                       />
-                      <span>{gap.message}</span>
+                      <span className="text-foreground">{gap.message}</span>
                     </li>
                   );
                 })}
