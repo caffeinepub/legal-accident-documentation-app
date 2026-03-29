@@ -673,15 +673,26 @@ export default function AccidentReportForm() {
     setWeatherError("");
     try {
       const geoRes = await fetch(
-        `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(weatherLocation.trim())}&count=1&language=en&format=json`,
+        `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(isMalta ? `${weatherLocation.trim()}, Malta` : weatherLocation.trim())}&count=5&language=en&format=json`,
       );
       const geoData = (await geoRes.json()) as {
-        results?: { latitude: number; longitude: number }[];
+        results?: {
+          latitude: number;
+          longitude: number;
+          country_code?: string;
+        }[];
       };
-      const loc = geoData.results?.[0];
+      const results = geoData.results ?? [];
+      // In Malta mode, prefer a result from Malta (MT) if available
+      const loc = isMalta
+        ? (results.find((r) => r.country_code?.toUpperCase() === "MT") ??
+          results[0])
+        : results[0];
       if (!loc) {
         setWeatherError(
-          "Location not found. Try a different postcode or city.",
+          isMalta
+            ? "Location not found. Try entering a town or village name, e.g. Valletta, Sliema, Birkirkara."
+            : "Location not found. Try a different postcode or city.",
         );
         return;
       }
@@ -736,7 +747,7 @@ export default function AccidentReportForm() {
     } finally {
       setWeatherFetching(false);
     }
-  }, [weatherLocation]);
+  }, [weatherLocation, isMalta]);
 
   // ── Step content ──────────────────────────────────────────────────────────
 
@@ -1250,7 +1261,9 @@ export default function AccidentReportForm() {
         <div className="space-y-2">
           <Label className="flex items-center gap-1.5">
             <CloudSun className="h-3.5 w-3.5 text-muted-foreground" />
-            Location at time of accident (postcode/city)
+            {isMalta
+              ? "Town or locality at time of accident"
+              : "Location at time of accident (postcode/city)"}
           </Label>
           <div className="flex gap-2">
             <Input
