@@ -32,6 +32,7 @@ import {
 import type React from "react";
 import { useState } from "react";
 import { toast } from "sonner";
+import CyclingLegalGuide from "../components/CyclingLegalGuide";
 import { useCountry } from "../contexts/CountryContext";
 import {
   MALTA_COMPENSATION_TABLE,
@@ -802,6 +803,7 @@ export default function LegalOutputsPage() {
       <SettlementEstimator />
       <LegalPathwayGuide />
       <LiabilityDisputeTemplate />
+      <CyclingLegalGuide />
     </div>
   );
 }

@@ -51,6 +51,7 @@ import AccidentNarrativePanel from "./AccidentNarrativePanel";
 import ClaimStatusTimeline from "./ClaimStatusTimeline";
 import ClaimSummaryPanel from "./ClaimSummaryPanel";
 import ContributoryNegligencePanel from "./ContributoryNegligencePanel";
+import CyclingDetailsCard, { CyclingLegalPanel } from "./CyclingDetailsCard";
 import DamageSeverityPanel from "./DamageSeverityPanel";
 import DashCamAnalysisPanel from "./DashCamAnalysisPanel";
 import DashCamGallery from "./DashCamGallery";
@@ -349,6 +350,28 @@ export default function ReportDetail({ reportId, report }: ReportDetailProps) {
       ? report.violations[0].violationType
       : undefined;
 
+  const reportWithType = report as typeof report & { incidentType?: string };
+  const isCyclingIncident = reportWithType.incidentType === "cycling";
+
+  // Inject cycling violation type for legal references panel when it's a cycling incident
+  const effectiveViolations = isCyclingIncident
+    ? [
+        ...(report.violations ?? []),
+        ...(!(report.violations ?? []).some(
+          (v) => v.violationType === "Cycling",
+        )
+          ? [
+              {
+                violationType: "Cycling",
+                description: "Cycling incident",
+                severity: BigInt(1) as bigint,
+                detectedAt: report.timestamp,
+              },
+            ]
+          : []),
+      ]
+    : report.violations;
+
   const photoAnalysis = report.aiAnalysisResult?.photoAnalysis ?? "";
   const dashCamAnalysisText = report.aiAnalysisResult?.dashCamAnalysis ?? "";
   const evidenceGaps = report.aiAnalysisResult?.evidenceGaps ?? [];
@@ -433,6 +456,9 @@ export default function ReportDetail({ reportId, report }: ReportDetailProps) {
 
       {/* Evidence Strength Check */}
       <EvidenceGapPanel report={report} reportId={reportIdStr} />
+
+      {/* Cycling Incident Details */}
+      <CyclingDetailsCard report={report} />
 
       {/* Trust & Credibility Badge */}
       <SubmissionCredibilityBadge
@@ -605,7 +631,10 @@ export default function ReportDetail({ reportId, report }: ReportDetailProps) {
       <InjuryProgressionTracker reportId={reportId} />
 
       {/* Legal Reference */}
-      <LegalReferencePanel violations={report.violations} />
+      <LegalReferencePanel violations={effectiveViolations} />
+
+      {/* Cycling Legal References */}
+      <CyclingLegalPanel report={report} />
 
       {/* Fault Matrix */}
       <FaultMatrixPanel violationType={primaryViolation} />

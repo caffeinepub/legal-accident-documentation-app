@@ -13,7 +13,9 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useNavigate } from "@tanstack/react-router";
 import {
+  Bike,
   Camera,
+  Car,
   ChevronLeft,
   ChevronRight,
   CloudSun,
@@ -42,7 +44,7 @@ const ADDITIONAL_PARTIES_DELIMITER = "\n\n---ADDITIONAL_PARTIES---\n";
 const POLICE_INFO_DELIMITER = "\n\n---POLICE_INFO---\n";
 const DRAFT_KEY = "accident_draft_v1";
 
-const WIZARD_STEPS = [
+const BASE_WIZARD_STEPS = [
   { number: 1, label: "Media" },
   { number: 2, label: "Vehicle" },
   { number: 3, label: "Details" },
@@ -100,6 +102,14 @@ interface DraftData {
   dashCamCrossAnalysisDescription: string;
   policeRef: string;
   officerName: string;
+  // Cycling fields
+  incidentType: "vehicle" | "cycling";
+  cyclingSubScenario: string;
+  bikeType: string;
+  helmetWorn: boolean;
+  lightsPresent: boolean;
+  hiVisWorn: boolean;
+  roadDefectDescription: string;
   savedAt: string;
 }
 
@@ -137,6 +147,19 @@ export default function AccidentReportForm() {
   const [dashCamCrossAnalysisDescription, setDashCamCrossAnalysisDescription] =
     useState("");
   const [photoEvidenceGaps, setPhotoEvidenceGaps] = useState<EvidenceGap[]>([]);
+
+  // Incident type
+  const [incidentType, setIncidentType] = useState<"vehicle" | "cycling">(
+    "vehicle",
+  );
+
+  // Cycling-specific fields
+  const [cyclingSubScenario, setCyclingSubScenario] = useState("");
+  const [bikeType, setBikeType] = useState("");
+  const [helmetWorn, setHelmetWorn] = useState(false);
+  const [lightsPresent, setLightsPresent] = useState(false);
+  const [hiVisWorn, setHiVisWorn] = useState(false);
+  const [roadDefectDescription, setRoadDefectDescription] = useState("");
 
   // Vehicle info
   const [make, setMake] = useState("");
@@ -215,6 +238,13 @@ export default function AccidentReportForm() {
   // Auto-save debounce ref
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Dynamic wizard steps label for step 2
+  const WIZARD_STEPS = BASE_WIZARD_STEPS.map((s) =>
+    s.number === 2
+      ? { ...s, label: incidentType === "cycling" ? "Your Details" : "Vehicle" }
+      : s,
+  );
+
   const buildDraft = useCallback((): DraftData => {
     return {
       make,
@@ -240,6 +270,13 @@ export default function AccidentReportForm() {
       dashCamCrossAnalysisDescription,
       policeRef,
       officerName,
+      incidentType,
+      cyclingSubScenario,
+      bikeType,
+      helmetWorn,
+      lightsPresent,
+      hiVisWorn,
+      roadDefectDescription,
       savedAt: new Date().toISOString(),
     };
   }, [
@@ -266,6 +303,13 @@ export default function AccidentReportForm() {
     dashCamCrossAnalysisDescription,
     policeRef,
     officerName,
+    incidentType,
+    cyclingSubScenario,
+    bikeType,
+    helmetWorn,
+    lightsPresent,
+    hiVisWorn,
+    roadDefectDescription,
   ]);
 
   const applyDraft = useCallback(
@@ -295,6 +339,13 @@ export default function AccidentReportForm() {
       );
       setPoliceRef(draft.policeRef ?? "");
       setOfficerName(draft.officerName ?? "");
+      setIncidentType(draft.incidentType ?? "vehicle");
+      setCyclingSubScenario(draft.cyclingSubScenario ?? "");
+      setBikeType(draft.bikeType ?? "");
+      setHelmetWorn(draft.helmetWorn ?? false);
+      setLightsPresent(draft.lightsPresent ?? false);
+      setHiVisWorn(draft.hiVisWorn ?? false);
+      setRoadDefectDescription(draft.roadDefectDescription ?? "");
     },
     [isMalta],
   );
@@ -323,6 +374,13 @@ export default function AccidentReportForm() {
     setDashCamCrossAnalysisDescription("");
     setPoliceRef("");
     setOfficerName("");
+    setIncidentType("vehicle");
+    setCyclingSubScenario("");
+    setBikeType("");
+    setHelmetWorn(false);
+    setLightsPresent(false);
+    setHiVisWorn(false);
+    setRoadDefectDescription("");
     setPhotos([]);
     setDashCamClips([]);
     setPhotoEvidenceGaps([]);
@@ -682,6 +740,43 @@ export default function AccidentReportForm() {
 
   // ── Step content ──────────────────────────────────────────────────────────
 
+  // Incident type selector (shown at top of Step 1)
+  const IncidentTypeSelector = (
+    <div className="space-y-2">
+      <Label className="text-sm font-semibold">Incident Type</Label>
+      <div className="flex gap-2">
+        <button
+          type="button"
+          onClick={() => setIncidentType("vehicle")}
+          data-ocid="incident.vehicle.toggle"
+          className={[
+            "flex-1 flex items-center justify-center gap-2 rounded-lg border-2 px-4 py-3 text-sm font-medium transition-colors",
+            incidentType === "vehicle"
+              ? "border-primary bg-primary/10 text-primary"
+              : "border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground",
+          ].join(" ")}
+        >
+          <Car className="h-4 w-4" />
+          Vehicle Accident
+        </button>
+        <button
+          type="button"
+          onClick={() => setIncidentType("cycling")}
+          data-ocid="incident.cycling.toggle"
+          className={[
+            "flex-1 flex items-center justify-center gap-2 rounded-lg border-2 px-4 py-3 text-sm font-medium transition-colors",
+            incidentType === "cycling"
+              ? "border-primary bg-primary/10 text-primary"
+              : "border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground",
+          ].join(" ")}
+        >
+          <Bike className="h-4 w-4" />
+          Cycling Accident
+        </button>
+      </div>
+    </div>
+  );
+
   const StepMedia = (
     <Card className="border-2 border-primary/20">
       <CardHeader className="pb-3">
@@ -695,6 +790,11 @@ export default function AccidentReportForm() {
         </p>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* Incident type selector */}
+        {IncidentTypeSelector}
+
+        <div className="border-t border-border" />
+
         {/* Photo upload */}
         <div className="space-y-3">
           <div className="flex items-center gap-2">
@@ -733,87 +833,305 @@ export default function AccidentReportForm() {
     </Card>
   );
 
-  const StepVehicle = (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg">Your Vehicle</CardTitle>
-        <p className="text-sm text-muted-foreground">
-          Enter the details of your vehicle. These will be used to contextualise
-          the AI photo analysis.
-        </p>
-      </CardHeader>
-      <CardContent className="grid grid-cols-2 gap-4">
-        <div className="space-y-1">
-          <Label htmlFor="make">Make</Label>
-          <Input
-            id="make"
-            value={make}
-            onChange={(e) => setMake(e.target.value)}
-            placeholder="e.g. Ford"
-            data-ocid="vehicle.make.input"
-          />
+  // Step 2: vehicle fields (unchanged) or cycling details
+  const StepVehicle =
+    incidentType === "vehicle" ? (
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg">Your Vehicle</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Enter the details of your vehicle. These will be used to
+            contextualise the AI photo analysis.
+          </p>
+        </CardHeader>
+        <CardContent className="grid grid-cols-2 gap-4">
+          <div className="space-y-1">
+            <Label htmlFor="make">Make</Label>
+            <Input
+              id="make"
+              value={make}
+              onChange={(e) => setMake(e.target.value)}
+              placeholder="e.g. Ford"
+              data-ocid="vehicle.make.input"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="model">Model</Label>
+            <Input
+              id="model"
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+              placeholder="e.g. Focus"
+              data-ocid="vehicle.model.input"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="colour">Colour</Label>
+            <Input
+              id="colour"
+              value={colour}
+              onChange={(e) => setColour(e.target.value)}
+              placeholder="e.g. Silver"
+              data-ocid="vehicle.colour.input"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="licencePlate">Licence Plate / Registration</Label>
+            <Input
+              id="licencePlate"
+              value={licencePlate}
+              onChange={(e) => {
+                setLicencePlate(e.target.value);
+                setRegistration(e.target.value); // keep registration in sync
+              }}
+              placeholder={isMalta ? "e.g. ABC 123" : "e.g. AB12 CDE"}
+              data-ocid="vehicle.licencePlate.input"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="year">Year</Label>
+            <Input
+              id="year"
+              type="number"
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
+              placeholder="e.g. 2019"
+              data-ocid="vehicle.year.input"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="mot">
+              {isMalta
+                ? "VRT Expiry (Vehicle Roadworthiness Test)"
+                : "MOT Expiry"}
+            </Label>
+            <Input
+              id="mot"
+              value={mot}
+              onChange={(e) => setMot(e.target.value)}
+              placeholder="e.g. 2025-06-01"
+              data-ocid="vehicle.mot.input"
+            />
+          </div>
+        </CardContent>
+      </Card>
+    ) : (
+      // Cycling details
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Bike className="h-5 w-5 text-primary" />
+            Your Details
+          </CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Provide details about your bike and safety equipment. These affect
+            contributory negligence weighting.
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-5">
+          {/* Bike type */}
+          <div className="space-y-1">
+            <Label htmlFor="bikeType">Bike Type</Label>
+            <Select value={bikeType} onValueChange={setBikeType}>
+              <SelectTrigger id="bikeType" data-ocid="cycling.bikeType.select">
+                <SelectValue placeholder="Select bike type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="road">Road bike</SelectItem>
+                <SelectItem value="mountain">Mountain bike</SelectItem>
+                <SelectItem value="ebike">E-bike</SelectItem>
+                <SelectItem value="hybrid">City / Hybrid</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Safety toggles */}
+          <div className="space-y-3">
+            <p className="text-sm font-medium text-foreground">
+              Safety Equipment
+            </p>
+            {/* Helmet */}
+            <div className="flex items-center justify-between rounded-lg border border-border bg-muted/20 px-4 py-3">
+              <Label htmlFor="helmetWorn" className="text-sm cursor-pointer">
+                Helmet worn
+              </Label>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  id="helmetWorn"
+                  onClick={() => setHelmetWorn(true)}
+                  data-ocid="cycling.helmet.yes_toggle"
+                  className={[
+                    "rounded px-3 py-1 text-xs font-medium transition-colors",
+                    helmetWorn
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-background border border-border text-muted-foreground hover:border-primary/40",
+                  ].join(" ")}
+                >
+                  Yes
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setHelmetWorn(false)}
+                  data-ocid="cycling.helmet.no_toggle"
+                  className={[
+                    "rounded px-3 py-1 text-xs font-medium transition-colors",
+                    !helmetWorn
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-background border border-border text-muted-foreground hover:border-primary/40",
+                  ].join(" ")}
+                >
+                  No
+                </button>
+              </div>
+            </div>
+
+            {/* Lights */}
+            <div className="flex items-center justify-between rounded-lg border border-border bg-muted/20 px-4 py-3">
+              <Label htmlFor="lightsPresent" className="text-sm cursor-pointer">
+                Lights present (front &amp; rear)
+              </Label>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  id="lightsPresent"
+                  onClick={() => setLightsPresent(true)}
+                  data-ocid="cycling.lights.yes_toggle"
+                  className={[
+                    "rounded px-3 py-1 text-xs font-medium transition-colors",
+                    lightsPresent
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-background border border-border text-muted-foreground hover:border-primary/40",
+                  ].join(" ")}
+                >
+                  Yes
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLightsPresent(false)}
+                  data-ocid="cycling.lights.no_toggle"
+                  className={[
+                    "rounded px-3 py-1 text-xs font-medium transition-colors",
+                    !lightsPresent
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-background border border-border text-muted-foreground hover:border-primary/40",
+                  ].join(" ")}
+                >
+                  No
+                </button>
+              </div>
+            </div>
+
+            {/* Hi-vis */}
+            <div className="flex items-center justify-between rounded-lg border border-border bg-muted/20 px-4 py-3">
+              <Label htmlFor="hiVisWorn" className="text-sm cursor-pointer">
+                Hi-vis / reflective clothing worn
+              </Label>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  id="hiVisWorn"
+                  onClick={() => setHiVisWorn(true)}
+                  data-ocid="cycling.hivis.yes_toggle"
+                  className={[
+                    "rounded px-3 py-1 text-xs font-medium transition-colors",
+                    hiVisWorn
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-background border border-border text-muted-foreground hover:border-primary/40",
+                  ].join(" ")}
+                >
+                  Yes
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setHiVisWorn(false)}
+                  data-ocid="cycling.hivis.no_toggle"
+                  className={[
+                    "rounded px-3 py-1 text-xs font-medium transition-colors",
+                    !hiVisWorn
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-background border border-border text-muted-foreground hover:border-primary/40",
+                  ].join(" ")}
+                >
+                  No
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Legal note */}
+          <div className="rounded-lg border border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30 px-4 py-3">
+            <p className="text-xs text-amber-800 dark:text-amber-300 leading-relaxed">
+              These details affect contributory negligence weighting under{" "}
+              <span className="font-semibold">
+                {isMalta
+                  ? "Malta Road Code Section 9.1"
+                  : "Highway Code Rule 59"}
+              </span>
+              . Failure to wear a helmet or use lights may reduce your
+              recoverable compensation under{" "}
+              <span className="font-semibold">
+                {isMalta
+                  ? "Civil Code Arts. 1031–1033"
+                  : "Law Reform (Contributory Negligence) Act 1945"}
+              </span>
+              .
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+
+  // Cycling sub-scenario selector for Step 3
+  const CyclingSubScenarioSelector =
+    incidentType === "cycling" ? (
+      <div className="space-y-3">
+        <Label className="text-sm font-semibold">Cycling Scenario</Label>
+        <div className="grid grid-cols-3 gap-2">
+          {[
+            { value: "vs-vehicle", label: "Cyclist vs Vehicle" },
+            { value: "vs-pedestrian", label: "Cyclist vs Pedestrian" },
+            { value: "solo", label: "Solo / Road Defect" },
+          ].map(({ value, label }) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setCyclingSubScenario(value)}
+              data-ocid={`cycling.scenario.${value}.toggle`}
+              className={[
+                "rounded-lg border-2 px-3 py-2.5 text-xs font-medium text-center transition-colors leading-snug",
+                cyclingSubScenario === value
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground",
+              ].join(" ")}
+            >
+              {label}
+            </button>
+          ))}
         </div>
-        <div className="space-y-1">
-          <Label htmlFor="model">Model</Label>
-          <Input
-            id="model"
-            value={model}
-            onChange={(e) => setModel(e.target.value)}
-            placeholder="e.g. Focus"
-            data-ocid="vehicle.model.input"
-          />
-        </div>
-        <div className="space-y-1">
-          <Label htmlFor="colour">Colour</Label>
-          <Input
-            id="colour"
-            value={colour}
-            onChange={(e) => setColour(e.target.value)}
-            placeholder="e.g. Silver"
-            data-ocid="vehicle.colour.input"
-          />
-        </div>
-        <div className="space-y-1">
-          <Label htmlFor="licencePlate">Licence Plate / Registration</Label>
-          <Input
-            id="licencePlate"
-            value={licencePlate}
-            onChange={(e) => {
-              setLicencePlate(e.target.value);
-              setRegistration(e.target.value); // keep registration in sync
-            }}
-            placeholder={isMalta ? "e.g. ABC 123" : "e.g. AB12 CDE"}
-            data-ocid="vehicle.licencePlate.input"
-          />
-        </div>
-        <div className="space-y-1">
-          <Label htmlFor="year">Year</Label>
-          <Input
-            id="year"
-            type="number"
-            value={year}
-            onChange={(e) => setYear(e.target.value)}
-            placeholder="e.g. 2019"
-            data-ocid="vehicle.year.input"
-          />
-        </div>
-        <div className="space-y-1">
-          <Label htmlFor="mot">
-            {isMalta
-              ? "VRT Expiry (Vehicle Roadworthiness Test)"
-              : "MOT Expiry"}
-          </Label>
-          <Input
-            id="mot"
-            value={mot}
-            onChange={(e) => setMot(e.target.value)}
-            placeholder="e.g. 2025-06-01"
-            data-ocid="vehicle.mot.input"
-          />
-        </div>
-      </CardContent>
-    </Card>
-  );
+        {cyclingSubScenario === "solo" && (
+          <div className="space-y-1">
+            <Label htmlFor="roadDefectDescription">
+              Road Defect Description
+            </Label>
+            <Textarea
+              id="roadDefectDescription"
+              value={roadDefectDescription}
+              onChange={(e) => setRoadDefectDescription(e.target.value)}
+              rows={3}
+              placeholder={
+                isMalta
+                  ? "e.g. Pothole on Triq ir-Repubblika, Valletta — approx. 30cm wide, unmarked"
+                  : "e.g. Pothole on High Street — approx. 30cm wide, unmarked"
+              }
+              data-ocid="cycling.roadDefect.textarea"
+            />
+          </div>
+        )}
+        <div className="border-t border-border" />
+      </div>
+    ) : null;
 
   const StepDetails = (
     <Card>
@@ -824,10 +1142,14 @@ export default function AccidentReportForm() {
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* Cycling sub-scenario selector (only shown for cycling incidents) */}
+        {CyclingSubScenarioSelector}
+
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1">
             <Label htmlFor="vehicleSpeed">
-              Vehicle Speed ({isMalta ? "km/h" : "mph"})
+              {incidentType === "cycling" ? "Cycling" : "Vehicle"} Speed (
+              {isMalta ? "km/h" : "mph"})
             </Label>
             <Input
               id="vehicleSpeed"
@@ -1142,6 +1464,20 @@ export default function AccidentReportForm() {
     </Card>
   );
 
+  // Cycling details summary for Step 5
+  const cyclingSubScenarioLabel: Record<string, string> = {
+    "vs-vehicle": "Cyclist vs Vehicle",
+    "vs-pedestrian": "Cyclist vs Pedestrian",
+    solo: "Solo / Road Defect",
+  };
+  const bikeTypeLabel: Record<string, string> = {
+    road: "Road bike",
+    mountain: "Mountain bike",
+    ebike: "E-bike",
+    hybrid: "City / Hybrid",
+    other: "Other",
+  };
+
   const StepReview = (
     <Card>
       <CardHeader className="pb-3">
@@ -1158,6 +1494,12 @@ export default function AccidentReportForm() {
             Media &amp; Evidence
           </h3>
           <div className="grid grid-cols-2 gap-2 text-sm">
+            <span className="text-muted-foreground">Incident type</span>
+            <span className="capitalize">
+              {incidentType === "cycling"
+                ? "🚲 Cycling Accident"
+                : "🚗 Vehicle Accident"}
+            </span>
             <span className="text-muted-foreground">Photos uploaded</span>
             <span>
               {photos.length > 0 ? `${photos.length} photo(s)` : "None"}
@@ -1177,40 +1519,77 @@ export default function AccidentReportForm() {
 
         <div className="border-t border-border" />
 
-        {/* Vehicle summary */}
-        <div className="space-y-1">
-          <h3 className="text-sm font-semibold text-foreground">
-            Your Vehicle
-          </h3>
-          <div className="grid grid-cols-2 gap-2 text-sm">
-            <span className="text-muted-foreground">Make / Model</span>
-            <span>
-              {[make, model].filter(Boolean).join(" ") || (
-                <span className="text-muted-foreground/60 italic">
-                  Not entered
-                </span>
-              )}
-            </span>
-            <span className="text-muted-foreground">Colour</span>
-            <span>
-              {colour || (
-                <span className="text-muted-foreground/60 italic">—</span>
-              )}
-            </span>
-            <span className="text-muted-foreground">Licence Plate</span>
-            <span>
-              {licencePlate || (
-                <span className="text-muted-foreground/60 italic">—</span>
-              )}
-            </span>
-            <span className="text-muted-foreground">Year</span>
-            <span>
-              {year || (
-                <span className="text-muted-foreground/60 italic">—</span>
-              )}
-            </span>
+        {/* Conditional: vehicle summary OR cycling details summary */}
+        {incidentType === "vehicle" ? (
+          <div className="space-y-1">
+            <h3 className="text-sm font-semibold text-foreground">
+              Your Vehicle
+            </h3>
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              <span className="text-muted-foreground">Make / Model</span>
+              <span>
+                {[make, model].filter(Boolean).join(" ") || (
+                  <span className="text-muted-foreground/60 italic">
+                    Not entered
+                  </span>
+                )}
+              </span>
+              <span className="text-muted-foreground">Colour</span>
+              <span>
+                {colour || (
+                  <span className="text-muted-foreground/60 italic">—</span>
+                )}
+              </span>
+              <span className="text-muted-foreground">Licence Plate</span>
+              <span>
+                {licencePlate || (
+                  <span className="text-muted-foreground/60 italic">—</span>
+                )}
+              </span>
+              <span className="text-muted-foreground">Year</span>
+              <span>
+                {year || (
+                  <span className="text-muted-foreground/60 italic">—</span>
+                )}
+              </span>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="space-y-1">
+            <h3 className="text-sm font-semibold text-foreground flex items-center gap-1.5">
+              <Bike className="h-4 w-4 text-primary" />
+              Cycling Details
+            </h3>
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              <span className="text-muted-foreground">Scenario</span>
+              <span>
+                {cyclingSubScenarioLabel[cyclingSubScenario] || (
+                  <span className="text-muted-foreground/60 italic">
+                    Not selected
+                  </span>
+                )}
+              </span>
+              <span className="text-muted-foreground">Bike type</span>
+              <span>
+                {bikeTypeLabel[bikeType] || (
+                  <span className="text-muted-foreground/60 italic">—</span>
+                )}
+              </span>
+              <span className="text-muted-foreground">Helmet worn</span>
+              <span>{helmetWorn ? "Yes" : "No"}</span>
+              <span className="text-muted-foreground">Lights present</span>
+              <span>{lightsPresent ? "Yes" : "No"}</span>
+              <span className="text-muted-foreground">Hi-vis worn</span>
+              <span>{hiVisWorn ? "Yes" : "No"}</span>
+              {cyclingSubScenario === "solo" && roadDefectDescription && (
+                <>
+                  <span className="text-muted-foreground">Road defect</span>
+                  <span className="truncate">{roadDefectDescription}</span>
+                </>
+              )}
+            </div>
+          </div>
+        )}
 
         <div className="border-t border-border" />
 
