@@ -131,7 +131,33 @@ export type TranslationKey =
   | "report.delete.confirm"
   | "nav.dangerous_roads"
   | "nav.privacy"
-  | "nav.terms";
+  | "nav.terms"
+  // Draft restore banner
+  | "draft.restore_title"
+  | "draft.restore_desc"
+  | "draft.restore_button"
+  | "draft.discard_button"
+  | "draft.last_saved"
+  // Important notice / disclaimer
+  | "notice.title"
+  | "notice.body"
+  | "notice.body_malta"
+  // Onboarding banner
+  | "onboarding.title"
+  | "onboarding.subtitle"
+  | "onboarding.tip1"
+  | "onboarding.tip2"
+  | "onboarding.tip3"
+  | "onboarding.got_it"
+  // Cookie consent banner
+  | "cookie.title"
+  | "cookie.desc"
+  | "cookie.accept"
+  | "cookie.decline"
+  // Form headings
+  | "form.heading"
+  | "form.step_of"
+  | "form.draft_saved";
 
 type Translations = Record<Language, Record<TranslationKey, string>>;
 
@@ -251,6 +277,33 @@ const translations: Translations = {
     "nav.dangerous_roads": "Dangerous Roads",
     "nav.privacy": "Privacy Policy",
     "nav.terms": "Terms of Service",
+    "draft.restore_title": "Unsaved draft found",
+    "draft.restore_desc":
+      "You have an unsubmitted accident report saved locally. Would you like to restore it or start fresh?",
+    "draft.restore_button": "Restore draft",
+    "draft.discard_button": "Start fresh",
+    "draft.last_saved": "last saved",
+    "notice.title": "Important Notice",
+    "notice.body":
+      "This application and its outputs do not constitute legal advice. All content is provided for informational and insurance documentation purposes only. You should seek independent legal advice from a qualified solicitor before taking any legal action.",
+    "notice.body_malta":
+      "This application and its outputs do not constitute legal advice. All content is provided for informational and insurance documentation purposes only. You should seek independent legal advice from a qualified avukat (advocate) before taking any legal action.",
+    "onboarding.title": "Welcome to iamthe.law",
+    "onboarding.subtitle":
+      "Your AI-powered accident documentation toolkit. Here's how it works:",
+    "onboarding.tip1": "Upload photos & dash cam footage for AI analysis",
+    "onboarding.tip2":
+      "Generate a formal accident narrative and fault assessment",
+    "onboarding.tip3": "Export insurer-ready reports with legal references",
+    "onboarding.got_it": "Got it",
+    "cookie.title": "Local Data Storage",
+    "cookie.desc":
+      "We store your claim drafts, fleet data, and insurer contacts locally in your browser using localStorage. Nothing is sent to external servers. Your data stays on your device. This app complies with GDPR — you can delete any stored data at any time via the Data & Privacy section of each report.",
+    "cookie.accept": "Accept",
+    "cookie.decline": "Decline",
+    "form.heading": "New Accident Report",
+    "form.step_of": "Step {current} of {total}",
+    "form.draft_saved": "Draft saved",
   },
 
   es: {
@@ -368,6 +421,34 @@ const translations: Translations = {
     "nav.dangerous_roads": "Carreteras Peligrosas",
     "nav.privacy": "Política de Privacidad",
     "nav.terms": "Términos de Servicio",
+    "draft.restore_title": "Borrador no guardado encontrado",
+    "draft.restore_desc":
+      "Tiene un informe de accidente no enviado guardado localmente. ¿Le gustaría restaurarlo o empezar de nuevo?",
+    "draft.restore_button": "Restaurar borrador",
+    "draft.discard_button": "Empezar de nuevo",
+    "draft.last_saved": "guardado el",
+    "notice.title": "Aviso Importante",
+    "notice.body":
+      "Esta aplicación y sus resultados no constituyen asesoramiento legal. Todo el contenido se proporciona únicamente con fines informativos y de documentación de seguros. Debe buscar asesoramiento legal independiente de un abogado cualificado antes de emprender cualquier acción legal.",
+    "notice.body_malta":
+      "Esta aplicación y sus resultados no constituyen asesoramiento legal. Todo el contenido se proporciona únicamente con fines informativos y de documentación de seguros. Debe buscar asesoramiento legal independiente de un avukat (abogado) cualificado antes de emprender cualquier acción legal.",
+    "onboarding.title": "Bienvenido a iamthe.law",
+    "onboarding.subtitle":
+      "Su kit de herramientas de documentación de accidentes con IA. Así funciona:",
+    "onboarding.tip1": "Suba fotos y grabaciones para análisis de IA",
+    "onboarding.tip2":
+      "Genere una narrativa formal del accidente y evaluación de culpabilidad",
+    "onboarding.tip3":
+      "Exporte informes listos para aseguradoras con referencias legales",
+    "onboarding.got_it": "Entendido",
+    "cookie.title": "Almacenamiento Local de Datos",
+    "cookie.desc":
+      "Almacenamos sus borradores de reclamaciones, datos de flota y contactos de aseguradoras localmente en su navegador usando localStorage. No se envía nada a servidores externos. Sus datos permanecen en su dispositivo. Esta aplicación cumple con el RGPD — puede eliminar cualquier dato almacenado en cualquier momento a través de la sección Datos y Privacidad de cada informe.",
+    "cookie.accept": "Aceptar",
+    "cookie.decline": "Rechazar",
+    "form.heading": "Nuevo Informe de Accidente",
+    "form.step_of": "Paso {current} de {total}",
+    "form.draft_saved": "Borrador guardado",
   },
 
   pl: {
@@ -485,7 +566,35 @@ const translations: Translations = {
     "nav.dangerous_roads": "Niebezpieczne Drogi",
     "nav.privacy": "Polityka Prywatności",
     "nav.terms": "Warunki Usługi",
+    "draft.restore_title": "Znaleziono niezapisany szkic",
+    "draft.restore_desc":
+      "Masz lokalnie zapisany, nieprzesłany raport wypadku. Czy chcesz go przywrócić, czy zacząć od nowa?",
+    "draft.restore_button": "Przywróć szkic",
+    "draft.discard_button": "Zacznij od nowa",
+    "draft.last_saved": "ostatnio zapisano",
+    "notice.title": "Ważna informacja",
+    "notice.body":
+      "Ta aplikacja i jej wyniki nie stanowią porady prawnej. Wszystkie treści są udostępniane wyłącznie w celach informacyjnych i dokumentacyjnych ubezpieczeń. Przed podjęciem jakichkolwiek działań prawnych należy zasięgnąć niezależnej porady prawnej u wykwalifikowanego prawnika.",
+    "notice.body_malta":
+      "Ta aplikacja i jej wyniki nie stanowią porady prawnej. Wszystkie treści są udostępniane wyłącznie w celach informacyjnych i dokumentacyjnych ubezpieczeń. Przed podjęciem jakichkolwiek działań prawnych należy zasięgnąć niezależnej porady prawnej u wykwalifikowanego avukat (adwokata).",
+    "onboarding.title": "Witamy w iamthe.law",
+    "onboarding.subtitle":
+      "Twój zestaw narzędzi do dokumentowania wypadków oparty na AI. Oto jak to działa:",
+    "onboarding.tip1": "Prześlij zdjęcia i nagrania do analizy AI",
+    "onboarding.tip2": "Generuj formalną narrację wypadku i ocenę winy",
+    "onboarding.tip3":
+      "Eksportuj raporty gotowe dla ubezpieczycieli z odniesieniami prawnymi",
+    "onboarding.got_it": "Rozumiem",
+    "cookie.title": "Lokalne Przechowywanie Danych",
+    "cookie.desc":
+      "Przechowujemy szkice Twoich roszczeń, dane floty i kontakty ubezpieczycieli lokalnie w Twojej przeglądarce przy użyciu localStorage. Nic nie jest wysyłane na zewnętrzne serwery. Twoje dane pozostają na Twoim urządzeniu. Ta aplikacja jest zgodna z RODO — możesz usunąć wszelkie przechowywane dane w dowolnym momencie poprzez sekcję Dane i Prywatność każdego raportu.",
+    "cookie.accept": "Akceptuj",
+    "cookie.decline": "Odrzuć",
+    "form.heading": "Nowy Raport Wypadku",
+    "form.step_of": "Krok {current} z {total}",
+    "form.draft_saved": "Szkic zapisany",
   },
+
   mt: {
     "nav.new_report": "Rapport Ġdid",
     "nav.my_reports": "Ir-Rapporti Tiegħi",
@@ -499,7 +608,7 @@ const translations: Translations = {
     "action.cancel": "Ikkanċella",
     "action.delete": "Ħassar",
     "action.export": "Esporta",
-    "action.add": "Žid",
+    "action.add": "Żid",
     "action.generate": "Ġenera",
     "action.analyse": "Analizza",
     "action.confirm": "Ikkonferma",
@@ -531,9 +640,9 @@ const translations: Translations = {
     "gdpr.delete_evidence": "Ħassar il-Fajls tal-Evidenza",
     "gdpr.delete_report": "Ħassar ir-Rapport Kollu",
     "gdpr.delete_evidence_confirm":
-      "Dan se jħassar b’mod permanenti l-photos u l-fajls tal-dashcam kollha għal dan ir-rapport. Il-metadejta tar-rapport ser tinzaġħar. Inti Ďert?",
+      "Dan se jħassar b'mod permanenti l-photos u l-fajls tal-dashcam kollha għal dan ir-rapport. Il-metadejta tar-rapport ser tinżamm. Inti Ċert?",
     "gdpr.delete_report_confirm":
-      "Dan se jħassar b’mod permanenti r-rapport kollu mill-maħzenazzjoni lokali. Din l-azzjoni ma tistax tiġi revokata. Inti Ďert?",
+      "Dan se jħassar b'mod permanenti r-rapport kollu mill-maħzenazzjoni lokali. Din l-azzjoni ma tistax tiġi revokata. Inti Ċert?",
     "gdpr.data_stored_locally":
       "Id-dejta tar-rapport kollha, inklużi l-photos, il-videos u d-dettalji personali, hi maħzuna biss fil-maħzenazzjoni lokali tal-browser tiegħek.",
     "privacy.intro": "Introduzzjoni",
@@ -601,6 +710,35 @@ const translations: Translations = {
     "nav.dangerous_roads": "Toroq Perikolużi",
     "nav.privacy": "Politika tal-Privatezza",
     "nav.terms": "Kundizzjonijiet tas-Servizz",
+    "draft.restore_title": "Abbozz mhux salvat instab",
+    "draft.restore_desc":
+      "Għandek rapport tal-inċident mhux mibgħut salvat lokalment. Trid tirrestawrah jew tibda mill-ġdid?",
+    "draft.restore_button": "Irrestawra l-abbozz",
+    "draft.discard_button": "Ibda mill-ġdid",
+    "draft.last_saved": "salvat l-aħħar",
+    "notice.title": "Avviż Importanti",
+    "notice.body":
+      "Din l-applikazzjoni u l-outputs tagħha ma jikkostitwixxux parir legali. Il-kontenut kollu huwa pprovdut għal skopijiet ta' informazzjoni u dokumentazzjoni tal-assigurazzjoni biss. Għandek tfittex parir legali indipendenti minn solicitor kwalifikat qabel ma tieħu xi azzjoni legali.",
+    "notice.body_malta":
+      "Din l-applikazzjoni u l-outputs tagħha ma jikkostitwixxux parir legali. Il-kontenut kollu huwa pprovdut għal skopijiet ta' informazzjoni u dokumentazzjoni tal-assigurazzjoni biss. Għandek tfittex parir legali indipendenti minn avukat (avukat) kwalifikat qabel ma tieħu xi azzjoni legali.",
+    "onboarding.title": "Merħba f'iamthe.law",
+    "onboarding.subtitle":
+      "Il-kit tal-għodod tiegħek għad-dokumentazzjoni tal-inċidenti bl-AI. Hekk jaħdem:",
+    "onboarding.tip1":
+      "Itla' ritratti u footage tad-dash cam għall-analiżi tal-AI",
+    "onboarding.tip2":
+      "Iġġenera narrativa formali tal-inċident u valutazzjoni tal-ħtija",
+    "onboarding.tip3":
+      "Esporta rapporti lesti għall-assiguraturi b'referenzi leġali",
+    "onboarding.got_it": "Mifhum",
+    "cookie.title": "Ħażna Lokali tad-Dejta",
+    "cookie.desc":
+      "Naħżnu l-abbozzi tat-talbiet tiegħek, id-dejta tal-flotta u l-kuntatti tal-assiguraturi lokalment fil-browser tiegħek bl-użu tal-localStorage. Xejn ma jintbagħat lil servers esterni. Id-dejta tiegħek tibqa' fuq l-apparat tiegħek. Din l-applikazzjoni tikkonforma mal-GDPR — tista' tħassar kwalunkwe dejta maħżuna fi kwalunkwe ħin permezz tas-sezzjoni Dejta u Privatezza ta' kull rapport.",
+    "cookie.accept": "Aċċetta",
+    "cookie.decline": "Irrifjuta",
+    "form.heading": "Rapport Ġdid tal-Inċident",
+    "form.step_of": "Pass {current} minn {total}",
+    "form.draft_saved": "Abbozz salvat",
   },
 };
 

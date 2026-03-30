@@ -10,6 +10,7 @@ import {
 import React, { useState } from "react";
 import AccidentReportForm from "../components/AccidentReportForm";
 import { useCountry } from "../contexts/CountryContext";
+import { useLanguage } from "../contexts/LanguageContext";
 
 export default function NewReportPage() {
   const [disclaimerDismissed, setDisclaimerDismissed] = useState(false);
@@ -17,6 +18,7 @@ export default function NewReportPage() {
     () => !!localStorage.getItem("iatl_onboarded"),
   );
   const { country } = useCountry();
+  const { t } = useLanguage();
   const isMalta = country === "mt";
 
   const dismissOnboarding = () => {
@@ -38,11 +40,10 @@ export default function NewReportPage() {
                 className="text-lg font-bold tracking-tight"
                 style={{ fontFamily: "Fraunces, Georgia, serif" }}
               >
-                Welcome to iamthe.law
+                {t("onboarding.title")}
               </h2>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Your AI-powered accident documentation toolkit. Here's how it
-                works:
+                {t("onboarding.subtitle")}
               </p>
             </div>
             <button
@@ -59,19 +60,19 @@ export default function NewReportPage() {
             <div className="flex-1 flex items-start gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2.5">
               <Camera className="w-4 h-4 text-primary shrink-0 mt-0.5" />
               <span className="text-xs text-foreground leading-relaxed">
-                Upload photos &amp; dash cam footage for AI analysis
+                {t("onboarding.tip1")}
               </span>
             </div>
             <div className="flex-1 flex items-start gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2.5">
               <FileText className="w-4 h-4 text-primary shrink-0 mt-0.5" />
               <span className="text-xs text-foreground leading-relaxed">
-                Generate a formal accident narrative and fault assessment
+                {t("onboarding.tip2")}
               </span>
             </div>
             <div className="flex-1 flex items-start gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2.5">
               <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
               <span className="text-xs text-foreground leading-relaxed">
-                Export insurer-ready reports with legal references
+                {t("onboarding.tip3")}
               </span>
             </div>
           </div>
@@ -81,7 +82,7 @@ export default function NewReportPage() {
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             data-ocid="onboarding.close_button"
           >
-            Got it
+            {t("onboarding.got_it")}
           </button>
         </div>
       )}
@@ -94,12 +95,8 @@ export default function NewReportPage() {
         >
           <AlertTriangle className="h-5 w-5 shrink-0 mt-0.5 text-amber-600" />
           <p className="text-sm leading-relaxed flex-1">
-            <span className="font-semibold">Important Notice: </span>
-            This application and its outputs do not constitute legal advice. All
-            content is provided for informational and insurance documentation
-            purposes only. You should seek independent legal advice from a
-            qualified{isMalta ? " avukat (advocate)" : " solicitor"} before
-            taking any legal action.
+            <span className="font-semibold">{t("notice.title")}: </span>
+            {isMalta ? t("notice.body_malta") : t("notice.body")}
           </p>
           <button
             type="button"

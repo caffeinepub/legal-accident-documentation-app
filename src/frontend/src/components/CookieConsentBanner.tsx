@@ -1,8 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Cookie } from "lucide-react";
 import { useState } from "react";
+import { useLanguage } from "../contexts/LanguageContext";
 
 export default function CookieConsentBanner() {
+  const { t } = useLanguage();
   const [visible, setVisible] = useState(() => {
     return localStorage.getItem("cookie_consent") === null;
   });
@@ -28,14 +30,11 @@ export default function CookieConsentBanner() {
       <div className="max-w-5xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
         <Cookie className="w-5 h-5 text-amber-400 shrink-0 mt-0.5 sm:mt-0" />
         <div className="flex-1">
-          <p className="text-sm font-semibold text-white">Local Data Storage</p>
+          <p className="text-sm font-semibold text-white">
+            {t("cookie.title")}
+          </p>
           <p className="text-xs text-zinc-300 mt-0.5 leading-relaxed">
-            We store your claim drafts, fleet data, and insurer contacts locally
-            in your browser using localStorage. Nothing is sent to external
-            servers. Your data stays on your device. This app complies with{" "}
-            <strong className="text-zinc-100">GDPR</strong> — you can delete any
-            stored data at any time via the Data &amp; Privacy section of each
-            report.
+            {t("cookie.desc")}
           </p>
         </div>
         <div className="flex gap-2 shrink-0">
@@ -46,7 +45,7 @@ export default function CookieConsentBanner() {
             onClick={handleDecline}
             data-ocid="cookie_consent.cancel_button"
           >
-            Decline
+            {t("cookie.decline")}
           </Button>
           <Button
             size="sm"
@@ -54,7 +53,7 @@ export default function CookieConsentBanner() {
             onClick={handleAccept}
             data-ocid="cookie_consent.confirm_button"
           >
-            Accept
+            {t("cookie.accept")}
           </Button>
         </div>
       </div>

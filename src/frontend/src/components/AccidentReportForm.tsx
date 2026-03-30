@@ -114,6 +114,19 @@ interface DraftData {
   savedAt: string;
 }
 
+function hasMeaningfulData(draft: DraftData): boolean {
+  return !!(
+    draft.make?.trim() ||
+    draft.colour?.trim() ||
+    draft.licencePlate?.trim() ||
+    draft.damageDescription?.trim() ||
+    draft.witnessStatement?.trim() ||
+    draft.accidentMarker?.trim() ||
+    draft.stopLocation?.trim() ||
+    (draft.additionalParties && draft.additionalParties.length > 0)
+  );
+}
+
 function formatTime(isoString: string): string {
   try {
     return new Date(isoString).toLocaleTimeString("en-GB", {
@@ -398,8 +411,13 @@ export default function AccidentReportForm() {
     if (raw) {
       try {
         const draft = JSON.parse(raw) as DraftData;
-        setDraftSavedAt(draft.savedAt ? formatTime(draft.savedAt) : "");
-        setShowRestoreBanner(true);
+        if (hasMeaningfulData(draft)) {
+          setDraftSavedAt(draft.savedAt ? formatTime(draft.savedAt) : "");
+          setShowRestoreBanner(true);
+        } else {
+          // Empty draft from auto-save on mount — silently remove it
+          localStorage.removeItem(DRAFT_KEY);
+        }
       } catch {
         localStorage.removeItem(DRAFT_KEY);
       }
@@ -1734,10 +1752,12 @@ export default function AccidentReportForm() {
       <div className="flex items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold text-foreground">
-            New Accident Report
+            {t("form.heading")}
           </h1>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Step {currentStep} of {WIZARD_STEPS.length}
+            {t("form.step_of")
+              .replace("{current}", String(currentStep))
+              .replace("{total}", String(WIZARD_STEPS.length))}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -1747,7 +1767,7 @@ export default function AccidentReportForm() {
               className="text-xs text-muted-foreground border-border gap-1"
               data-ocid="draft.success_state"
             >
-              Draft saved {lastSavedTime}
+              {t("form.draft_saved")} {lastSavedTime}
             </Badge>
           )}
           <Button

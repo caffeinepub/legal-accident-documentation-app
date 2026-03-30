@@ -1,28 +1,36 @@
-# iamthe.law — Fix Make/Model, Full Translation, Locality Placeholder
+# iamthe.law — Legal Accident Documentation App
 
 ## Current State
-- The accident report wizard has two separate fields, Make and Model, both in `AccidentReportForm.tsx` (Step 2 — Your Vehicle) and in `PartyVehicleCard.tsx` (Step 4 — Other Parties).
-- The app uses a translations system (`i18n/translations.ts`) but only a small subset of UI strings (nav, actions, page headings, status labels, footer, disclaimer, GDPR, privacy, reports list) are translated. The vast majority of component UI strings are still hardcoded in English.
-- In Malta mode, the weather fetch location placeholder reads `e.g. Triq ir-Repubblika, Valletta` (a street name format). It should show a locality example like `e.g. Sliema`.
+
+- Multi-language support exists (English, Spanish, Polish, Maltese) via `LanguageContext` and `translations.ts`
+- The `t()` function is available but NOT used in several key components: `NewReportPage.tsx`, `RestoreDraftBanner.tsx`, `CookieConsentBanner.tsx`
+- These components have hardcoded English text, so switching language does not update their content
+- The auto-save effect in `AccidentReportForm.tsx` fires 800ms after mount (even with blank form state), saving an empty draft to localStorage
+- On the next visit, the restore-draft banner appears even though no real data was entered — confusing for first-time users
 
 ## Requested Changes (Diff)
 
 ### Add
-- A large set of new translation keys in `translations.ts` covering: form step headings/labels, vehicle fields, accident details, cycling details, legal panels, wizard navigation buttons, weather fetch, other parties section, review step, fleet manager labels, dangerous roads page title, report detail labels, and common panel titles.
-- Spanish, Polish, and Maltese translations for all new keys (English already exists in-code).
+- New translation keys in `translations.ts` for all four languages: draft-related strings, disclaimer/notice strings, onboarding banner strings, cookie consent strings, auto-save badge text
 
 ### Modify
-- **`AccidentReportForm.tsx`**: Merge the separate Make and Model inputs into a single combined input labelled "Make / Model" (placeholder: `e.g. Ford Focus`). Store the value in the `make` state; set `model` to empty string. Update the review summary in Step 5 accordingly.
-- **`PartyVehicleCard.tsx`**: Same — merge the Make and Model inputs into a single "Make / Model" input (placeholder: `e.g. Toyota Corolla`). Store in `party.make`; `party.model` stays empty.
-- **`AccidentReportForm.tsx` weather placeholder**: Change Malta placeholder from `e.g. Triq ir-Repubblika, Valletta` to `e.g. Sliema`.
-- **All major components** — update hardcoded English strings to use the `t()` hook wherever a translation key exists. Priority files: `AccidentReportForm.tsx`, `PartyVehicleCard.tsx`, `Layout.tsx`, `ReportDetail.tsx`, `ReportsPage.tsx`, `NewReportPage.tsx`, `FaultReferencePage.tsx`, `LegalOutputsPage.tsx`, `FleetPage.tsx`, `DangerousRoadsPage.tsx`, `PrivacyPolicyPage.tsx`, `TermsOfServicePage.tsx`.
+- `RestoreDraftBanner.tsx` — consume `useLanguage()` and use `t()` for all text
+- `NewReportPage.tsx` — consume `useLanguage()` and use `t()` for disclaimer notice, onboarding banner, hero tagline and feature pills
+- `CookieConsentBanner.tsx` — consume `useLanguage()` and use `t()` for all text
+- `AccidentReportForm.tsx` — before showing the restore banner, check if the draft has any meaningful data (at least one of: make, colour, licencePlate, damageDescription, witnessStatement, accidentMarker, or at least one additional party); skip the banner and discard the draft silently if the form is blank; also translate the "New Accident Report" heading, "Step X of Y" label, and "Draft saved" badge using `t()`
 
 ### Remove
-- The separate Make field and separate Model field (replaced by single Make / Model field in both locations).
+- Nothing removed
 
 ## Implementation Plan
-1. Expand `translations.ts` — add ~60 new translation keys, with all four language translations (en, es, pl, mt).
-2. Update `AccidentReportForm.tsx` — merge Make + Model fields; change Malta weather placeholder; add `useLanguage()` hook; replace hardcoded strings with `t()` calls.
-3. Update `PartyVehicleCard.tsx` — merge Make + Model fields; use `t()` for labels.
-4. Update remaining priority components to use `t()` for translated strings.
-5. Validate (lint + typecheck + build).
+
+1. Add translation keys to `translations.ts` for all four languages:
+   - `draft.restore_title`, `draft.restore_desc`, `draft.restore_button`, `draft.discard_button`
+   - `notice.title`, `notice.text`, `notice.text_malta`
+   - `onboarding.title`, `onboarding.subtitle`, `onboarding.tip1`, `onboarding.tip2`, `onboarding.tip3`, `onboarding.got_it`
+   - `cookie.title`, `cookie.desc`, `cookie.accept`, `cookie.decline`
+   - `form.heading`, `form.step_of`, `form.draft_saved`
+2. Update `RestoreDraftBanner` to use `useLanguage()` with the new keys
+3. Update `NewReportPage` to use `useLanguage()` and `t()` for disclaimer and onboarding
+4. Update `CookieConsentBanner` to use `useLanguage()` and `t()`
+5. Update `AccidentReportForm` draft-detection logic: add a `hasMeaningfulDraft()` helper that returns `true` only if at least one meaningful field is non-empty; only call `setShowRestoreBanner(true)` when that check passes; also use `t()` for the form heading and draft-saved badge
