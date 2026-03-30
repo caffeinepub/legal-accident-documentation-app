@@ -12,6 +12,7 @@ import { AlertTriangle, MapPin, TrendingUp } from "lucide-react";
 import React, { useMemo, useRef, useState } from "react";
 import GeographicHeatMap from "../components/GeographicHeatMap";
 import { useCountry } from "../contexts/CountryContext";
+import { useLanguage } from "../contexts/LanguageContext";
 import {
   type DangerousRoad,
   HAZARD_COLORS,
@@ -40,6 +41,7 @@ function getRoadBadge(country: string): string {
 
 export default function DangerousRoadsPage() {
   const { country } = useCountry();
+  const { t } = useLanguage();
   const isMalta = country === "mt";
   const ROADS = isMalta ? MALTA_DANGEROUS_ROADS : UK_DANGEROUS_ROADS;
 
@@ -98,7 +100,7 @@ export default function DangerousRoadsPage() {
               className="text-2xl font-bold text-foreground"
               style={{ fontFamily: "Fraunces, Georgia, serif" }}
             >
-              Dangerous Roads
+              {t("nav.dangerous_roads")}
             </h1>
             <span className="text-xl">{isMalta ? "🇲🇹" : "🇬🇧"}</span>
           </div>

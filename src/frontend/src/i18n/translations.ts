@@ -69,7 +69,69 @@ export type TranslationKey =
   // Reports list
   | "reports.empty.title"
   | "reports.empty.description"
-  | "reports.create_first";
+  | "reports.create_first"
+  // Wizard steps
+  | "wizard.step1"
+  | "wizard.step2"
+  | "wizard.step2.cycling"
+  | "wizard.step3"
+  | "wizard.step4"
+  | "wizard.step5"
+  | "wizard.next"
+  | "wizard.back"
+  | "wizard.submit"
+  // Vehicle fields
+  | "vehicle.make_model"
+  | "vehicle.colour"
+  | "vehicle.licence_plate"
+  | "vehicle.year"
+  | "vehicle.type"
+  // Accident details
+  | "accident.date"
+  | "accident.time"
+  | "accident.location"
+  | "accident.description"
+  | "accident.speed_limit"
+  | "accident.weather"
+  | "accident.road_conditions"
+  | "accident.damage"
+  | "accident.injuries"
+  // Panels
+  | "panel.photos"
+  | "panel.dashcam"
+  | "panel.witness"
+  | "panel.police"
+  | "panel.other_parties"
+  | "panel.legal_refs"
+  | "panel.fault"
+  | "panel.damage_severity"
+  | "panel.repair_cost"
+  | "panel.demand_letter"
+  | "panel.negotiation"
+  // Report detail
+  | "report.claim_id"
+  | "report.date"
+  | "report.location"
+  | "report.vehicle"
+  | "report.other_parties"
+  | "report.evidence"
+  // Fleet
+  | "fleet.overview"
+  | "fleet.vehicles"
+  | "fleet.drivers"
+  | "fleet.maintenance"
+  | "fleet.add_vehicle"
+  | "fleet.add_driver"
+  // Weather
+  | "weather.fetch"
+  | "weather.label"
+  // Other
+  | "report.new"
+  | "report.view"
+  | "report.delete.confirm"
+  | "nav.dangerous_roads"
+  | "nav.privacy"
+  | "nav.terms";
 
 type Translations = Record<Language, Record<TranslationKey, string>>;
 
@@ -135,6 +197,60 @@ const translations: Translations = {
     "reports.empty.title": "No reports found",
     "reports.empty.description": "Create your first report to get started.",
     "reports.create_first": "Create Report",
+    "wizard.step1": "Media & Evidence",
+    "wizard.step2": "Your Vehicle",
+    "wizard.step2.cycling": "Your Details",
+    "wizard.step3": "Accident Details",
+    "wizard.step4": "Other Parties",
+    "wizard.step5": "Review & Submit",
+    "wizard.next": "Next",
+    "wizard.back": "Back",
+    "wizard.submit": "Submit Report",
+    "vehicle.make_model": "Make / Model",
+    "vehicle.colour": "Colour",
+    "vehicle.licence_plate": "Licence Plate / Registration",
+    "vehicle.year": "Year",
+    "vehicle.type": "Vehicle Type",
+    "accident.date": "Date of Accident",
+    "accident.time": "Time of Accident",
+    "accident.location": "Location of Accident",
+    "accident.description": "Accident Description",
+    "accident.speed_limit": "Speed Limit (mph)",
+    "accident.weather": "Weather Conditions",
+    "accident.road_conditions": "Road Conditions",
+    "accident.damage": "Vehicle Damage",
+    "accident.injuries": "Injuries Sustained",
+    "panel.photos": "Photos & Evidence",
+    "panel.dashcam": "Dash Cam Footage",
+    "panel.witness": "Witness Statement",
+    "panel.police": "Police Details",
+    "panel.other_parties": "Other Parties Involved",
+    "panel.legal_refs": "Legal References",
+    "panel.fault": "Fault Assessment",
+    "panel.damage_severity": "Damage Severity",
+    "panel.repair_cost": "Repair Cost Estimate",
+    "panel.demand_letter": "Demand Letter",
+    "panel.negotiation": "Negotiation Letter Builder",
+    "report.claim_id": "Claim ID",
+    "report.date": "Date",
+    "report.location": "Location",
+    "report.vehicle": "Your Vehicle",
+    "report.other_parties": "Other Parties",
+    "report.evidence": "Evidence",
+    "fleet.overview": "Overview",
+    "fleet.vehicles": "Vehicles",
+    "fleet.drivers": "Drivers",
+    "fleet.maintenance": "Maintenance",
+    "fleet.add_vehicle": "Add Vehicle",
+    "fleet.add_driver": "Add Driver",
+    "weather.fetch": "Fetch Weather",
+    "weather.label": "Weather at Time of Accident",
+    "report.new": "Start New Report",
+    "report.view": "View Report",
+    "report.delete.confirm": "Are you sure you want to delete this report?",
+    "nav.dangerous_roads": "Dangerous Roads",
+    "nav.privacy": "Privacy Policy",
+    "nav.terms": "Terms of Service",
   },
 
   es: {
@@ -198,6 +314,60 @@ const translations: Translations = {
     "reports.empty.title": "No se encontraron informes",
     "reports.empty.description": "Cree su primer informe para comenzar.",
     "reports.create_first": "Crear Informe",
+    "wizard.step1": "Medios y Evidencia",
+    "wizard.step2": "Su Vehículo",
+    "wizard.step2.cycling": "Sus Detalles",
+    "wizard.step3": "Detalles del Accidente",
+    "wizard.step4": "Otras Partes",
+    "wizard.step5": "Revisar y Enviar",
+    "wizard.next": "Siguiente",
+    "wizard.back": "Atrás",
+    "wizard.submit": "Enviar Informe",
+    "vehicle.make_model": "Marca / Modelo",
+    "vehicle.colour": "Color",
+    "vehicle.licence_plate": "Matrícula / Registro",
+    "vehicle.year": "Año",
+    "vehicle.type": "Tipo de Vehículo",
+    "accident.date": "Fecha del Accidente",
+    "accident.time": "Hora del Accidente",
+    "accident.location": "Lugar del Accidente",
+    "accident.description": "Descripción del Accidente",
+    "accident.speed_limit": "Límite de Velocidad (mph)",
+    "accident.weather": "Condiciones Meteorológicas",
+    "accident.road_conditions": "Estado de la Carretera",
+    "accident.damage": "Daño al Vehículo",
+    "accident.injuries": "Lesiones Sufridas",
+    "panel.photos": "Fotos y Evidencia",
+    "panel.dashcam": "Grabación de Cámara",
+    "panel.witness": "Declaración de Testigo",
+    "panel.police": "Detalles de la Policía",
+    "panel.other_parties": "Otras Partes Involucradas",
+    "panel.legal_refs": "Referencias Legales",
+    "panel.fault": "Evaluación de Culpa",
+    "panel.damage_severity": "Gravedad del Daño",
+    "panel.repair_cost": "Estimación del Costo de Reparación",
+    "panel.demand_letter": "Carta de Demanda",
+    "panel.negotiation": "Constructor de Carta de Negociación",
+    "report.claim_id": "ID del Reclamo",
+    "report.date": "Fecha",
+    "report.location": "Ubicación",
+    "report.vehicle": "Su Vehículo",
+    "report.other_parties": "Otras Partes",
+    "report.evidence": "Evidencia",
+    "fleet.overview": "Descripción General",
+    "fleet.vehicles": "Vehículos",
+    "fleet.drivers": "Conductores",
+    "fleet.maintenance": "Mantenimiento",
+    "fleet.add_vehicle": "Agregar Vehículo",
+    "fleet.add_driver": "Agregar Conductor",
+    "weather.fetch": "Obtener Clima",
+    "weather.label": "Clima en el Momento del Accidente",
+    "report.new": "Iniciar Nuevo Informe",
+    "report.view": "Ver Informe",
+    "report.delete.confirm": "¿Está seguro de que desea eliminar este informe?",
+    "nav.dangerous_roads": "Carreteras Peligrosas",
+    "nav.privacy": "Política de Privacidad",
+    "nav.terms": "Términos de Servicio",
   },
 
   pl: {
@@ -261,6 +431,60 @@ const translations: Translations = {
     "reports.empty.title": "Nie znaleziono raportów",
     "reports.empty.description": "Utwórz swój pierwszy raport, aby zacząć.",
     "reports.create_first": "Utwórz Raport",
+    "wizard.step1": "Media i Dowody",
+    "wizard.step2": "Twój Pojazd",
+    "wizard.step2.cycling": "Twoje Dane",
+    "wizard.step3": "Szczegóły Wypadku",
+    "wizard.step4": "Inne Strony",
+    "wizard.step5": "Przegląd i Wyślij",
+    "wizard.next": "Dalej",
+    "wizard.back": "Wstecz",
+    "wizard.submit": "Prześlij Raport",
+    "vehicle.make_model": "Marka / Model",
+    "vehicle.colour": "Kolor",
+    "vehicle.licence_plate": "Tablica / Rejestracja",
+    "vehicle.year": "Rok",
+    "vehicle.type": "Typ Pojazdu",
+    "accident.date": "Data Wypadku",
+    "accident.time": "Godzina Wypadku",
+    "accident.location": "Miejsce Wypadku",
+    "accident.description": "Opis Wypadku",
+    "accident.speed_limit": "Ograniczenie Prędkości (mph)",
+    "accident.weather": "Warunki Pogodowe",
+    "accident.road_conditions": "Stan Drogi",
+    "accident.damage": "Uszkodzenia Pojazdu",
+    "accident.injuries": "Doznane Obrażenia",
+    "panel.photos": "Zdjęcia i Dowody",
+    "panel.dashcam": "Nagranie z Dashcam",
+    "panel.witness": "Zeznanie Świadka",
+    "panel.police": "Dane Policji",
+    "panel.other_parties": "Inne Zaangażowane Strony",
+    "panel.legal_refs": "Odniesienia Prawne",
+    "panel.fault": "Ocena Winy",
+    "panel.damage_severity": "Stopień Szkody",
+    "panel.repair_cost": "Szacowany Koszt Naprawy",
+    "panel.demand_letter": "Pismo Żądania",
+    "panel.negotiation": "Kreator Listu Negocjacyjnego",
+    "report.claim_id": "ID Roszczenia",
+    "report.date": "Data",
+    "report.location": "Lokalizacja",
+    "report.vehicle": "Twój Pojazd",
+    "report.other_parties": "Inne Strony",
+    "report.evidence": "Dowody",
+    "fleet.overview": "Przegląd",
+    "fleet.vehicles": "Pojazdy",
+    "fleet.drivers": "Kierowcy",
+    "fleet.maintenance": "Konserwacja",
+    "fleet.add_vehicle": "Dodaj Pojazd",
+    "fleet.add_driver": "Dodaj Kierowcę",
+    "weather.fetch": "Pobierz Pogodę",
+    "weather.label": "Pogoda w Czasie Wypadku",
+    "report.new": "Utwórz Nowy Raport",
+    "report.view": "Zobacz Raport",
+    "report.delete.confirm": "Czy na pewno chcesz usunąć ten raport?",
+    "nav.dangerous_roads": "Niebezpieczne Drogi",
+    "nav.privacy": "Polityka Prywatności",
+    "nav.terms": "Warunki Usługi",
   },
   mt: {
     "nav.new_report": "Rapport Ġdid",
@@ -323,6 +547,60 @@ const translations: Translations = {
     "reports.empty.title": "L-ebda rapport ma nstab",
     "reports.empty.description": "Oħloq l-ewwel rapport tiegħek biex tibda.",
     "reports.create_first": "Oħloq Rapport",
+    "wizard.step1": "Midja u Evidenza",
+    "wizard.step2": "Il-Vettura Tiegħek",
+    "wizard.step2.cycling": "Id-Dettalji Tiegħek",
+    "wizard.step3": "Dettalji tal-Inċident",
+    "wizard.step4": "Partijiet Oħra",
+    "wizard.step5": "Irrevedi u Ibgħat",
+    "wizard.next": "Li Jmiss",
+    "wizard.back": "Lura",
+    "wizard.submit": "Ibgħat ir-Rapport",
+    "vehicle.make_model": "Għamla / Mudell",
+    "vehicle.colour": "Kulur",
+    "vehicle.licence_plate": "Pjanċa tal-Karozza / Reġistrazzjoni",
+    "vehicle.year": "Sena",
+    "vehicle.type": "Tip tal-Vettura",
+    "accident.date": "Data tal-Inċident",
+    "accident.time": "Ħin tal-Inċident",
+    "accident.location": "Post tal-Inċident",
+    "accident.description": "Deskrizzjoni tal-Inċident",
+    "accident.speed_limit": "Limitu tal-Veloċità (km/h)",
+    "accident.weather": "Kundizzjonijiet tat-Temp",
+    "accident.road_conditions": "Kundizzjonijiet tat-Triq",
+    "accident.damage": "Ħsara fil-Vettura",
+    "accident.injuries": "Korrimenti Mġarrba",
+    "panel.photos": "Ritratti u Evidenza",
+    "panel.dashcam": "Footage tad-Dash Cam",
+    "panel.witness": "Dikjarazzjoni tax-Xhud",
+    "panel.police": "Dettalji tal-Pulizija",
+    "panel.other_parties": "Partijiet Oħra Involuti",
+    "panel.legal_refs": "Referenzi Leġali",
+    "panel.fault": "Valutazzjoni tal-Ħtija",
+    "panel.damage_severity": "Severità tal-Ħsara",
+    "panel.repair_cost": "Stima tal-Ispejjeż tat-Tiswija",
+    "panel.demand_letter": "Ittra ta' Talba",
+    "panel.negotiation": "Banitur ta' Ittra tan-Negozjat",
+    "report.claim_id": "ID tat-Talba",
+    "report.date": "Data",
+    "report.location": "Post",
+    "report.vehicle": "Il-Vettura Tiegħek",
+    "report.other_parties": "Partijiet Oħra",
+    "report.evidence": "Evidenza",
+    "fleet.overview": "Ħarsa ġenerali",
+    "fleet.vehicles": "Vetturi",
+    "fleet.drivers": "Sewwieqa",
+    "fleet.maintenance": "Manutenzjoni",
+    "fleet.add_vehicle": "Żid Vettura",
+    "fleet.add_driver": "Żid Sewwieq",
+    "weather.fetch": "Iġġib it-Temp",
+    "weather.label": "Temp fil-Ħin tal-Inċident",
+    "report.new": "Ibda Rapport Ġdid",
+    "report.view": "Ara r-Rapport",
+    "report.delete.confirm": "Inti ċert li trid tħassar dan ir-rapport?",
+    "nav.dangerous_roads": "Toroq Perikolużi",
+    "nav.privacy": "Politika tal-Privatezza",
+    "nav.terms": "Kundizzjonijiet tas-Servizz",
   },
 };
 

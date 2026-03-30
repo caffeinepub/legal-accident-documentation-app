@@ -56,6 +56,7 @@ import {
 import type React from "react";
 import { useEffect, useState } from "react";
 import { useCountry } from "../contexts/CountryContext";
+import { useLanguage } from "../contexts/LanguageContext";
 import { useGetAllReports } from "../hooks/useQueries";
 import { formatClaimId } from "../utils/claimId";
 
@@ -307,6 +308,7 @@ const EMPTY_DRIVER_FORM: Omit<FleetDriver, "id"> = {
 
 // ── Main component ────────────────────────────────────────────────────────────
 export default function FleetPage() {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const { country } = useCountry();
   const isMalta = country === "mt";
@@ -523,7 +525,7 @@ export default function FleetPage() {
             data-ocid="fleet.add_driver.primary_button"
           >
             <User className="w-4 h-4" />
-            Add Driver
+            {t("fleet.add_driver")}
           </Button>
           <Button
             onClick={openAddVehicleDialog}
@@ -531,7 +533,7 @@ export default function FleetPage() {
             data-ocid="fleet.primary_button"
           >
             <Plus className="w-4 h-4" />
-            Add Vehicle
+            {t("fleet.add_vehicle")}
           </Button>
         </div>
       </div>
@@ -540,16 +542,16 @@ export default function FleetPage() {
       <Tabs defaultValue="overview">
         <TabsList className="w-full sm:w-auto grid grid-cols-4 sm:inline-flex">
           <TabsTrigger value="overview" data-ocid="fleet.overview.tab">
-            Overview
+            {t("fleet.overview")}
           </TabsTrigger>
           <TabsTrigger value="vehicles" data-ocid="fleet.vehicles.tab">
-            Vehicles
+            {t("fleet.vehicles")}
           </TabsTrigger>
           <TabsTrigger value="drivers" data-ocid="fleet.drivers.tab">
-            Drivers
+            {t("fleet.drivers")}
           </TabsTrigger>
           <TabsTrigger value="maintenance" data-ocid="fleet.maintenance.tab">
-            Maintenance
+            {t("fleet.maintenance")}
           </TabsTrigger>
         </TabsList>
 

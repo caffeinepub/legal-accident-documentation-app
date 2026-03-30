@@ -22,6 +22,7 @@ import {
   X,
 } from "lucide-react";
 import { useState } from "react";
+import { useLanguage } from "../contexts/LanguageContext";
 
 export type VehicleType =
   | "car"
@@ -97,6 +98,7 @@ export default function PartyVehicleCard({
   onRemove,
 }: PartyVehicleCardProps) {
   const [isOpen, setIsOpen] = useState(true);
+  const { t } = useLanguage();
 
   const label = `Party ${String.fromCharCode(66 + index)}`; // B, C, D…
   const isVulnerable = VULNERABLE_TYPES.includes(party.vehicleType);
@@ -214,27 +216,22 @@ export default function PartyVehicleCard({
           {/* Vehicle fields — hidden for pedestrian / third_party_object */}
           {!isNonVehicle ? (
             <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <Label htmlFor={`party-make-${party.id}`}>Make</Label>
+              <div className="space-y-1 col-span-2">
+                <Label htmlFor={`party-make-${party.id}`}>
+                  {t("vehicle.make_model")}
+                </Label>
                 <Input
                   id={`party-make-${party.id}`}
                   value={party.make}
                   onChange={(e) => update("make", e.target.value)}
-                  placeholder="e.g. Toyota"
+                  placeholder="e.g. Toyota Corolla"
                   data-ocid={`party.input.${ocidIndex}`}
                 />
               </div>
               <div className="space-y-1">
-                <Label htmlFor={`party-model-${party.id}`}>Model</Label>
-                <Input
-                  id={`party-model-${party.id}`}
-                  value={party.model}
-                  onChange={(e) => update("model", e.target.value)}
-                  placeholder="e.g. Corolla"
-                />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor={`party-colour-${party.id}`}>Colour</Label>
+                <Label htmlFor={`party-colour-${party.id}`}>
+                  {t("vehicle.colour")}
+                </Label>
                 <Input
                   id={`party-colour-${party.id}`}
                   value={party.colour}
@@ -243,7 +240,9 @@ export default function PartyVehicleCard({
                 />
               </div>
               <div className="space-y-1">
-                <Label htmlFor={`party-plate-${party.id}`}>Licence Plate</Label>
+                <Label htmlFor={`party-plate-${party.id}`}>
+                  {t("vehicle.licence_plate")}
+                </Label>
                 <Input
                   id={`party-plate-${party.id}`}
                   value={party.licencePlate}

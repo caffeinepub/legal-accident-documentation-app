@@ -32,6 +32,7 @@ import type React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ExternalBlob } from "../backend";
 import { useCountry } from "../contexts/CountryContext";
+import { useLanguage } from "../contexts/LanguageContext";
 import { useCreateReport } from "../hooks/useQueries";
 import DashCamUpload, { type DashCamClip } from "./DashCamUpload";
 import PartyVehicleCard, { type AdditionalParty } from "./PartyVehicleCard";
@@ -45,11 +46,11 @@ const POLICE_INFO_DELIMITER = "\n\n---POLICE_INFO---\n";
 const DRAFT_KEY = "accident_draft_v1";
 
 const BASE_WIZARD_STEPS = [
-  { number: 1, label: "Media" },
-  { number: 2, label: "Vehicle" },
-  { number: 3, label: "Details" },
-  { number: 4, label: "Parties" },
-  { number: 5, label: "Review" },
+  { number: 1, labelKey: "wizard.step1" as const },
+  { number: 2, labelKey: "wizard.step2" as const },
+  { number: 3, labelKey: "wizard.step3" as const },
+  { number: 4, labelKey: "wizard.step4" as const },
+  { number: 5, labelKey: "wizard.step5" as const },
 ];
 
 function createEmptyParty(id: string): AdditionalParty {
@@ -129,6 +130,7 @@ export default function AccidentReportForm() {
   const createReport = useCreateReport();
   const { country } = useCountry();
   const isMalta = country === "mt";
+  const { t } = useLanguage();
 
   // Wizard step (1-indexed)
   const [currentStep, setCurrentStep] = useState(1);
@@ -163,7 +165,7 @@ export default function AccidentReportForm() {
 
   // Vehicle info
   const [make, setMake] = useState("");
-  const [model, setModel] = useState("");
+  const model = ""; // merged into make field
   const [colour, setColour] = useState("");
   const [licencePlate, setLicencePlate] = useState("");
   const [year, setYear] = useState("");
@@ -241,8 +243,15 @@ export default function AccidentReportForm() {
   // Dynamic wizard steps label for step 2
   const WIZARD_STEPS = BASE_WIZARD_STEPS.map((s) =>
     s.number === 2
-      ? { ...s, label: incidentType === "cycling" ? "Your Details" : "Vehicle" }
-      : s,
+      ? {
+          ...s,
+          label: t(
+            incidentType === "cycling"
+              ? "wizard.step2.cycling"
+              : "wizard.step2",
+          ),
+        }
+      : { ...s, label: t(s.labelKey) },
   );
 
   const buildDraft = useCallback((): DraftData => {
@@ -281,7 +290,6 @@ export default function AccidentReportForm() {
     };
   }, [
     make,
-    model,
     colour,
     licencePlate,
     year,
@@ -315,7 +323,6 @@ export default function AccidentReportForm() {
   const applyDraft = useCallback(
     (draft: DraftData) => {
       setMake(draft.make ?? "");
-      setModel(draft.model ?? "");
       setColour(draft.colour ?? "");
       setLicencePlate(draft.licencePlate ?? "");
       setYear(draft.year ?? "");
@@ -352,7 +359,6 @@ export default function AccidentReportForm() {
 
   const resetForm = useCallback(() => {
     setMake("");
-    setModel("");
     setColour("");
     setLicencePlate("");
     setYear("");
@@ -856,28 +862,18 @@ export default function AccidentReportForm() {
           </p>
         </CardHeader>
         <CardContent className="grid grid-cols-2 gap-4">
-          <div className="space-y-1">
-            <Label htmlFor="make">Make</Label>
+          <div className="space-y-1 col-span-2">
+            <Label htmlFor="make">{t("vehicle.make_model")}</Label>
             <Input
               id="make"
               value={make}
               onChange={(e) => setMake(e.target.value)}
-              placeholder="e.g. Ford"
+              placeholder="e.g. Ford Focus"
               data-ocid="vehicle.make.input"
             />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="model">Model</Label>
-            <Input
-              id="model"
-              value={model}
-              onChange={(e) => setModel(e.target.value)}
-              placeholder="e.g. Focus"
-              data-ocid="vehicle.model.input"
-            />
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="colour">Colour</Label>
+            <Label htmlFor="colour">{t("vehicle.colour")}</Label>
             <Input
               id="colour"
               value={colour}
@@ -887,7 +883,7 @@ export default function AccidentReportForm() {
             />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="licencePlate">Licence Plate / Registration</Label>
+            <Label htmlFor="licencePlate">{t("vehicle.licence_plate")}</Label>
             <Input
               id="licencePlate"
               value={licencePlate}
@@ -900,7 +896,7 @@ export default function AccidentReportForm() {
             />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="year">Year</Label>
+            <Label htmlFor="year">{t("vehicle.year")}</Label>
             <Input
               id="year"
               type="number"
@@ -1279,9 +1275,7 @@ export default function AccidentReportForm() {
                 }
               }}
               placeholder={
-                isMalta
-                  ? "e.g. Triq ir-Repubblika, Valletta"
-                  : "e.g. SW1A 1AA or Manchester"
+                isMalta ? "e.g. Sliema" : "e.g. SW1A 1AA or Manchester"
               }
               className="flex-1"
               data-ocid="weather.location.input"
@@ -1300,7 +1294,7 @@ export default function AccidentReportForm() {
               ) : (
                 <CloudSun className="h-3.5 w-3.5" />
               )}
-              {weatherFetching ? "Fetching…" : "Fetch Weather"}
+              {weatherFetching ? "Fetching…" : t("weather.fetch")}
             </Button>
           </div>
           {weatherError && (
@@ -1541,7 +1535,7 @@ export default function AccidentReportForm() {
             <div className="grid grid-cols-2 gap-2 text-sm">
               <span className="text-muted-foreground">Make / Model</span>
               <span>
-                {[make, model].filter(Boolean).join(" ") || (
+                {make || (
                   <span className="text-muted-foreground/60 italic">
                     Not entered
                   </span>
@@ -1790,7 +1784,7 @@ export default function AccidentReportForm() {
             data-ocid="wizard.pagination_prev"
           >
             <ChevronLeft className="w-4 h-4" />
-            Previous
+            {t("wizard.back")}
           </Button>
         ) : (
           <div /> /* spacer */
@@ -1804,7 +1798,7 @@ export default function AccidentReportForm() {
             onClick={() => setCurrentStep((s) => s + 1)}
             data-ocid="wizard.pagination_next"
           >
-            Next
+            {t("wizard.next")}
             <ChevronRight className="w-4 h-4" />
           </Button>
         ) : (
@@ -1825,7 +1819,7 @@ export default function AccidentReportForm() {
                 Submitting Report…
               </>
             ) : (
-              "Submit Accident Report"
+              t("wizard.submit")
             )}
           </Button>
         )}

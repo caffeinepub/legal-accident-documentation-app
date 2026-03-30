@@ -1,31 +1,28 @@
-# iamthe.law — Cycling Accidents: Report Detail & Legal Outputs
+# iamthe.law — Fix Make/Model, Full Translation, Locality Placeholder
 
 ## Current State
-- The 5-step wizard captures cycling-specific fields: `incidentType` (vehicle|cycling), `bikeType`, `helmetWorn`, `hiVisWorn`, `cyclingSubScenario` (vs-vehicle|vs-pedestrian|solo), `roadDefectDescription`
-- Cycling legal references exist in both `legalReferences.ts` (UK) and `maltaLegalReferences.ts` (Malta) under violation type "cycling"
-- `ReportDetail.tsx` does NOT display any cycling-specific fields — the report detail view is entirely vehicle-centric
-- `LegalOutputsPage.tsx` has no cycling-specific section at all
-- The Legal Reference Panel does surface cycling law when violations include cycling, but only if violations are tagged accordingly
+- The accident report wizard has two separate fields, Make and Model, both in `AccidentReportForm.tsx` (Step 2 — Your Vehicle) and in `PartyVehicleCard.tsx` (Step 4 — Other Parties).
+- The app uses a translations system (`i18n/translations.ts`) but only a small subset of UI strings (nav, actions, page headings, status labels, footer, disclaimer, GDPR, privacy, reports list) are translated. The vast majority of component UI strings are still hardcoded in English.
+- In Malta mode, the weather fetch location placeholder reads `e.g. Triq ir-Repubblika, Valletta` (a street name format). It should show a locality example like `e.g. Sliema`.
 
 ## Requested Changes (Diff)
 
 ### Add
-- **Cycling Details Section in ReportDetail**: When `incidentType === 'cycling'`, show a dedicated "Cycling Details" card with: incident sub-type (vs vehicle / vs pedestrian / solo road defect), bike type, helmet worn (yes/no, with legal note if no), hi-vis worn, road defect description if sub-type is solo
-- **Cycling Legal Panel in ReportDetail**: When `incidentType === 'cycling'`, surface a dedicated collapsible cycling legal reference panel pulling from the existing cycling-specific violation refs — HC Rules 59–82 + 211–215 (UK), TRO Cap. 65 Arts. 53/54/57/58 (Malta), relevant case law (Eagle v Chambers, Gough v Thorne, Phipps v Rochester for UK; Borg v Pisani, Camilleri v Attard for Malta)
-- **Cycling Section in LegalOutputsPage**: Add a new "Cycling Accident Legal Guide" section with: sub-scenario-specific legal summary cards (vs vehicle, vs pedestrian, solo/road defect), UK and Malta legal references, fault weighting guide (helmet/hi-vis/lights impact on contributory negligence), council/highway authority liability for road defects, deeper case law panel
-- **Auto-tag cycling violation**: When `incidentType === 'cycling'`, automatically include a cycling violation in the violations list so the existing LegalReferencePanel picks it up
+- A large set of new translation keys in `translations.ts` covering: form step headings/labels, vehicle fields, accident details, cycling details, legal panels, wizard navigation buttons, weather fetch, other parties section, review step, fleet manager labels, dangerous roads page title, report detail labels, and common panel titles.
+- Spanish, Polish, and Maltese translations for all new keys (English already exists in-code).
 
 ### Modify
-- `ReportDetail.tsx`: Add cycling details card and cycling legal panel, gated on `incidentType === 'cycling'`
-- `LegalOutputsPage.tsx`: Add cycling guide section at the bottom of the page
-- Fault weighting logic: helmet not worn should add a note about potential contributory negligence reduction (Froom v Butcher principle for UK; Civil Code Art. 1033 for Malta)
+- **`AccidentReportForm.tsx`**: Merge the separate Make and Model inputs into a single combined input labelled "Make / Model" (placeholder: `e.g. Ford Focus`). Store the value in the `make` state; set `model` to empty string. Update the review summary in Step 5 accordingly.
+- **`PartyVehicleCard.tsx`**: Same — merge the Make and Model inputs into a single "Make / Model" input (placeholder: `e.g. Toyota Corolla`). Store in `party.make`; `party.model` stays empty.
+- **`AccidentReportForm.tsx` weather placeholder**: Change Malta placeholder from `e.g. Triq ir-Repubblika, Valletta` to `e.g. Sliema`.
+- **All major components** — update hardcoded English strings to use the `t()` hook wherever a translation key exists. Priority files: `AccidentReportForm.tsx`, `PartyVehicleCard.tsx`, `Layout.tsx`, `ReportDetail.tsx`, `ReportsPage.tsx`, `NewReportPage.tsx`, `FaultReferencePage.tsx`, `LegalOutputsPage.tsx`, `FleetPage.tsx`, `DangerousRoadsPage.tsx`, `PrivacyPolicyPage.tsx`, `TermsOfServicePage.tsx`.
 
 ### Remove
-- Nothing removed
+- The separate Make field and separate Model field (replaced by single Make / Model field in both locations).
 
 ## Implementation Plan
-1. Add a `CyclingDetailsCard` component in `ReportDetail.tsx` — displays all cycling fields with icons and legal tooltips
-2. Add a `CyclingLegalPanel` component (inline or separate file) that pulls cycling-specific refs from existing data
-3. Wire `incidentType === 'cycling'` check in `ReportDetail.tsx` to render both new sections
-4. Add a `CyclingLegalGuide` section to `LegalOutputsPage.tsx` with sub-scenario cards, fault weighting table, and deeper case law — adapts for UK/Malta via `useCountry()`
-5. Ensure helmet/hi-vis fields in cycling details card show a contextual amber warning when not worn (contributory negligence risk)
+1. Expand `translations.ts` — add ~60 new translation keys, with all four language translations (en, es, pl, mt).
+2. Update `AccidentReportForm.tsx` — merge Make + Model fields; change Malta weather placeholder; add `useLanguage()` hook; replace hardcoded strings with `t()` calls.
+3. Update `PartyVehicleCard.tsx` — merge Make + Model fields; use `t()` for labels.
+4. Update remaining priority components to use `t()` for translated strings.
+5. Validate (lint + typecheck + build).

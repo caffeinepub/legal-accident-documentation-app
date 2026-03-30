@@ -163,7 +163,7 @@ export default function Layout() {
               data-ocid="nav.dangerous_roads.link"
             >
               <AlertTriangle className="w-3.5 h-3.5" />
-              Dangerous Roads
+              {t("nav.dangerous_roads")}
             </Button>
           </nav>
 
@@ -291,7 +291,7 @@ export default function Layout() {
                     data-ocid="nav.dangerous_roads.link"
                   >
                     <AlertTriangle className="w-4 h-4 shrink-0" />
-                    Dangerous Roads
+                    {t("nav.dangerous_roads")}
                   </button>
                   {/* Mobile lang row */}
                   <div className="mt-3 pt-3 border-t border-border flex items-center gap-2 px-3">
