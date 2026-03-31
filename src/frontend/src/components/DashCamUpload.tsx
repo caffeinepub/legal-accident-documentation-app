@@ -11,6 +11,7 @@ import { Loader2, RefreshCw, ScanSearch, Video, X } from "lucide-react";
 import type React from "react";
 import { useRef, useState } from "react";
 import { ExternalBlob } from "../backend";
+import { useLanguage } from "../contexts/LanguageContext";
 import { analyzeDashCam } from "../utils/dashCamAnalyzer";
 
 export interface DashCamClip {
@@ -34,6 +35,7 @@ export default function DashCamUpload({
   onDashCamCrossAnalysisChange,
   photoAnalysisDescription,
 }: DashCamUploadProps) {
+  const { t } = useLanguage();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [clips, setClips] = useState<DashCamClip[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -111,10 +113,11 @@ export default function DashCamUpload({
         type="button"
         className="w-full border-2 border-dashed border-border rounded-lg p-6 text-center cursor-pointer hover:border-primary/60 transition-colors bg-transparent"
         onClick={() => fileInputRef.current?.click()}
+        data-ocid="dashcam.upload_button"
       >
         <Video className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
         <p className="text-sm text-muted-foreground">
-          Click to upload dash cam footage (MP4, MOV, AVI)
+          {t("upload.dashcam.click")}
         </p>
         <input
           ref={fileInputRef}
@@ -133,6 +136,7 @@ export default function DashCamUpload({
             <div
               key={clip.filename}
               className="flex items-center gap-3 p-3 bg-muted/40 rounded-lg border border-border"
+              data-ocid={`dashcam.item.${index + 1}`}
             >
               <video
                 src={clip.previewUrl}
@@ -161,6 +165,7 @@ export default function DashCamUpload({
                 type="button"
                 onClick={() => removeClip(index)}
                 className="text-muted-foreground hover:text-destructive transition-colors"
+                data-ocid={`dashcam.delete_button.${index + 1}`}
               >
                 <X className="h-4 w-4" />
               </button>
@@ -176,21 +181,22 @@ export default function DashCamUpload({
         disabled={clips.length === 0 || isAnalyzing}
         onClick={handleAnalyze}
         className="w-full gap-2"
+        data-ocid="dashcam.primary_button"
       >
         {isAnalyzing ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin" />
-            Analysing Dash Cam…
+            {t("dashcam.analysing")}
           </>
         ) : hasAnalyzed ? (
           <>
             <RefreshCw className="h-4 w-4" />
-            Re-analyse Dash Cam
+            {t("dashcam.reanalyse")}
           </>
         ) : (
           <>
             <ScanSearch className="h-4 w-4" />
-            Analyse Dash Cam
+            {t("dashcam.analyse")}
           </>
         )}
       </Button>
@@ -202,9 +208,9 @@ export default function DashCamUpload({
             htmlFor="dashcam-cross-analysis"
             className="text-sm font-medium text-foreground"
           >
-            AI Dash Cam Cross-Analysis{" "}
+            {t("dashcam.cross_analysis_label")}{" "}
             <span className="text-muted-foreground font-normal">
-              (editable)
+              {t("common.editable")}
             </span>
           </label>
           <Textarea
@@ -213,11 +219,12 @@ export default function DashCamUpload({
             onChange={(e) => handleDescriptionChange(e.target.value)}
             rows={5}
             className="text-sm resize-none"
-            placeholder="AI-generated cross-analysis will appear here…"
+            placeholder={t("dashcam.placeholder")}
+            data-ocid="dashcam.textarea"
           />
           {photoAnalysisDescription && (
             <p className="text-xs text-muted-foreground">
-              ✓ Cross-referenced with photo analysis
+              {t("dashcam.cross_referenced")}
             </p>
           )}
         </div>

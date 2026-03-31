@@ -814,7 +814,7 @@ export default function AccidentReportForm() {
   // Incident type selector (shown at top of Step 1)
   const IncidentTypeSelector = (
     <div className="space-y-2">
-      <Label className="text-sm font-semibold">Incident Type</Label>
+      <Label className="text-sm font-semibold">{t("form.incident_type")}</Label>
       <div className="flex gap-2">
         <button
           type="button"
@@ -828,7 +828,7 @@ export default function AccidentReportForm() {
           ].join(" ")}
         >
           <Car className="h-4 w-4" />
-          Vehicle Accident
+          {t("form.vehicle_incident")}
         </button>
         <button
           type="button"
@@ -842,7 +842,7 @@ export default function AccidentReportForm() {
           ].join(" ")}
         >
           <Bike className="h-4 w-4" />
-          Cycling Accident
+          {t("form.cycling_incident")}
         </button>
       </div>
     </div>
@@ -853,11 +853,10 @@ export default function AccidentReportForm() {
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-lg">
           <Camera className="h-5 w-5 text-primary" />
-          Media &amp; AI Analysis
+          {t("form.section.media")}
         </CardTitle>
         <p className="text-sm text-muted-foreground">
-          Upload photos and dash cam footage. Use the analyse buttons to
-          generate AI descriptions that complement each other.
+          {t("form.section.media_desc")}
         </p>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -870,7 +869,9 @@ export default function AccidentReportForm() {
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <Camera className="h-4 w-4 text-muted-foreground" />
-            <h3 className="text-sm font-semibold">Accident Scene Photos</h3>
+            <h3 className="text-sm font-semibold">
+              {t("form.section.photos")}
+            </h3>
           </div>
           <PhotoUpload
             onPhotosSelected={setPhotos}
@@ -892,7 +893,9 @@ export default function AccidentReportForm() {
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <FileVideo className="h-4 w-4 text-muted-foreground" />
-            <h3 className="text-sm font-semibold">Dash Cam Footage</h3>
+            <h3 className="text-sm font-semibold">
+              {t("form.section.dashcam")}
+            </h3>
           </div>
           <DashCamUpload
             onChange={setDashCamClips}
@@ -909,10 +912,9 @@ export default function AccidentReportForm() {
     incidentType === "vehicle" ? (
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg">Your Vehicle</CardTitle>
+          <CardTitle className="text-lg">{t("step.vehicle_title")}</CardTitle>
           <p className="text-sm text-muted-foreground">
-            Enter the details of your vehicle. These will be used to
-            contextualise the AI photo analysis.
+            {t("step.vehicle_desc")}
           </p>
         </CardHeader>
         <CardContent className="grid grid-cols-2 gap-4">
@@ -962,9 +964,7 @@ export default function AccidentReportForm() {
           </div>
           <div className="space-y-1">
             <Label htmlFor="mot">
-              {isMalta
-                ? "VRT Expiry (Vehicle Roadworthiness Test)"
-                : "MOT Expiry"}
+              {isMalta ? t("vehicle.vrt_expiry") : t("vehicle.mot_expiry")}
             </Label>
             <Input
               id="mot"
@@ -982,17 +982,16 @@ export default function AccidentReportForm() {
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-lg">
             <Bike className="h-5 w-5 text-primary" />
-            Your Details
+            {t("step.cycling_title")}
           </CardTitle>
           <p className="text-sm text-muted-foreground">
-            Provide details about your bike and safety equipment. These affect
-            contributory negligence weighting.
+            {t("step.cycling_desc")}
           </p>
         </CardHeader>
         <CardContent className="space-y-5">
           {/* Bike type */}
           <div className="space-y-1">
-            <Label htmlFor="bikeType">Bike Type</Label>
+            <Label htmlFor="bikeType">{t("vehicle.bike_type")}</Label>
             <Select value={bikeType} onValueChange={setBikeType}>
               <SelectTrigger id="bikeType" data-ocid="cycling.bikeType.select">
                 <SelectValue placeholder="Select bike type" />
@@ -1197,9 +1196,9 @@ export default function AccidentReportForm() {
   const StepDetails = (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle className="text-lg">Accident Details</CardTitle>
+        <CardTitle className="text-lg">{t("step.details_title")}</CardTitle>
         <p className="text-sm text-muted-foreground">
-          Describe the conditions and circumstances at the time of the accident.
+          {t("step.details_desc")}
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -1222,7 +1221,7 @@ export default function AccidentReportForm() {
             />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="roadType">Road Type</Label>
+            <Label htmlFor="roadType">{t("accident.road_type")}</Label>
             <Select
               value={roadType}
               onValueChange={(v) => setRoadType(v as typeof roadType)}
@@ -1253,7 +1252,9 @@ export default function AccidentReportForm() {
             />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="roadCondition">Road Condition</Label>
+            <Label htmlFor="roadCondition">
+              {t("accident.road_condition")}
+            </Label>
             <Input
               id="roadCondition"
               value={roadCondition}
@@ -1263,7 +1264,7 @@ export default function AccidentReportForm() {
             />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="visibility">Visibility</Label>
+            <Label htmlFor="visibility">{t("accident.visibility")}</Label>
             <Input
               id="visibility"
               value={visibility}
@@ -1444,7 +1445,9 @@ export default function AccidentReportForm() {
         {/* Voice-to-text witness statement */}
         <div className="space-y-1">
           <div className="flex items-center justify-between gap-2">
-            <Label htmlFor="witnessStatement">Witness Statement</Label>
+            <Label htmlFor="witnessStatement">
+              {t("accident.witness_statement")}
+            </Label>
             {speechSupported && (
               <div className="flex items-center gap-2">
                 {voiceTranscribing && (
@@ -1511,12 +1514,11 @@ export default function AccidentReportForm() {
             data-ocid="report.add_party_button"
           >
             <Plus size={14} />
-            Add Party
+            {t("step.parties_add")}
           </Button>
         </div>
         <p className="text-sm text-muted-foreground">
-          Add all other parties involved — vehicles, motorcycles, cyclists,
-          pedestrians, or third-party objects.
+          {t("step.parties_desc")}
         </p>
       </CardHeader>
 
@@ -1594,19 +1596,27 @@ export default function AccidentReportForm() {
                 ? "🚲 Cycling Accident"
                 : "🚗 Vehicle Accident"}
             </span>
-            <span className="text-muted-foreground">Photos uploaded</span>
+            <span className="text-muted-foreground">{t("review.photos")}</span>
             <span>
-              {photos.length > 0 ? `${photos.length} photo(s)` : "None"}
+              {photos.length > 0
+                ? `${photos.length} photo(s)`
+                : t("review.none")}
             </span>
-            <span className="text-muted-foreground">Dash cam clips</span>
+            <span className="text-muted-foreground">
+              {t("review.dashcam_clips")}
+            </span>
             <span>
               {dashCamClips.length > 0
                 ? `${dashCamClips.length} clip(s)`
-                : "None"}
+                : t("review.none")}
             </span>
-            <span className="text-muted-foreground">Photo analysis</span>
+            <span className="text-muted-foreground">
+              {t("review.photo_analysis")}
+            </span>
             <span className="truncate">
-              {photoAnalysisDescription ? "Generated" : "Not run"}
+              {photoAnalysisDescription
+                ? t("review.generated")
+                : t("review.not_run")}
             </span>
           </div>
         </div>
@@ -1628,7 +1638,9 @@ export default function AccidentReportForm() {
                   </span>
                 )}
               </span>
-              <span className="text-muted-foreground">Colour</span>
+              <span className="text-muted-foreground">
+                {t("review.colour")}
+              </span>
               <span>
                 {colour || (
                   <span className="text-muted-foreground/60 italic">—</span>
@@ -1640,7 +1652,7 @@ export default function AccidentReportForm() {
                   <span className="text-muted-foreground/60 italic">—</span>
                 )}
               </span>
-              <span className="text-muted-foreground">Year</span>
+              <span className="text-muted-foreground">{t("review.year")}</span>
               <span>
                 {year || (
                   <span className="text-muted-foreground/60 italic">—</span>

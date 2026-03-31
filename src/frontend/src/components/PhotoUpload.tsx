@@ -13,6 +13,7 @@ import {
 import type React from "react";
 import { useRef, useState } from "react";
 import { ExternalBlob } from "../backend";
+import { useLanguage } from "../contexts/LanguageContext";
 import { type VehicleContext, analyzePhotos } from "../utils/photoAnalyzer";
 import CrashAnalysisDiagramPanel from "./CrashAnalysisDiagramPanel";
 
@@ -48,6 +49,7 @@ export default function PhotoUpload({
   onPhotoEvidenceGapsChange,
   vehicleContext,
 }: PhotoUploadProps) {
+  const { t } = useLanguage();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [photos, setPhotos] = useState<PhotoFile[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -151,7 +153,7 @@ export default function PhotoUpload({
       >
         <ImagePlus className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
         <p className="text-sm text-muted-foreground">
-          Click to upload accident scene photos (JPG, PNG, WebP)
+          {t("upload.photos.click")}
         </p>
         <input
           ref={fileInputRef}
@@ -205,17 +207,17 @@ export default function PhotoUpload({
         {isAnalyzing ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin" />
-            Analysing Photos…
+            {t("photo.analysing")}
           </>
         ) : hasAnalyzed ? (
           <>
             <RefreshCw className="h-4 w-4" />
-            Re-analyse Photos
+            {t("photo.reanalyse")}
           </>
         ) : (
           <>
             <ScanSearch className="h-4 w-4" />
-            Analyse Photo
+            {t("photo.analyse")}
           </>
         )}
       </Button>
@@ -226,14 +228,14 @@ export default function PhotoUpload({
           className="text-sm text-muted-foreground text-center py-2"
           data-ocid="photo.loading_state"
         >
-          Analysing photos with AI…
+          {t("photo.analysing_with_ai")}
         </div>
       )}
 
       {/* === POST-ANALYSIS RESULTS === */}
       {hasAnalyzed && (
         <>
-          {/* Crash Scenario Diagram — shown immediately after analysis */}
+          {/* Crash Scenario Diagram */}
           <CrashAnalysisDiagramPanel
             analysisText={analysisDescription}
             onAdditionalPhotos={handleAdditionalPhotos}
@@ -245,9 +247,9 @@ export default function PhotoUpload({
               htmlFor="photo-analysis-description"
               className="text-sm font-medium text-foreground"
             >
-              AI Photo Description{" "}
+              {t("photo.ai_description_label")}{" "}
               <span className="text-muted-foreground font-normal">
-                (editable)
+                {t("common.editable")}
               </span>
             </label>
             <Textarea
@@ -256,7 +258,7 @@ export default function PhotoUpload({
               onChange={(e) => handleDescriptionChange(e.target.value)}
               rows={5}
               className="text-sm resize-none"
-              placeholder="AI-generated description will appear here…"
+              placeholder={t("photo.placeholder")}
               data-ocid="photo.textarea"
             />
           </div>
@@ -270,7 +272,7 @@ export default function PhotoUpload({
             >
               <AlertTriangle className="h-4 w-4 text-amber-600" />
               <AlertTitle className="text-amber-700 dark:text-amber-400 text-sm font-semibold">
-                Evidence Gaps Detected
+                {t("photo.evidence_gaps_title")}
               </AlertTitle>
               <AlertDescription>
                 <ul className="mt-2 space-y-2">
@@ -299,10 +301,10 @@ export default function PhotoUpload({
               data-ocid="photo.success_state"
             >
               <AlertTitle className="text-green-700 dark:text-green-400 text-sm font-semibold">
-                ✓ No Evidence Gaps Detected
+                ✓ {t("photo.no_evidence_gaps_title")}
               </AlertTitle>
               <AlertDescription className="text-green-700 dark:text-green-400 text-sm">
-                Photo evidence appears comprehensive for this report.
+                {t("photo.no_evidence_gaps_desc")}
               </AlertDescription>
             </Alert>
           )}

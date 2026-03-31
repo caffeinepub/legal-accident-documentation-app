@@ -25,6 +25,7 @@ import {
   Users,
 } from "lucide-react";
 import React, { useState, useEffect } from "react";
+import { useLanguage } from "../contexts/LanguageContext";
 
 const ADDITIONAL_PARTIES_DELIMITER = "---ADDITIONAL_PARTIES---";
 
@@ -80,6 +81,7 @@ export default function FaultLikelihoodPanel({
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   const updateAssessment = useUpdateAccidentAssessment();
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (faultLikelihoodAssessment)
@@ -202,7 +204,7 @@ export default function FaultLikelihoodPanel({
                   ) : (
                     <Sparkles size={14} />
                   )}
-                  Calculate Fault Split
+                  {t("fault.calculate")}
                 </Button>
               </div>
             ) : (
@@ -238,7 +240,7 @@ export default function FaultLikelihoodPanel({
                   <div className="grid grid-cols-2 gap-3">
                     <div className="p-3 rounded-lg bg-muted/40 border border-border space-y-1">
                       <p className="text-xs text-muted-foreground uppercase tracking-wide font-semibold">
-                        Party A (Subject)
+                        {t("fault.party_a")}
                       </p>
                       <p
                         className="text-2xl font-bold"
@@ -252,7 +254,7 @@ export default function FaultLikelihoodPanel({
                     </div>
                     <div className="p-3 rounded-lg bg-muted/40 border border-border space-y-1">
                       <p className="text-xs text-muted-foreground uppercase tracking-wide font-semibold">
-                        Party B (Other)
+                        {t("fault.party_b")}
                       </p>
                       <p
                         className="text-2xl font-bold"
@@ -271,7 +273,7 @@ export default function FaultLikelihoodPanel({
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground font-medium">
-                      Assessment Confidence
+                      {t("fault.confidence")}
                     </span>
                     <span className="font-semibold">{confidence}%</span>
                   </div>
@@ -290,7 +292,7 @@ export default function FaultLikelihoodPanel({
                 {/* Reasoning */}
                 <div className="space-y-2">
                   <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                    Liability Determination Basis
+                    {t("fault.basis")}
                   </p>
                   <div className="p-3 bg-muted/30 rounded-lg border border-border text-sm leading-relaxed">
                     {localAssessment.reasoning}
@@ -303,7 +305,7 @@ export default function FaultLikelihoodPanel({
                     <div className="space-y-2">
                       <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1">
                         <ThumbsUp size={12} className="text-green-500" />
-                        Factors Supporting Liability Finding
+                        {t("fault.supporting")}
                       </p>
                       <ul className="space-y-1.5">
                         {localAssessment.supportingFactors.map((factor) => (
@@ -328,7 +330,7 @@ export default function FaultLikelihoodPanel({
                     <div className="space-y-2">
                       <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1">
                         <ThumbsDown size={12} className="text-amber-500" />
-                        Mitigating Circumstances
+                        {t("fault.mitigating")}
                       </p>
                       <ul className="space-y-1.5">
                         {localAssessment.conflictingFactors.map((factor) => (
@@ -351,7 +353,7 @@ export default function FaultLikelihoodPanel({
                   <div className="space-y-1.5">
                     <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1">
                       <MapPin size={12} className="text-blue-500" />
-                      Road Position Impact
+                      {t("fault.road_position")}
                     </p>
                     <p className="text-xs text-foreground leading-relaxed p-3 bg-blue-50/50 dark:bg-blue-900/10 rounded-lg border border-blue-200/50 dark:border-blue-800/30">
                       {localAssessment.roadPositionImpact}

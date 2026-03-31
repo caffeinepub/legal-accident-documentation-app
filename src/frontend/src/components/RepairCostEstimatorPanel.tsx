@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useCountry } from "../contexts/CountryContext";
+import { useLanguage } from "../contexts/LanguageContext";
 
 interface RepairCostEstimatorPanelProps {
   damageSeverity?: DamageSeverity;
@@ -184,6 +185,7 @@ export default function RepairCostEstimatorPanel({
 }: RepairCostEstimatorPanelProps) {
   const { country } = useCountry();
   const isMalta = country === "mt";
+  const { t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
 
   const detectedCrashKey = crashType ? normaliseCrashType(crashType) : null;
@@ -221,7 +223,7 @@ export default function RepairCostEstimatorPanel({
             >
               <CardTitle className="text-sm flex items-center gap-2">
                 <Wrench size={16} className="text-orange-500" />
-                Repair Cost Estimator
+                {t("repair.title")}
                 {(detectedCrashKey || autoSeverityBand) && (
                   <Badge
                     variant="outline"
@@ -265,14 +267,14 @@ export default function RepairCostEstimatorPanel({
             {/* Crash type selector */}
             <div className="space-y-2">
               <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                Crash Type
+                {t("repair.crash_type_label")}
               </Label>
               <Select
                 value={selectedCrash}
                 onValueChange={(v) => setSelectedCrash(v as CrashTypeKey)}
               >
                 <SelectTrigger data-ocid="repair.select">
-                  <SelectValue placeholder="Select crash type…" />
+                  <SelectValue placeholder={t("repair.crash_placeholder")} />
                 </SelectTrigger>
                 <SelectContent>
                   {(Object.keys(CRASH_TYPE_LABELS) as CrashTypeKey[]).map(
@@ -289,7 +291,7 @@ export default function RepairCostEstimatorPanel({
             {/* Severity selector */}
             <div className="space-y-2">
               <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                Damage Severity
+                {t("repair.severity_label")}
               </Label>
               <div className="grid grid-cols-2 gap-2">
                 {(
@@ -329,7 +331,7 @@ export default function RepairCostEstimatorPanel({
                   <div className="flex items-center justify-between p-4 rounded-xl bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-800/40">
                     <div>
                       <p className="text-xs text-orange-600 dark:text-orange-400 font-medium uppercase tracking-wide">
-                        Estimated Repair Range
+                        {t("repair.estimate_range_label")}
                       </p>
                       <p className="text-2xl font-bold text-orange-700 dark:text-orange-300 mt-0.5">
                         {costRange}

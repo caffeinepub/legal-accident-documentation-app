@@ -37,6 +37,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useLanguage } from "../contexts/LanguageContext";
 
 interface MedicalEntry {
   id: string;
@@ -122,7 +123,10 @@ const emptyForm = {
   severity: 5,
 };
 
-function SeverityChart({ entries }: { entries: MedicalEntry[] }) {
+function SeverityChart({
+  entries,
+  chartTitle,
+}: { entries: MedicalEntry[]; chartTitle: string }) {
   const sorted = [...entries]
     .filter((e) => e.date)
     .sort((a, b) => a.date.localeCompare(b.date));
@@ -139,7 +143,7 @@ function SeverityChart({ entries }: { entries: MedicalEntry[] }) {
   return (
     <div className="rounded-lg border border-border bg-card p-3 mb-4">
       <p className="text-xs font-medium text-muted-foreground mb-2">
-        Pain / Severity Over Time
+        {chartTitle}
       </p>
       <ResponsiveContainer width="100%" height={180}>
         <AreaChart
@@ -202,6 +206,7 @@ const InjuryProgressionTracker: React.FC<InjuryProgressionTrackerProps> = ({
   reportId,
 }) => {
   const [open, setOpen] = useState(false);
+  const { t } = useLanguage();
   const [entries, setEntries] = useState<MedicalEntry[]>(() =>
     loadEntries(reportId),
   );
@@ -237,7 +242,7 @@ const InjuryProgressionTracker: React.FC<InjuryProgressionTrackerProps> = ({
             <div className="flex items-center justify-between cursor-pointer select-none">
               <CardTitle className="flex items-center gap-2 text-base font-semibold">
                 <Activity className="h-4 w-4 text-primary" />
-                Injury Recovery Tracker
+                {t("injury.tracker_title")}
                 {trend && (
                   <Badge
                     className={`ml-2 flex items-center gap-1 text-xs ${trend.className}`}
@@ -260,7 +265,10 @@ const InjuryProgressionTracker: React.FC<InjuryProgressionTrackerProps> = ({
           <CardContent className="pt-0 space-y-4">
             {/* Chart when 2+ entries */}
             {chartEntries.length >= 2 && (
-              <SeverityChart entries={chartEntries} />
+              <SeverityChart
+                entries={chartEntries}
+                chartTitle={t("injury.severity_chart")}
+              />
             )}
 
             <Button
@@ -270,7 +278,7 @@ const InjuryProgressionTracker: React.FC<InjuryProgressionTrackerProps> = ({
               data-ocid="injury_tracker.add_button"
               onClick={() => setShowForm((v) => !v)}
             >
-              {showForm ? "Cancel" : "+ Add Entry"}
+              {showForm ? t("action.cancel") : t("injury.add_entry")}
             </Button>
 
             {showForm && (
@@ -280,7 +288,7 @@ const InjuryProgressionTracker: React.FC<InjuryProgressionTrackerProps> = ({
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <Label htmlFor="irt-date">Date</Label>
+                    <Label htmlFor="irt-date">{t("injury.date")}</Label>
                     <Input
                       id="irt-date"
                       type="date"
@@ -293,7 +301,9 @@ const InjuryProgressionTracker: React.FC<InjuryProgressionTrackerProps> = ({
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="irt-type">Appointment Type</Label>
+                    <Label htmlFor="irt-type">
+                      {t("injury.appointment_type")}
+                    </Label>
                     <Select
                       value={form.appointmentType}
                       onValueChange={(v) =>
@@ -319,7 +329,7 @@ const InjuryProgressionTracker: React.FC<InjuryProgressionTrackerProps> = ({
                     </Select>
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="irt-location">Hospital / Clinic</Label>
+                    <Label htmlFor="irt-location">{t("injury.hospital")}</Label>
                     <Input
                       id="irt-location"
                       placeholder="e.g. Royal London Hospital"
@@ -330,7 +340,7 @@ const InjuryProgressionTracker: React.FC<InjuryProgressionTrackerProps> = ({
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="irt-doctor">Doctor Name</Label>
+                    <Label htmlFor="irt-doctor">{t("injury.doctor")}</Label>
                     <Input
                       id="irt-doctor"
                       placeholder="e.g. Dr. Smith"
@@ -343,7 +353,7 @@ const InjuryProgressionTracker: React.FC<InjuryProgressionTrackerProps> = ({
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="irt-notes">Notes</Label>
+                  <Label htmlFor="irt-notes">{t("injury.notes")}</Label>
                   <Textarea
                     id="irt-notes"
                     data-ocid="injury_tracker.textarea"
@@ -383,7 +393,7 @@ const InjuryProgressionTracker: React.FC<InjuryProgressionTrackerProps> = ({
                     size="sm"
                     data-ocid="injury_tracker.submit_button"
                   >
-                    Save Entry
+                    {t("injury.save_entry")}
                   </Button>
                   <Button
                     type="button"

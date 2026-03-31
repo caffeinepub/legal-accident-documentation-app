@@ -3,6 +3,7 @@ import { Image, Upload, X } from "lucide-react";
 import type React from "react";
 import { useRef, useState } from "react";
 import { ExternalBlob } from "../backend";
+import { useLanguage } from "../contexts/LanguageContext";
 
 interface InjuryPhotoUploadProps {
   onPhotosSelected: (blobs: ExternalBlob[], files: File[]) => void;
@@ -11,8 +12,10 @@ interface InjuryPhotoUploadProps {
 
 export default function InjuryPhotoUpload({
   onPhotosSelected,
-  label = "Upload Photos",
+  label,
 }: InjuryPhotoUploadProps) {
+  const { t } = useLanguage();
+  const displayLabel = label ?? t("upload.add_more");
   const [previews, setPreviews] = useState<string[]>([]);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -70,11 +73,12 @@ export default function InjuryPhotoUpload({
           type="button"
           onClick={() => fileInputRef.current?.click()}
           className="w-full border-2 border-dashed border-border rounded-lg p-6 flex flex-col items-center gap-2 hover:border-primary/50 hover:bg-muted/30 transition-colors cursor-pointer"
+          data-ocid="injury.upload_button"
         >
           <Image className="h-8 w-8 text-muted-foreground" />
-          <p className="text-sm font-medium text-foreground">{label}</p>
+          <p className="text-sm font-medium text-foreground">{displayLabel}</p>
           <p className="text-xs text-muted-foreground">
-            JPEG, PNG, WebP supported
+            {t("upload.formats.photo")}
           </p>
         </button>
       ) : (
@@ -103,9 +107,10 @@ export default function InjuryPhotoUpload({
             size="sm"
             onClick={() => fileInputRef.current?.click()}
             className="w-full"
+            data-ocid="injury.secondary_button"
           >
             <Upload className="h-4 w-4 mr-2" />
-            Add More Photos
+            {t("upload.add_more")}
           </Button>
         </div>
       )}

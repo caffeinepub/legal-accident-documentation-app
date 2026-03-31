@@ -1,12 +1,13 @@
 import { CheckCircle2, Clock, FileEdit, Send } from "lucide-react";
 import type React from "react";
+import { useLanguage } from "../contexts/LanguageContext";
 
-const STEPS = [
-  { label: "Draft", icon: FileEdit, key: "draft" },
-  { label: "Submitted", icon: Send, key: "submitted" },
-  { label: "Acknowledged", icon: Clock, key: "under_review" },
-  { label: "Settled", icon: CheckCircle2, key: "settled" },
-] as const;
+const STEP_KEYS = [
+  { icon: FileEdit, statusKey: "draft" as const },
+  { icon: Send, statusKey: "submitted" as const },
+  { icon: Clock, statusKey: "acknowledged" as const },
+  { icon: CheckCircle2, statusKey: "settled" as const },
+];
 
 const STATUS_INDEX: Record<string, number> = {
   draft: 0,
@@ -25,13 +26,20 @@ export default function ClaimStatusTimeline({
   currentStatus,
   submittedAt,
 }: ClaimStatusTimelineProps) {
+  const { t } = useLanguage();
   const currentIndex = STATUS_INDEX[currentStatus] ?? 0;
+
+  const steps = STEP_KEYS.map((s) => ({
+    icon: s.icon,
+    key: s.statusKey,
+    label: t(`status.${s.statusKey}` as const),
+  }));
 
   return (
     <div data-ocid="claim-status.panel" className="py-1">
       {/* Desktop: horizontal stepper */}
       <ol className="hidden sm:flex items-center w-full">
-        {STEPS.map((step, idx) => {
+        {steps.map((step, idx) => {
           const Icon = step.icon;
           const isCompleted = idx < currentIndex;
           const isCurrent = idx === currentIndex;
@@ -72,7 +80,7 @@ export default function ClaimStatusTimeline({
                   )}
                 </div>
                 {/* Right connector */}
-                {idx < STEPS.length - 1 && (
+                {idx < steps.length - 1 && (
                   <div
                     className={`flex-1 h-0.5 ${
                       idx < currentIndex
@@ -108,7 +116,7 @@ export default function ClaimStatusTimeline({
 
       {/* Mobile: vertical compact list */}
       <ol className="sm:hidden flex flex-col gap-2">
-        {STEPS.map((step, idx) => {
+        {steps.map((step, idx) => {
           const Icon = step.icon;
           const isCompleted = idx < currentIndex;
           const isCurrent = idx === currentIndex;

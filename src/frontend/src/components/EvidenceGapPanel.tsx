@@ -17,6 +17,7 @@ import {
 import type React from "react";
 import { useState } from "react";
 import type { AccidentReport } from "../backend";
+import { useLanguage } from "../contexts/LanguageContext";
 import { getReportStatus } from "../utils/reportStatus";
 
 type Severity = "critical" | "warning" | "tip";
@@ -30,7 +31,6 @@ interface GapItem {
 function detectGaps(report: AccidentReport): GapItem[] {
   const gaps: GapItem[] = [];
 
-  // ── Basic evidence gaps ────────────────────────────────────────────────────
   if (!report.photos || report.photos.length === 0) {
     gaps.push({
       key: "no-photos",
@@ -104,9 +104,6 @@ function detectGaps(report: AccidentReport): GapItem[] {
     });
   }
 
-  // ── Smarter contextual checks ──────────────────────────────────────────────
-
-  // Disputed fault + no witness
   const fla = report.faultLikelihoodAssessment;
   if (fla) {
     const partyA = Number(fla.partyAPercentage);
@@ -117,7 +114,6 @@ function detectGaps(report: AccidentReport): GapItem[] {
       isDisputed &&
       (!report.witnessStatement || report.witnessStatement.trim() === "")
     ) {
-      // Avoid duplicate no-witness message
       const hasWitness = gaps.find((g) => g.key === "no-witness");
       if (hasWitness) {
         hasWitness.message =
@@ -133,7 +129,6 @@ function detectGaps(report: AccidentReport): GapItem[] {
       }
     }
 
-    // No dash cam for contested fault
     if (
       isDisputed &&
       (!report.dashCamFootage || report.dashCamFootage.length === 0)
@@ -153,7 +148,6 @@ function detectGaps(report: AccidentReport): GapItem[] {
     }
   }
 
-  // Injury description but no injury photos
   const hasInjuryDescription =
     report.damageDescription && report.damageDescription.trim() !== "";
   const hasInjuryPhotos =
@@ -168,8 +162,6 @@ function detectGaps(report: AccidentReport): GapItem[] {
     });
   }
 
-  // (demand letter check handled at component level via reportId prop)
-
   return gaps;
 }
 
@@ -179,29 +171,35 @@ const SEVERITY_STYLES: Record<
     icon: React.ElementType;
     iconClass: string;
     rowClass: string;
-    label: string;
+    labelKey: "status.draft" | "status.under_review" | "status.acknowledged";
   }
 > = {
   critical: {
     icon: XCircle,
     iconClass: "text-red-500",
     rowClass: "border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/50",
-    label: "Critical",
+    labelKey: "status.draft",
   },
   warning: {
     icon: AlertTriangle,
     iconClass: "text-amber-500",
     rowClass:
       "border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/50",
-    label: "Warning",
+    labelKey: "status.draft",
   },
   tip: {
     icon: Info,
     iconClass: "text-blue-500",
     rowClass:
       "border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/50",
-    label: "Tip",
+    labelKey: "status.draft",
   },
+};
+
+const SEVERITY_LABELS: Record<Severity, string> = {
+  critical: "Critical",
+  warning: "Warning",
+  tip: "Tip",
 };
 
 interface EvidenceGapPanelProps {
@@ -213,9 +211,9 @@ export default function EvidenceGapPanel({
   report,
   reportId,
 }: EvidenceGapPanelProps) {
+  const { t } = useLanguage();
   const [open, setOpen] = useState(true);
 
-  // Add demand letter check if reportId is provided
   const extraGaps: GapItem[] = [];
   if (reportId) {
     const claimStatus = getReportStatus(reportId);
@@ -234,6 +232,7 @@ export default function EvidenceGapPanel({
   const gaps = [...detectGaps(report), ...extraGaps];
   const criticalCount = gaps.filter((g) => g.severity === "critical").length;
   const warningCount = gaps.filter((g) => g.severity === "warning").length;
+  const tipCount = gaps.length - criticalCount - warningCount;
 
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
@@ -246,7 +245,7 @@ export default function EvidenceGapPanel({
             >
               <CardTitle className="flex items-center gap-2 text-sm font-semibold">
                 <Search className="w-4 h-4 text-muted-foreground" />
-                Evidence Strength Check
+                {t("evidence.check_title")}
               </CardTitle>
               <div className="flex items-center gap-2">
                 {gaps.length === 0 ? (
@@ -254,13 +253,13 @@ export default function EvidenceGapPanel({
                     variant="outline"
                     className="text-xs border-emerald-300 text-emerald-700 dark:text-emerald-400"
                   >
-                    Complete
+                    {t("evidence.complete_badge")}
                   </Badge>
                 ) : (
                   <>
                     {criticalCount > 0 && (
                       <Badge variant="destructive" className="text-xs">
-                        {criticalCount} critical
+                        {criticalCount} {SEVERITY_LABELS.critical.toLowerCase()}
                       </Badge>
                     )}
                     {warningCount > 0 && (
@@ -268,18 +267,17 @@ export default function EvidenceGapPanel({
                         variant="outline"
                         className="text-xs border-amber-300 text-amber-700 dark:text-amber-400"
                       >
-                        {warningCount} warning{warningCount > 1 ? "s" : ""}
+                        {warningCount} {SEVERITY_LABELS.warning.toLowerCase()}
+                        {warningCount > 1 ? "s" : ""}
                       </Badge>
                     )}
-                    {gaps.length - criticalCount - warningCount > 0 && (
+                    {tipCount > 0 && (
                       <Badge
                         variant="outline"
                         className="text-xs border-blue-300 text-blue-700 dark:text-blue-400"
                       >
-                        {gaps.length - criticalCount - warningCount} tip
-                        {gaps.length - criticalCount - warningCount > 1
-                          ? "s"
-                          : ""}
+                        {tipCount} {SEVERITY_LABELS.tip.toLowerCase()}
+                        {tipCount > 1 ? "s" : ""}
                       </Badge>
                     )}
                   </>
@@ -302,8 +300,7 @@ export default function EvidenceGapPanel({
               >
                 <CheckCircle2 className="w-4 h-4 shrink-0" />
                 <span className="font-medium">
-                  Evidence Complete — your report has all key evidence
-                  components.
+                  {t("evidence.complete_msg")}
                 </span>
               </div>
             ) : (

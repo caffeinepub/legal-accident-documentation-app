@@ -20,6 +20,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import React, { useState, useEffect } from "react";
+import { useLanguage } from "../contexts/LanguageContext";
 
 interface DamageSeverityPanelProps {
   reportId: bigint;
@@ -324,6 +325,7 @@ export default function DamageSeverityPanel({
   const [isAiInformed, setIsAiInformed] = useState(false);
 
   const updateAssessment = useUpdateAccidentAssessment();
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (damageSeverity) setLocalSeverity(damageSeverity);
@@ -359,7 +361,7 @@ export default function DamageSeverityPanel({
             >
               <CardTitle className="text-sm flex items-center gap-2 flex-wrap">
                 <ShieldAlert size={16} className="text-orange-500" />
-                Vehicle Damage Assessment
+                {t("damage.title")}
                 {localSeverity && (
                   <Badge
                     variant="outline"
@@ -410,7 +412,7 @@ export default function DamageSeverityPanel({
                   ) : (
                     <Sparkles size={14} />
                   )}
-                  Calculate Severity
+                  {t("damage.calculate")}
                 </Button>
               </div>
             ) : (

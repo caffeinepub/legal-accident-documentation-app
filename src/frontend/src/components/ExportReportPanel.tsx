@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useCountry } from "../contexts/CountryContext";
+import { useLanguage } from "../contexts/LanguageContext";
 import { formatClaimId } from "../utils/claimId";
 import QRCodeDisplay from "./QRCodeDisplay";
 
@@ -286,6 +287,7 @@ export default function ExportReportPanel({
   const [copied, setCopied] = useState(false);
   const { country } = useCountry();
   const isMalta = country === "mt";
+  const { t } = useLanguage();
   const [previewOpen, setPreviewOpen] = useState(false);
   const [showFullPreview, setShowFullPreview] = useState(false);
 
@@ -359,7 +361,7 @@ export default function ExportReportPanel({
       <CardHeader className="pb-3">
         <CardTitle className="text-sm flex items-center gap-2">
           <FileDown size={16} className="text-primary" />
-          Export Claim Report
+          {t("export.title")}
           <Badge
             variant="outline"
             className="text-xs border-primary/40 text-primary ml-auto"
@@ -368,7 +370,7 @@ export default function ExportReportPanel({
           </Badge>
         </CardTitle>
         <p className="text-xs text-muted-foreground pt-1">
-          Compile all report data into a formal insurance claim document.
+          {t("export.description")}
         </p>
       </CardHeader>
 
@@ -402,7 +404,7 @@ export default function ExportReportPanel({
             data-ocid="export.secondary_button"
           >
             <Printer size={14} />
-            Print Report
+            {t("export.print")}
           </Button>
         </div>
 
@@ -422,7 +424,7 @@ export default function ExportReportPanel({
               data-ocid="export.toggle"
             >
               <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide group-hover:text-foreground transition-colors">
-                Preview Report
+                {t("export.preview")}
               </span>
               <span className="text-muted-foreground group-hover:text-foreground transition-colors">
                 {previewOpen ? (
@@ -447,7 +449,9 @@ export default function ExportReportPanel({
                   className="text-xs text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded"
                   data-ocid="export.toggle"
                 >
-                  {showFullPreview ? "Show less" : "Show full preview"}
+                  {showFullPreview
+                    ? t("export.show_less")
+                    : t("export.show_more")}
                 </button>
               )}
             </div>

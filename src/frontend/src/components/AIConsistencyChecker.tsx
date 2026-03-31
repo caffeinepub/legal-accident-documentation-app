@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import type React from "react";
 import type { FaultLikelihoodAssessment } from "../backend.d";
+import { useLanguage } from "../contexts/LanguageContext";
 
 interface AIConsistencyCheckerProps {
   inferredCrashType?: string;
@@ -113,6 +114,7 @@ const AIConsistencyChecker: React.FC<AIConsistencyCheckerProps> = ({
   inferredCrashType,
   faultLikelihoodAssessment,
 }) => {
+  const { t } = useLanguage();
   const result = checkConsistency(inferredCrashType, faultLikelihoodAssessment);
 
   return (
@@ -120,13 +122,13 @@ const AIConsistencyChecker: React.FC<AIConsistencyCheckerProps> = ({
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-base font-semibold">
           <BrainCircuit className="h-4 w-4 text-primary" />
-          AI Consistency Check
+          {t("ai.consistency_title")}
         </CardTitle>
       </CardHeader>
       <CardContent>
         {result.status === "no_data" && (
           <p className="text-sm text-muted-foreground italic">
-            Run fault assessment and photo analysis to enable consistency check.
+            {t("ai.consistency_no_data")}
           </p>
         )}
 
@@ -135,7 +137,7 @@ const AIConsistencyChecker: React.FC<AIConsistencyCheckerProps> = ({
             <div className="flex items-center gap-2">
               <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400 shrink-0" />
               <Badge className="bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300 border-green-300 dark:border-green-700">
-                Consistent
+                {t("ai.consistency_consistent")}
               </Badge>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
@@ -149,7 +151,7 @@ const AIConsistencyChecker: React.FC<AIConsistencyCheckerProps> = ({
             <div className="flex items-center gap-2">
               <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
               <Badge className="bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 border-amber-300 dark:border-amber-700">
-                Review Recommended
+                {t("ai.consistency_review")}
               </Badge>
             </div>
             <p className="text-sm text-foreground leading-relaxed">

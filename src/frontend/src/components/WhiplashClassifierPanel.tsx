@@ -19,6 +19,7 @@ import { Separator } from "@/components/ui/separator";
 import { AlertCircle, Brain, ChevronDown, ChevronUp, Info } from "lucide-react";
 import { useState } from "react";
 import { useCountry } from "../contexts/CountryContext";
+import { useLanguage } from "../contexts/LanguageContext";
 
 interface WhiplashClassifierPanelProps {
   injuryDescription?: string;
@@ -87,6 +88,7 @@ export default function WhiplashClassifierPanel({
 }: WhiplashClassifierPanelProps) {
   const [isOpen, setIsOpen] = useState(false);
   const { country } = useCountry();
+  const { t } = useLanguage();
   const isMalta = country === "mt";
   const [injuryType, setInjuryType] = useState<InjuryType>("whiplash_only");
   const [duration, setDuration] = useState<DurationBand | "">("");
@@ -117,9 +119,7 @@ export default function WhiplashClassifierPanel({
             >
               <CardTitle className="text-sm flex items-center gap-2">
                 <Brain size={16} className="text-violet-500" />
-                {isMalta
-                  ? "Soft Tissue Injury Estimator"
-                  : "Whiplash Injury Classifier"}
+                {isMalta ? t("whiplash.title_mt") : t("whiplash.title_uk")}
                 <Badge
                   variant="outline"
                   className="text-xs text-violet-600 border-violet-400"
@@ -147,7 +147,7 @@ export default function WhiplashClassifierPanel({
             {/* Injury type */}
             <div className="space-y-2">
               <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                Injury Type
+                {t("whiplash.injury_type_label")}
               </Label>
               <RadioGroup
                 value={injuryType}
@@ -182,7 +182,7 @@ export default function WhiplashClassifierPanel({
             {/* Duration band */}
             <div className="space-y-2">
               <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                Estimated Injury Duration
+                {t("whiplash.duration_label")}
               </Label>
               <Select
                 value={duration}
@@ -192,7 +192,9 @@ export default function WhiplashClassifierPanel({
                 }}
               >
                 <SelectTrigger className="w-full" data-ocid="whiplash.select">
-                  <SelectValue placeholder="Select duration band…" />
+                  <SelectValue
+                    placeholder={t("whiplash.duration_placeholder")}
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   {(Object.keys(DURATION_LABELS) as DurationBand[]).map(
@@ -220,7 +222,9 @@ export default function WhiplashClassifierPanel({
               data-ocid="whiplash.primary_button"
             >
               <Brain size={14} />
-              {isMalta ? "Calculate Compensation" : "Calculate WRP Tariff"}
+              {isMalta
+                ? t("whiplash.calculate_mt")
+                : t("whiplash.calculate_uk")}
             </Button>
 
             {/* Result */}
@@ -231,7 +235,7 @@ export default function WhiplashClassifierPanel({
                   <div className="flex items-center justify-between p-4 rounded-xl bg-violet-50 dark:bg-violet-950/30 border border-violet-200 dark:border-violet-800/40">
                     <div>
                       <p className="text-xs text-violet-600 dark:text-violet-400 font-medium uppercase tracking-wide">
-                        Indicative Tariff Value
+                        {t("whiplash.tariff_value")}
                       </p>
                       <p className="text-3xl font-bold text-violet-700 dark:text-violet-300 mt-0.5">
                         {isMalta
@@ -240,7 +244,7 @@ export default function WhiplashClassifierPanel({
                       </p>
                       {injuryType === "whiplash_psychological" && (
                         <p className="text-xs text-violet-500 mt-0.5">
-                          Includes 10% psychological uplift
+                          {t("whiplash.psych_uplift_note")}
                         </p>
                       )}
                     </div>

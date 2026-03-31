@@ -40,6 +40,7 @@ export type TranslationKey =
   | "status.draft"
   | "status.submitted"
   | "status.under_review"
+  | "status.acknowledged"
   | "status.settled"
   | "status.label"
   // Footer
@@ -157,7 +158,150 @@ export type TranslationKey =
   // Form headings
   | "form.heading"
   | "form.step_of"
-  | "form.draft_saved";
+  | "form.draft_saved"
+  // Form sections
+  | "form.section.media"
+  | "form.section.media_desc"
+  | "form.section.photos"
+  | "form.section.dashcam"
+  | "form.incident_type"
+  | "form.vehicle_incident"
+  | "form.cycling_incident"
+  // Upload components
+  | "upload.dashcam.click"
+  | "upload.photos.click"
+  | "upload.formats.photo"
+  | "upload.add_more"
+  // DashCam analyse
+  | "dashcam.analysing"
+  | "dashcam.reanalyse"
+  | "dashcam.analyse"
+  | "dashcam.cross_analysis_label"
+  | "dashcam.cross_referenced"
+  | "dashcam.placeholder"
+  // Photo analyse
+  | "photo.analysing"
+  | "photo.reanalyse"
+  | "photo.analyse"
+  | "photo.analysing_with_ai"
+  | "photo.ai_description_label"
+  | "photo.placeholder"
+  | "photo.evidence_gaps_title"
+  | "photo.no_evidence_gaps_title"
+  | "photo.no_evidence_gaps_desc"
+  // Common
+  | "common.editable"
+  | "common.saved"
+  // Evidence panel
+  | "evidence.check_title"
+  | "evidence.complete_msg"
+  | "evidence.complete_badge"
+  // AI Consistency
+  | "ai.consistency_title"
+  | "ai.consistency_no_data"
+  | "ai.consistency_consistent"
+  | "ai.consistency_review"
+  // Injury tracker
+  | "injury.tracker_title"
+  | "injury.add_entry"
+  | "injury.save_entry"
+  | "injury.date"
+  | "injury.appointment_type"
+  | "injury.hospital"
+  | "injury.doctor"
+  | "injury.notes"
+  | "injury.severity_label"
+  | "injury.mild"
+  | "injury.severe_end"
+  | "injury.no_entries"
+  | "injury.improving"
+  | "injury.worsening"
+  | "injury.stable"
+  | "injury.severity_chart"
+  // Fault panel
+  | "fault.calculate"
+  | "fault.recalculate"
+  | "fault.ai_informed"
+  | "fault.confidence"
+  | "fault.basis"
+  | "fault.supporting"
+  | "fault.mitigating"
+  | "fault.road_position"
+  | "fault.party_a"
+  | "fault.party_b"
+  | "fault.ai_evidence_detected"
+  // Whiplash panel
+  | "whiplash.title_uk"
+  | "whiplash.title_mt"
+  | "whiplash.injury_type_label"
+  | "whiplash.only"
+  | "whiplash.psychological"
+  | "whiplash.uplift"
+  | "whiplash.duration_label"
+  | "whiplash.duration_placeholder"
+  | "whiplash.calculate_uk"
+  | "whiplash.calculate_mt"
+  | "whiplash.tariff_value"
+  | "whiplash.psych_uplift_note"
+  // Repair panel
+  | "repair.title"
+  | "repair.auto_detected"
+  | "repair.crash_type_label"
+  | "repair.crash_placeholder"
+  | "repair.severity_label"
+  | "repair.estimate_range_label"
+  // Export panel
+  | "export.title"
+  | "export.insurance_ready"
+  | "export.description"
+  | "export.copy"
+  | "export.copied"
+  | "export.print"
+  | "export.preview"
+  | "export.show_more"
+  | "export.show_less"
+  // Damage severity panel
+  | "damage.calculate"
+  | "damage.recalculate"
+  | "damage.title"
+  // Step descriptions
+  | "step.vehicle_title"
+  | "step.vehicle_desc"
+  | "step.cycling_title"
+  | "step.cycling_desc"
+  | "step.details_title"
+  | "step.details_desc"
+  | "step.parties_title"
+  | "step.parties_desc"
+  | "step.parties_add"
+  // Claim status
+  | "claim.status_title"
+  // Vehicle step fields
+  | "vehicle.vrt_expiry"
+  | "vehicle.mot_expiry"
+  | "vehicle.bike_type"
+  | "vehicle.select_bike_type"
+  // Accident step fields
+  | "accident.road_type"
+  | "accident.police_ref"
+  | "accident.officer_name"
+  | "accident.witness_statement"
+  | "accident.road_condition"
+  | "accident.visibility"
+  // Cycling
+  | "cycling.sub_scenario"
+  | "cycling.vs_vehicle"
+  | "cycling.vs_pedestrian"
+  | "cycling.solo"
+  // Review step
+  | "review.photos"
+  | "review.dashcam_clips"
+  | "review.photo_analysis"
+  | "review.generated"
+  | "review.not_run"
+  | "review.none"
+  | "review.colour"
+  | "review.year";
 
 type Translations = Record<Language, Record<TranslationKey, string>>;
 
@@ -193,6 +337,7 @@ const translations: Translations = {
     "status.draft": "Draft",
     "status.submitted": "Submitted",
     "status.under_review": "Under Review",
+    "status.acknowledged": "Acknowledged",
     "status.settled": "Settled",
     "status.label": "Claim Status",
     "footer.built_with": "Built with",
@@ -304,6 +449,142 @@ const translations: Translations = {
     "form.heading": "New Accident Report",
     "form.step_of": "Step {current} of {total}",
     "form.draft_saved": "Draft saved",
+    "form.section.media": "Media & AI Analysis",
+    "form.section.media_desc":
+      "Upload photos and dash cam footage. Use the analyse buttons to generate AI descriptions that complement each other.",
+    "form.section.photos": "Accident Scene Photos",
+    "form.section.dashcam": "Dash Cam Footage",
+    "form.incident_type": "Incident Type",
+    "form.vehicle_incident": "Vehicle Accident",
+    "form.cycling_incident": "Cycling Accident",
+    "upload.dashcam.click": "Click to upload dash cam footage (MP4, MOV, AVI)",
+    "upload.photos.click":
+      "Click to upload accident scene photos (JPG, PNG, WebP)",
+    "upload.formats.photo": "JPEG, PNG, WebP supported",
+    "upload.add_more": "Add More Photos",
+    "dashcam.analysing": "Analysing Dash Cam…",
+    "dashcam.reanalyse": "Re-analyse Dash Cam",
+    "dashcam.analyse": "Analyse Dash Cam",
+    "dashcam.cross_analysis_label": "AI Dash Cam Cross-Analysis",
+    "dashcam.cross_referenced": "✓ Cross-referenced with photo analysis",
+    "dashcam.placeholder": "AI-generated cross-analysis will appear here…",
+    "photo.analysing": "Analysing Photos…",
+    "photo.reanalyse": "Re-analyse Photos",
+    "photo.analyse": "Analyse Photos",
+    "photo.analysing_with_ai": "Analysing photos with AI…",
+    "photo.ai_description_label": "AI Photo Description",
+    "photo.placeholder": "AI-generated description will appear here…",
+    "photo.evidence_gaps_title": "Evidence Gaps Detected",
+    "photo.no_evidence_gaps_title": "No Evidence Gaps Detected",
+    "photo.no_evidence_gaps_desc":
+      "Photo evidence appears comprehensive for this report.",
+    "common.editable": "(editable)",
+    "common.saved": "Saved",
+    "evidence.check_title": "Evidence Strength Check",
+    "evidence.complete_msg":
+      "Evidence Complete — your report has all key evidence components.",
+    "evidence.complete_badge": "Complete",
+    "ai.consistency_title": "AI Consistency Check",
+    "ai.consistency_no_data":
+      "Run fault assessment and photo analysis to enable consistency check.",
+    "ai.consistency_consistent": "Consistent",
+    "ai.consistency_review": "Review Recommended",
+    "injury.tracker_title": "Injury Recovery Tracker",
+    "injury.add_entry": "+ Add Entry",
+    "injury.save_entry": "Save Entry",
+    "injury.date": "Date",
+    "injury.appointment_type": "Appointment Type",
+    "injury.hospital": "Hospital / Clinic",
+    "injury.doctor": "Doctor Name",
+    "injury.notes": "Notes",
+    "injury.severity_label": "Pain / Severity",
+    "injury.mild": "1 — Mild",
+    "injury.severe_end": "10 — Severe",
+    "injury.no_entries":
+      "No medical entries yet. Add your first appointment to begin tracking recovery.",
+    "injury.improving": "Improving",
+    "injury.worsening": "Worsening",
+    "injury.stable": "Stable",
+    "injury.severity_chart": "Pain / Severity Over Time",
+    "fault.calculate": "Calculate Fault Split",
+    "fault.recalculate": "Recalculate",
+    "fault.ai_informed": "AI-Informed",
+    "fault.confidence": "Assessment Confidence",
+    "fault.basis": "Liability Determination Basis",
+    "fault.supporting": "Factors Supporting Liability Finding",
+    "fault.mitigating": "Mitigating Circumstances",
+    "fault.road_position": "Road Position Impact",
+    "fault.party_a": "Party A (Subject)",
+    "fault.party_b": "Party B (Other)",
+    "fault.ai_evidence_detected":
+      "AI evidence detected — will be used in assessment.",
+    "whiplash.title_uk": "Whiplash Injury Classifier",
+    "whiplash.title_mt": "Soft Tissue Injury Estimator",
+    "whiplash.injury_type_label": "Injury Type",
+    "whiplash.only": "Whiplash only",
+    "whiplash.psychological": "Whiplash + minor psychological injury",
+    "whiplash.uplift": "(+10% uplift)",
+    "whiplash.duration_label": "Estimated Injury Duration",
+    "whiplash.duration_placeholder": "Select duration band…",
+    "whiplash.calculate_uk": "Calculate WRP Tariff",
+    "whiplash.calculate_mt": "Calculate Compensation",
+    "whiplash.tariff_value": "Indicative Tariff Value",
+    "whiplash.psych_uplift_note": "Includes 10% psychological uplift",
+    "repair.title": "Repair Cost Estimator",
+    "repair.auto_detected": "Auto-detected",
+    "repair.crash_type_label": "Crash Type",
+    "repair.crash_placeholder": "Select crash type…",
+    "repair.severity_label": "Damage Severity",
+    "repair.estimate_range_label": "Estimated Repair Range",
+    "export.title": "Export Claim Report",
+    "export.insurance_ready": "Insurance Ready",
+    "export.description":
+      "Compile all report data into a formal insurance claim document.",
+    "export.copy": "Copy to Clipboard",
+    "export.copied": "Copied!",
+    "export.print": "Print Report",
+    "export.preview": "Preview Report",
+    "export.show_more": "Show full preview",
+    "export.show_less": "Show less",
+    "damage.calculate": "Calculate Severity",
+    "damage.recalculate": "Recalculate",
+    "damage.title": "Vehicle Damage Assessment",
+    "step.vehicle_title": "Your Vehicle",
+    "step.vehicle_desc":
+      "Enter the details of your vehicle. These will be used to contextualise the AI photo analysis.",
+    "step.cycling_title": "Your Details",
+    "step.cycling_desc":
+      "Provide details about your bike and safety equipment. These affect contributory negligence weighting.",
+    "step.details_title": "Accident Details",
+    "step.details_desc":
+      "Describe the conditions and circumstances at the time of the accident.",
+    "step.parties_title": "Other Parties Involved",
+    "step.parties_desc":
+      "Add all other parties involved — vehicles, motorcycles, cyclists, pedestrians, or third-party objects.",
+    "step.parties_add": "Add Party",
+    "claim.status_title": "Claim Status",
+    "vehicle.vrt_expiry": "VRT Expiry (Vehicle Roadworthiness Test)",
+    "vehicle.mot_expiry": "MOT Expiry",
+    "vehicle.bike_type": "Bike Type",
+    "vehicle.select_bike_type": "Select bike type",
+    "accident.road_type": "Road Type",
+    "accident.police_ref": "Police Reference No.",
+    "accident.officer_name": "Attending Officer Name",
+    "accident.witness_statement": "Witness Statement",
+    "accident.road_condition": "Road Condition",
+    "accident.visibility": "Visibility",
+    "cycling.sub_scenario": "Cycling Scenario",
+    "cycling.vs_vehicle": "Cyclist vs Vehicle",
+    "cycling.vs_pedestrian": "Cyclist vs Pedestrian",
+    "cycling.solo": "Solo / Road Defect",
+    "review.photos": "Photos uploaded",
+    "review.dashcam_clips": "Dash cam clips",
+    "review.photo_analysis": "Photo analysis",
+    "review.generated": "Generated",
+    "review.not_run": "Not run",
+    "review.none": "None",
+    "review.colour": "Colour",
+    "review.year": "Year",
   },
 
   es: {
@@ -337,6 +618,7 @@ const translations: Translations = {
     "status.draft": "Borrador",
     "status.submitted": "Enviado",
     "status.under_review": "En Revisión",
+    "status.acknowledged": "Confirmado",
     "status.settled": "Resuelto",
     "status.label": "Estado del Reclamo",
     "footer.built_with": "Creado con",
@@ -385,7 +667,7 @@ const translations: Translations = {
     "accident.time": "Hora del Accidente",
     "accident.location": "Lugar del Accidente",
     "accident.description": "Descripción del Accidente",
-    "accident.speed_limit": "Límite de Velocidad (mph)",
+    "accident.speed_limit": "Límite de Velocidad",
     "accident.weather": "Condiciones Meteorológicas",
     "accident.road_conditions": "Estado de la Carretera",
     "accident.damage": "Daño al Vehículo",
@@ -443,12 +725,151 @@ const translations: Translations = {
     "onboarding.got_it": "Entendido",
     "cookie.title": "Almacenamiento Local de Datos",
     "cookie.desc":
-      "Almacenamos sus borradores de reclamaciones, datos de flota y contactos de aseguradoras localmente en su navegador usando localStorage. No se envía nada a servidores externos. Sus datos permanecen en su dispositivo. Esta aplicación cumple con el RGPD — puede eliminar cualquier dato almacenado en cualquier momento a través de la sección Datos y Privacidad de cada informe.",
+      "Almacenamos sus borradores de reclamaciones, datos de flota y contactos de aseguradoras localmente en su navegador usando localStorage. No se envía nada a servidores externos. Sus datos permanecen en su dispositivo. Esta aplicación cumple con el RGPD.",
     "cookie.accept": "Aceptar",
     "cookie.decline": "Rechazar",
     "form.heading": "Nuevo Informe de Accidente",
     "form.step_of": "Paso {current} de {total}",
     "form.draft_saved": "Borrador guardado",
+    "form.section.media": "Medios y Análisis de IA",
+    "form.section.media_desc":
+      "Suba fotos y grabaciones de la cámara. Use los botones de análisis para generar descripciones de IA complementarias.",
+    "form.section.photos": "Fotos de la Escena del Accidente",
+    "form.section.dashcam": "Grabación de Cámara de Tablero",
+    "form.incident_type": "Tipo de Incidente",
+    "form.vehicle_incident": "Accidente de Vehículo",
+    "form.cycling_incident": "Accidente en Bicicleta",
+    "upload.dashcam.click":
+      "Haga clic para subir grabación de cámara (MP4, MOV, AVI)",
+    "upload.photos.click":
+      "Haga clic para subir fotos de la escena del accidente (JPG, PNG, WebP)",
+    "upload.formats.photo": "Compatible con JPEG, PNG, WebP",
+    "upload.add_more": "Agregar Más Fotos",
+    "dashcam.analysing": "Analizando Cámara…",
+    "dashcam.reanalyse": "Re-analizar Cámara",
+    "dashcam.analyse": "Analizar Cámara",
+    "dashcam.cross_analysis_label": "Análisis Cruzado de Cámara IA",
+    "dashcam.cross_referenced": "✓ Verificado con análisis de fotos",
+    "dashcam.placeholder":
+      "El análisis cruzado generado por IA aparecerá aquí…",
+    "photo.analysing": "Analizando Fotos…",
+    "photo.reanalyse": "Re-analizar Fotos",
+    "photo.analyse": "Analizar Fotos",
+    "photo.analysing_with_ai": "Analizando fotos con IA…",
+    "photo.ai_description_label": "Descripción de Fotos por IA",
+    "photo.placeholder": "La descripción generada por IA aparecerá aquí…",
+    "photo.evidence_gaps_title": "Brechas de Evidencia Detectadas",
+    "photo.no_evidence_gaps_title": "Sin Brechas de Evidencia",
+    "photo.no_evidence_gaps_desc":
+      "La evidencia fotográfica parece completa para este informe.",
+    "common.editable": "(editable)",
+    "common.saved": "Guardado",
+    "evidence.check_title": "Verificación de Evidencia",
+    "evidence.complete_msg":
+      "Evidencia Completa — su informe tiene todos los componentes clave.",
+    "evidence.complete_badge": "Completo",
+    "ai.consistency_title": "Verificación de Coherencia IA",
+    "ai.consistency_no_data":
+      "Ejecute la evaluación de culpa y el análisis de fotos para activar la verificación.",
+    "ai.consistency_consistent": "Coherente",
+    "ai.consistency_review": "Revisión Recomendada",
+    "injury.tracker_title": "Seguimiento de Recuperación de Lesiones",
+    "injury.add_entry": "+ Agregar Entrada",
+    "injury.save_entry": "Guardar Entrada",
+    "injury.date": "Fecha",
+    "injury.appointment_type": "Tipo de Cita",
+    "injury.hospital": "Hospital / Clínica",
+    "injury.doctor": "Nombre del Médico",
+    "injury.notes": "Notas",
+    "injury.severity_label": "Dolor / Gravedad",
+    "injury.mild": "1 — Leve",
+    "injury.severe_end": "10 — Grave",
+    "injury.no_entries":
+      "No hay entradas médicas todavía. Agregue su primera cita para comenzar el seguimiento.",
+    "injury.improving": "Mejorando",
+    "injury.worsening": "Empeorando",
+    "injury.stable": "Estable",
+    "injury.severity_chart": "Dolor / Gravedad con el Tiempo",
+    "fault.calculate": "Calcular Reparto de Culpa",
+    "fault.recalculate": "Recalcular",
+    "fault.ai_informed": "Informado por IA",
+    "fault.confidence": "Confianza de Evaluación",
+    "fault.basis": "Base de Determinación de Responsabilidad",
+    "fault.supporting": "Factores que Apoyan la Determinación",
+    "fault.mitigating": "Circunstancias Atenuantes",
+    "fault.road_position": "Impacto de Posición en la Carretera",
+    "fault.party_a": "Parte A (Sujeto)",
+    "fault.party_b": "Parte B (Otro)",
+    "fault.ai_evidence_detected":
+      "Evidencia de IA detectada — se usará en la evaluación.",
+    "whiplash.title_uk": "Clasificador de Lesión por Latigazo",
+    "whiplash.title_mt": "Estimador de Lesión de Tejido Blando",
+    "whiplash.injury_type_label": "Tipo de Lesión",
+    "whiplash.only": "Solo latigazo",
+    "whiplash.psychological": "Latigazo + lesión psicológica menor",
+    "whiplash.uplift": "(+10% adicional)",
+    "whiplash.duration_label": "Duración Estimada de la Lesión",
+    "whiplash.duration_placeholder": "Seleccionar banda de duración…",
+    "whiplash.calculate_uk": "Calcular Tarifa WRP",
+    "whiplash.calculate_mt": "Calcular Compensación",
+    "whiplash.tariff_value": "Valor Indicativo de la Tarifa",
+    "whiplash.psych_uplift_note": "Incluye 10% adicional psicológico",
+    "repair.title": "Estimador de Costo de Reparación",
+    "repair.auto_detected": "Auto-detectado",
+    "repair.crash_type_label": "Tipo de Colisión",
+    "repair.crash_placeholder": "Seleccionar tipo de colisión…",
+    "repair.severity_label": "Gravedad del Daño",
+    "repair.estimate_range_label": "Rango Estimado de Reparación",
+    "export.title": "Exportar Informe de Reclamo",
+    "export.insurance_ready": "Listo para Aseguradora",
+    "export.description":
+      "Compile todos los datos del informe en un documento formal de reclamo de seguro.",
+    "export.copy": "Copiar al Portapapeles",
+    "export.copied": "¡Copiado!",
+    "export.print": "Imprimir Informe",
+    "export.preview": "Vista Previa del Informe",
+    "export.show_more": "Mostrar vista completa",
+    "export.show_less": "Mostrar menos",
+    "damage.calculate": "Calcular Gravedad",
+    "damage.recalculate": "Recalcular",
+    "damage.title": "Evaluación de Daños del Vehículo",
+    "step.vehicle_title": "Su Vehículo",
+    "step.vehicle_desc":
+      "Ingrese los detalles de su vehículo. Se usarán para contextualizar el análisis de fotos de IA.",
+    "step.cycling_title": "Sus Detalles",
+    "step.cycling_desc":
+      "Proporcione detalles sobre su bicicleta y equipo de seguridad. Estos afectan la negligencia contributiva.",
+    "step.details_title": "Detalles del Accidente",
+    "step.details_desc":
+      "Describa las condiciones y circunstancias en el momento del accidente.",
+    "step.parties_title": "Otras Partes Involucradas",
+    "step.parties_desc":
+      "Agregue todas las demás partes involucradas — vehículos, motocicletas, ciclistas, peatones u objetos.",
+    "step.parties_add": "Agregar Parte",
+    "claim.status_title": "Estado del Reclamo",
+    "vehicle.vrt_expiry":
+      "Vencimiento de VRT (Prueba de Idoneidad del Vehículo)",
+    "vehicle.mot_expiry": "Vencimiento de MOT",
+    "vehicle.bike_type": "Tipo de Bicicleta",
+    "vehicle.select_bike_type": "Seleccionar tipo de bicicleta",
+    "accident.road_type": "Tipo de Vía",
+    "accident.police_ref": "Número de Referencia Policial",
+    "accident.officer_name": "Nombre del Oficial",
+    "accident.witness_statement": "Declaración de Testigo",
+    "accident.road_condition": "Estado de la Vía",
+    "accident.visibility": "Visibilidad",
+    "cycling.sub_scenario": "Escenario de Ciclismo",
+    "cycling.vs_vehicle": "Ciclista vs Vehículo",
+    "cycling.vs_pedestrian": "Ciclista vs Peatón",
+    "cycling.solo": "Solo / Defecto Vial",
+    "review.photos": "Fotos subidas",
+    "review.dashcam_clips": "Clips de cámara",
+    "review.photo_analysis": "Análisis de fotos",
+    "review.generated": "Generado",
+    "review.not_run": "No ejecutado",
+    "review.none": "Ninguno",
+    "review.colour": "Color",
+    "review.year": "Año",
   },
 
   pl: {
@@ -482,6 +903,7 @@ const translations: Translations = {
     "status.draft": "Wersja Robocza",
     "status.submitted": "Przesłany",
     "status.under_review": "W Trakcie Przeglądu",
+    "status.acknowledged": "Potwierdzony",
     "status.settled": "Rozliczony",
     "status.label": "Status Roszczenia",
     "footer.built_with": "Zbudowano z",
@@ -530,7 +952,7 @@ const translations: Translations = {
     "accident.time": "Godzina Wypadku",
     "accident.location": "Miejsce Wypadku",
     "accident.description": "Opis Wypadku",
-    "accident.speed_limit": "Ograniczenie Prędkości (mph)",
+    "accident.speed_limit": "Ograniczenie Prędkości",
     "accident.weather": "Warunki Pogodowe",
     "accident.road_conditions": "Stan Drogi",
     "accident.damage": "Uszkodzenia Pojazdu",
@@ -587,12 +1009,148 @@ const translations: Translations = {
     "onboarding.got_it": "Rozumiem",
     "cookie.title": "Lokalne Przechowywanie Danych",
     "cookie.desc":
-      "Przechowujemy szkice Twoich roszczeń, dane floty i kontakty ubezpieczycieli lokalnie w Twojej przeglądarce przy użyciu localStorage. Nic nie jest wysyłane na zewnętrzne serwery. Twoje dane pozostają na Twoim urządzeniu. Ta aplikacja jest zgodna z RODO — możesz usunąć wszelkie przechowywane dane w dowolnym momencie poprzez sekcję Dane i Prywatność każdego raportu.",
+      "Przechowujemy szkice Twoich roszczeń, dane floty i kontakty ubezpieczycieli lokalnie w Twojej przeglądarce. Nic nie jest wysyłane na zewnętrzne serwery.",
     "cookie.accept": "Akceptuj",
     "cookie.decline": "Odrzuć",
     "form.heading": "Nowy Raport Wypadku",
     "form.step_of": "Krok {current} z {total}",
     "form.draft_saved": "Szkic zapisany",
+    "form.section.media": "Media i Analiza AI",
+    "form.section.media_desc":
+      "Prześlij zdjęcia i nagrania dashcam. Użyj przycisków analizy, aby wygenerować opisy AI.",
+    "form.section.photos": "Zdjęcia z Miejsca Wypadku",
+    "form.section.dashcam": "Nagranie z Dashcam",
+    "form.incident_type": "Typ Zdarzenia",
+    "form.vehicle_incident": "Wypadek Pojazdu",
+    "form.cycling_incident": "Wypadek Rowerowy",
+    "upload.dashcam.click":
+      "Kliknij, aby przesłać nagranie dashcam (MP4, MOV, AVI)",
+    "upload.photos.click":
+      "Kliknij, aby przesłać zdjęcia z miejsca wypadku (JPG, PNG, WebP)",
+    "upload.formats.photo": "Obsługiwane formaty: JPEG, PNG, WebP",
+    "upload.add_more": "Dodaj Więcej Zdjęć",
+    "dashcam.analysing": "Analizowanie Dashcam…",
+    "dashcam.reanalyse": "Re-analizuj Dashcam",
+    "dashcam.analyse": "Analizuj Dashcam",
+    "dashcam.cross_analysis_label": "Analiza Krzyżowa Dashcam AI",
+    "dashcam.cross_referenced": "✓ Skorelowano z analizą zdjęć",
+    "dashcam.placeholder":
+      "Tutaj pojawi się analiza krzyżowa wygenerowana przez AI…",
+    "photo.analysing": "Analizowanie Zdjęć…",
+    "photo.reanalyse": "Re-analizuj Zdjęcia",
+    "photo.analyse": "Analizuj Zdjęcia",
+    "photo.analysing_with_ai": "Analizowanie zdjęć przez AI…",
+    "photo.ai_description_label": "Opis Zdjęć przez AI",
+    "photo.placeholder": "Tutaj pojawi się opis wygenerowany przez AI…",
+    "photo.evidence_gaps_title": "Wykryto Luki w Dowodach",
+    "photo.no_evidence_gaps_title": "Brak Luk w Dowodach",
+    "photo.no_evidence_gaps_desc":
+      "Dowody fotograficzne wydają się kompletne dla tego raportu.",
+    "common.editable": "(edytowalne)",
+    "common.saved": "Zapisano",
+    "evidence.check_title": "Kontrola Siły Dowodów",
+    "evidence.complete_msg":
+      "Dowody Kompletne — raport zawiera wszystkie kluczowe elementy dowodowe.",
+    "evidence.complete_badge": "Kompletne",
+    "ai.consistency_title": "Kontrola Spójności AI",
+    "ai.consistency_no_data":
+      "Uruchom ocenę winy i analizę zdjęć, aby włączyć kontrolę spójności.",
+    "ai.consistency_consistent": "Spójny",
+    "ai.consistency_review": "Zalecana Weryfikacja",
+    "injury.tracker_title": "Śledzenie Powrotu do Zdrowia",
+    "injury.add_entry": "+ Dodaj Wpis",
+    "injury.save_entry": "Zapisz Wpis",
+    "injury.date": "Data",
+    "injury.appointment_type": "Typ Wizyty",
+    "injury.hospital": "Szpital / Klinika",
+    "injury.doctor": "Imię Lekarza",
+    "injury.notes": "Notatki",
+    "injury.severity_label": "Ból / Nasilenie",
+    "injury.mild": "1 — Łagodny",
+    "injury.severe_end": "10 — Ciężki",
+    "injury.no_entries":
+      "Brak wpisów medycznych. Dodaj pierwszą wizytę, aby rozpocząć śledzenie.",
+    "injury.improving": "Poprawia się",
+    "injury.worsening": "Pogarsza się",
+    "injury.stable": "Stabilny",
+    "injury.severity_chart": "Ból / Nasilenie w Czasie",
+    "fault.calculate": "Oblicz Podział Winy",
+    "fault.recalculate": "Przelicz",
+    "fault.ai_informed": "Wsparcie AI",
+    "fault.confidence": "Pewność Oceny",
+    "fault.basis": "Podstawa Ustalenia Odpowiedzialności",
+    "fault.supporting": "Czynniki Wspierające Ustalenie",
+    "fault.mitigating": "Okoliczności Łagodzące",
+    "fault.road_position": "Wpływ Pozycji na Drodze",
+    "fault.party_a": "Strona A (Podmiot)",
+    "fault.party_b": "Strona B (Inna)",
+    "fault.ai_evidence_detected": "Wykryto dowody AI — zostaną użyte w ocenie.",
+    "whiplash.title_uk": "Klasyfikator Urazu Biczowego",
+    "whiplash.title_mt": "Estymator Urazu Tkanek Miękkich",
+    "whiplash.injury_type_label": "Typ Urazu",
+    "whiplash.only": "Tylko uraz biczowy",
+    "whiplash.psychological": "Uraz biczowy + drobny uraz psychologiczny",
+    "whiplash.uplift": "(+10% dopłaty)",
+    "whiplash.duration_label": "Szacowany Czas Trwania Urazu",
+    "whiplash.duration_placeholder": "Wybierz przedział czasowy…",
+    "whiplash.calculate_uk": "Oblicz Taryfę WRP",
+    "whiplash.calculate_mt": "Oblicz Odszkodowanie",
+    "whiplash.tariff_value": "Wskazana Wartość Taryfowa",
+    "whiplash.psych_uplift_note": "Zawiera 10% dopłaty psychologicznej",
+    "repair.title": "Estymator Kosztów Naprawy",
+    "repair.auto_detected": "Auto-wykryto",
+    "repair.crash_type_label": "Typ Kolizji",
+    "repair.crash_placeholder": "Wybierz typ kolizji…",
+    "repair.severity_label": "Stopień Uszkodzenia",
+    "repair.estimate_range_label": "Szacowany Zakres Naprawy",
+    "export.title": "Eksportuj Raport Roszczenia",
+    "export.insurance_ready": "Gotowy dla Ubezpieczyciela",
+    "export.description":
+      "Skompiluj wszystkie dane raportu do formalnego dokumentu roszczenia ubezpieczeniowego.",
+    "export.copy": "Kopiuj do Schowka",
+    "export.copied": "Skopiowano!",
+    "export.print": "Drukuj Raport",
+    "export.preview": "Podgląd Raportu",
+    "export.show_more": "Pokaż pełny podgląd",
+    "export.show_less": "Pokaż mniej",
+    "damage.calculate": "Oblicz Stopień Uszkodzenia",
+    "damage.recalculate": "Przelicz",
+    "damage.title": "Ocena Uszkodzeń Pojazdu",
+    "step.vehicle_title": "Twój Pojazd",
+    "step.vehicle_desc":
+      "Wprowadź dane swojego pojazdu. Zostaną użyte do kontekstualizacji analizy zdjęć AI.",
+    "step.cycling_title": "Twoje Dane",
+    "step.cycling_desc":
+      "Podaj dane o rowerze i sprzęcie ochronnym. Wpływają na naliczanie odpowiedzialności przyczyniającej.",
+    "step.details_title": "Szczegóły Wypadku",
+    "step.details_desc": "Opisz warunki i okoliczności w chwili wypadku.",
+    "step.parties_title": "Inne Zaangażowane Strony",
+    "step.parties_desc":
+      "Dodaj wszystkie inne zaangażowane strony — pojazdy, motocykle, rowerzystów, pieszych lub przedmioty.",
+    "step.parties_add": "Dodaj Stronę",
+    "claim.status_title": "Status Roszczenia",
+    "vehicle.vrt_expiry": "Ważność VRT (Test Sprawności Pojazdu)",
+    "vehicle.mot_expiry": "Ważność MOT",
+    "vehicle.bike_type": "Typ Roweru",
+    "vehicle.select_bike_type": "Wybierz typ roweru",
+    "accident.road_type": "Typ Drogi",
+    "accident.police_ref": "Numer Ref. Policji",
+    "accident.officer_name": "Imię Oficera",
+    "accident.witness_statement": "Zeznanie Świadka",
+    "accident.road_condition": "Stan Nawierzchni",
+    "accident.visibility": "Widoczność",
+    "cycling.sub_scenario": "Scenariusz Wypadku Rowerowego",
+    "cycling.vs_vehicle": "Rowerzysta vs Pojazd",
+    "cycling.vs_pedestrian": "Rowerzysta vs Pieszy",
+    "cycling.solo": "Samodzielny / Wada Drogi",
+    "review.photos": "Przesłane zdjęcia",
+    "review.dashcam_clips": "Klipy dashcam",
+    "review.photo_analysis": "Analiza zdjęć",
+    "review.generated": "Wygenerowano",
+    "review.not_run": "Nie uruchomiono",
+    "review.none": "Brak",
+    "review.colour": "Kolor",
+    "review.year": "Rok",
   },
 
   mt: {
@@ -621,20 +1179,21 @@ const translations: Translations = {
     "page.reports.heading": "Ir-Rapporti Tiegħi",
     "page.reports.subheading":
       "Ara u mmaniġġja r-rapporti kollha tal-inċidenti salvati.",
-    "page.privacy.heading": "Politika tal-Ċirkolarità",
+    "page.privacy.heading": "Politika tal-Privatezza",
     "page.privacy.subheading": "Kif iamthe.law jimmaniġġa d-dejta tiegħek",
     "status.draft": "Abbozz",
     "status.submitted": "Mibġħut",
     "status.under_review": "Taħt Ir-Reviżjoni",
+    "status.acknowledged": "Rikonoxxut",
     "status.settled": "Sodisfatt",
     "status.label": "Status tal-Talba",
     "footer.built_with": "Mibni bi",
-    "footer.privacy_policy": "Politika tal-Ċirkolarità",
-    "footer.data_privacy": "Dejta u Ċirkolarità",
+    "footer.privacy_policy": "Politika tal-Privatezza",
+    "footer.data_privacy": "Dejta u Privatezza",
     "disclaimer.title": "Avviż Leġali Importanti",
     "disclaimer.text":
       "iamthe.law hija għodda ta' dokumentazzjoni assistita mill-AI. L-informazzjoni pprovduta ma tikkostitwixxix parir leġali. Dejjem ikkonsulta avukat kwalifikat għal gwida leġali.",
-    "gdpr.title": "Dejta u Ċirkolarità",
+    "gdpr.title": "Dejta u Privatezza",
     "gdpr.description":
       "Id-dejta tar-rapport tiegħek hi maħzuna lokalment fil-browser tiegħek. L-ebda dejta ma titħabat lil partijiet terzi mingħajr il-kunsens espliċitu tiegħek.",
     "gdpr.delete_evidence": "Ħassar il-Fajls tal-Evidenza",
@@ -648,7 +1207,7 @@ const translations: Translations = {
     "privacy.intro": "Introduzzjoni",
     "privacy.data_collected": "Dejta li Niġbru",
     "privacy.how_used": "Kif Tintuża d-Dejta Tiegħek",
-    "privacy.retention": "Retention tad-Dejta",
+    "privacy.retention": "Żamma tad-Dejta",
     "privacy.your_rights": "Id-Drittijiet Tiegħek",
     "privacy.cookies": "Cookies",
     "privacy.contact": "Ikkuntattjana",
@@ -696,7 +1255,7 @@ const translations: Translations = {
     "report.vehicle": "Il-Vettura Tiegħek",
     "report.other_parties": "Partijiet Oħra",
     "report.evidence": "Evidenza",
-    "fleet.overview": "Ħarsa ġenerali",
+    "fleet.overview": "Ħarsa Ġenerali",
     "fleet.vehicles": "Vetturi",
     "fleet.drivers": "Sewwieqa",
     "fleet.maintenance": "Manutenzjoni",
@@ -718,7 +1277,7 @@ const translations: Translations = {
     "draft.last_saved": "salvat l-aħħar",
     "notice.title": "Avviż Importanti",
     "notice.body":
-      "Din l-applikazzjoni u l-outputs tagħha ma jikkostitwixxux parir legali. Il-kontenut kollu huwa pprovdut għal skopijiet ta' informazzjoni u dokumentazzjoni tal-assigurazzjoni biss. Għandek tfittex parir legali indipendenti minn solicitor kwalifikat qabel ma tieħu xi azzjoni legali.",
+      "Din l-applikazzjoni u l-outputs tagħha ma jikkostitwixxux parir legali. Il-kontenut kollu huwa pprovdut għal skopijiet ta' informazzjoni u dokumentazzjoni tal-assigurazzjoni biss. Għandek tfittex parir legali indipendenti minn avukat kwalifikat qabel ma tieħu xi azzjoni legali.",
     "notice.body_malta":
       "Din l-applikazzjoni u l-outputs tagħha ma jikkostitwixxux parir legali. Il-kontenut kollu huwa pprovdut għal skopijiet ta' informazzjoni u dokumentazzjoni tal-assigurazzjoni biss. Għandek tfittex parir legali indipendenti minn avukat (avukat) kwalifikat qabel ma tieħu xi azzjoni legali.",
     "onboarding.title": "Merħba f'iamthe.law",
@@ -733,12 +1292,149 @@ const translations: Translations = {
     "onboarding.got_it": "Mifhum",
     "cookie.title": "Ħażna Lokali tad-Dejta",
     "cookie.desc":
-      "Naħżnu l-abbozzi tat-talbiet tiegħek, id-dejta tal-flotta u l-kuntatti tal-assiguraturi lokalment fil-browser tiegħek bl-użu tal-localStorage. Xejn ma jintbagħat lil servers esterni. Id-dejta tiegħek tibqa' fuq l-apparat tiegħek. Din l-applikazzjoni tikkonforma mal-GDPR — tista' tħassar kwalunkwe dejta maħżuna fi kwalunkwe ħin permezz tas-sezzjoni Dejta u Privatezza ta' kull rapport.",
+      "Naħżnu l-abbozzi tat-talbiet tiegħek, id-dejta tal-flotta u l-kuntatti tal-assiguraturi lokalment fil-browser tiegħek. Xejn ma jintbagħat lil servers esterni.",
     "cookie.accept": "Aċċetta",
     "cookie.decline": "Irrifjuta",
     "form.heading": "Rapport Ġdid tal-Inċident",
     "form.step_of": "Pass {current} minn {total}",
     "form.draft_saved": "Abbozz salvat",
+    "form.section.media": "Midja u Analiżi tal-AI",
+    "form.section.media_desc":
+      "Itla' ritratti u footage tad-dash cam. Uża l-buttuni tal-analiżi biex tiġġenera deskrizzjonijiet tal-AI.",
+    "form.section.photos": "Ritratti tax-Xena tal-Inċident",
+    "form.section.dashcam": "Footage tad-Dash Cam",
+    "form.incident_type": "Tip ta' Inċident",
+    "form.vehicle_incident": "Inċident ta' Vettura",
+    "form.cycling_incident": "Inċident ta' Rikkbu",
+    "upload.dashcam.click":
+      "Ikklikkja biex titla' footage tad-dash cam (MP4, MOV, AVI)",
+    "upload.photos.click":
+      "Ikklikkja biex titla' ritratti tax-xena tal-inċident (JPG, PNG, WebP)",
+    "upload.formats.photo": "JPEG, PNG, WebP supportati",
+    "upload.add_more": "Żid Aktar Ritratti",
+    "dashcam.analysing": "Qed Janalizza d-Dash Cam…",
+    "dashcam.reanalyse": "Re-analizza d-Dash Cam",
+    "dashcam.analyse": "Analizza d-Dash Cam",
+    "dashcam.cross_analysis_label": "Analiżi Inkroċjata tad-Dash Cam bl-AI",
+    "dashcam.cross_referenced": "✓ Ikkroċjat mal-analiżi tar-ritratti",
+    "dashcam.placeholder": "L-analiżi inkroċjata tal-AI se tidher hawn…",
+    "photo.analysing": "Qed Janalizza r-Ritratti…",
+    "photo.reanalyse": "Re-analizza r-Ritratti",
+    "photo.analyse": "Analizza r-Ritratti",
+    "photo.analysing_with_ai": "Qed janalizza r-ritratti bl-AI…",
+    "photo.ai_description_label": "Deskrizzjoni tar-Ritratti bl-AI",
+    "photo.placeholder": "Id-deskrizzjoni tal-AI se tidher hawn…",
+    "photo.evidence_gaps_title": "Lakuni fl-Evidenza Skoperti",
+    "photo.no_evidence_gaps_title": "Ebda Lakuni fl-Evidenza",
+    "photo.no_evidence_gaps_desc":
+      "L-evidenza fotografika tidher komprehensiva għal dan ir-rapport.",
+    "common.editable": "(editabbli)",
+    "common.saved": "Salvat",
+    "evidence.check_title": "Verifika tal-Qawwa tal-Evidenza",
+    "evidence.complete_msg":
+      "Evidenza Kompluta — ir-rapport tiegħek għandu l-komponenti ewlenin kollha.",
+    "evidence.complete_badge": "Kompluta",
+    "ai.consistency_title": "Verifika tal-Konsistenza tal-AI",
+    "ai.consistency_no_data":
+      "Mexxi l-valutazzjoni tal-ħtija u l-analiżi tar-ritratti biex tippermetti l-verifika.",
+    "ai.consistency_consistent": "Konsistenti",
+    "ai.consistency_review": "Reviżjoni Rakkomandata",
+    "injury.tracker_title": "Traċċatur tal-Irkupru mill-Korriment",
+    "injury.add_entry": "+ Żid Dħul",
+    "injury.save_entry": "Issejvja d-Dħul",
+    "injury.date": "Data",
+    "injury.appointment_type": "Tip ta' Appuntament",
+    "injury.hospital": "Sptar / Klinika",
+    "injury.doctor": "Isem it-Tabib",
+    "injury.notes": "Noti",
+    "injury.severity_label": "Uġigħ / Severità",
+    "injury.mild": "1 — Ħafif",
+    "injury.severe_end": "10 — Severu",
+    "injury.no_entries":
+      "Ebda dħuliet mediċi s'issa. Żid l-ewwel appuntament tiegħek biex tibda t-traċċar.",
+    "injury.improving": "Titjib",
+    "injury.worsening": "Aggravament",
+    "injury.stable": "Stabbli",
+    "injury.severity_chart": "Uġigħ / Severità maż-Żmien",
+    "fault.calculate": "Ikkalkola l-Qsim tal-Ħtija",
+    "fault.recalculate": "Erġa' Ikkalkola",
+    "fault.ai_informed": "Informata mill-AI",
+    "fault.confidence": "Kunfidenza tal-Valutazzjoni",
+    "fault.basis": "Bażi tad-Determinazzjoni tal-Responsabbiltà",
+    "fault.supporting": "Fatturi li Jappoġġjaw is-Sejba",
+    "fault.mitigating": "Ċirkostanzi Attenwanti",
+    "fault.road_position": "Impatt tal-Pożizzjoni fit-Triq",
+    "fault.party_a": "Parti A (Suġġett)",
+    "fault.party_b": "Parti B (Oħra)",
+    "fault.ai_evidence_detected":
+      "Evidenza tal-AI skoperta — se tintuża fil-valutazzjoni.",
+    "whiplash.title_uk": "Klassifikatur tal-Korriment bil-Latigu",
+    "whiplash.title_mt": "Stimatur tal-Korriment tat-Tessut Artab",
+    "whiplash.injury_type_label": "Tip ta' Korriment",
+    "whiplash.only": "Latigu biss",
+    "whiplash.psychological": "Latigu + korriment psikoloġiku minuri",
+    "whiplash.uplift": "(+10% żieda)",
+    "whiplash.duration_label": "Durata Stimata tal-Korriment",
+    "whiplash.duration_placeholder": "Agħżel il-banda tad-durata…",
+    "whiplash.calculate_uk": "Ikkalkola t-Tariffa WRP",
+    "whiplash.calculate_mt": "Ikkalkola l-Kumpens",
+    "whiplash.tariff_value": "Valur Indikattiv tat-Tariffa",
+    "whiplash.psych_uplift_note": "Tinkludi 10% żieda psikoloġika",
+    "repair.title": "Stimatur tal-Ispejjeż tat-Tiswija",
+    "repair.auto_detected": "Awto-skoperta",
+    "repair.crash_type_label": "Tip ta' Kolliżjoni",
+    "repair.crash_placeholder": "Agħżel it-tip ta' kolliżjoni…",
+    "repair.severity_label": "Severità tal-Ħsara",
+    "repair.estimate_range_label": "Firxa Stmata tat-Tiswija",
+    "export.title": "Esporta r-Rapport tat-Talba",
+    "export.insurance_ready": "Lest għall-Assiguratur",
+    "export.description":
+      "Kompila d-dejta tar-rapport kollha f'dokument formali tal-assigurazzjoni.",
+    "export.copy": "Ikkopja fil-Clipboard",
+    "export.copied": "Ikkopjat!",
+    "export.print": "Ipprintja r-Rapport",
+    "export.preview": "Anteprima tar-Rapport",
+    "export.show_more": "Uri l-anteprima sħiħa",
+    "export.show_less": "Uri inqas",
+    "damage.calculate": "Ikkalkola s-Severità",
+    "damage.recalculate": "Erġa' Ikkalkola",
+    "damage.title": "Valutazzjoni tal-Ħsara tal-Vettura",
+    "step.vehicle_title": "Il-Vettura Tiegħek",
+    "step.vehicle_desc":
+      "Daħħal id-dettalji tal-vettura tiegħek. Dawn se jintużaw biex jikkontestwalizzaw l-analiżi tal-AI.",
+    "step.cycling_title": "Id-Dettalji Tiegħek",
+    "step.cycling_desc":
+      "Ipprovdi dettalji dwar ir-rikkbu u t-tagħmir tas-sigurtà tiegħek. Dawn jaffettwaw il-piż tan-negliġenza kontributorja.",
+    "step.details_title": "Dettalji tal-Inċident",
+    "step.details_desc":
+      "Iddeskrivi l-kundizzjonijiet u ċ-ċirkostanzi fil-ħin tal-inċident.",
+    "step.parties_title": "Partijiet Oħra Involuti",
+    "step.parties_desc":
+      "Żid il-partijiet l-oħra kollha involuti — vetturi, muturi, rikkieba, pedestrians, jew oġġetti.",
+    "step.parties_add": "Żid Parti",
+    "claim.status_title": "Status tat-Talba",
+    "vehicle.vrt_expiry": "Skadenza VRT (Test tal-Idoneità tal-Vettura)",
+    "vehicle.mot_expiry": "Skadenza MOT",
+    "vehicle.bike_type": "Tip ta' Rikkbu",
+    "vehicle.select_bike_type": "Agħżel it-tip ta' rikkbu",
+    "accident.road_type": "Tip ta' Triq",
+    "accident.police_ref": "Nru ta' Referenza tal-Pulizija",
+    "accident.officer_name": "Isem tal-Uffiċjal",
+    "accident.witness_statement": "Dikjarazzjoni tax-Xhud",
+    "accident.road_condition": "Kundizzjoni tat-Triq",
+    "accident.visibility": "Viżibbiltà",
+    "cycling.sub_scenario": "Xenarju tar-Rikkbu",
+    "cycling.vs_vehicle": "Rikkieb vs Vettura",
+    "cycling.vs_pedestrian": "Rikkieb vs Pedistru",
+    "cycling.solo": "Waħdu / Difett fit-Triq",
+    "review.photos": "Ritratti mgħobbija",
+    "review.dashcam_clips": "Klipps tad-dash cam",
+    "review.photo_analysis": "Analiżi tar-ritratti",
+    "review.generated": "Iġġenerat",
+    "review.not_run": "Mhux imexxi",
+    "review.none": "Ebda",
+    "review.colour": "Kulur",
+    "review.year": "Sena",
   },
 };
 
