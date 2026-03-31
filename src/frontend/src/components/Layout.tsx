@@ -186,7 +186,7 @@ export default function Layout() {
             </button>
 
             {/* Language switcher */}
-            <DropdownMenu>
+            <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
@@ -200,7 +200,7 @@ export default function Layout() {
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 align="end"
-                className="min-w-[120px]"
+                className="min-w-[120px] z-50"
                 data-ocid="header.language.dropdown_menu"
               >
                 {LANGUAGES.map((lang) => (

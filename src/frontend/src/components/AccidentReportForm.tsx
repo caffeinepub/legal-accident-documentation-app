@@ -19,6 +19,7 @@ import {
   ChevronLeft,
   ChevronRight,
   CloudSun,
+  Crosshair,
   FileVideo,
   Loader2,
   Mic,
@@ -207,6 +208,8 @@ export default function AccidentReportForm() {
   // Weather fetch state
   const [weatherFetching, setWeatherFetching] = useState(false);
   const [weatherError, setWeatherError] = useState("");
+  const [geoFetching, setGeoFetching] = useState(false);
+  const [geoError, setGeoError] = useState("");
 
   // Voice-to-text state
   // SpeechRecognition is not in TypeScript's standard lib; use a local interface
@@ -773,6 +776,39 @@ export default function AccidentReportForm() {
     }
   }, [weatherLocation, isMalta]);
 
+  const fetchGeoLocation = () => {
+    if (!navigator.geolocation) {
+      setGeoError("Geolocation is not supported by your browser.");
+      return;
+    }
+    setGeoFetching(true);
+    setGeoError("");
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        const latDir = lat >= 0 ? "N" : "S";
+        const lngDir = lng >= 0 ? "E" : "W";
+        const coords = `${Math.abs(lat).toFixed(4)}° ${latDir}, ${Math.abs(lng).toFixed(4)}° ${lngDir}`;
+        setStopLocation(coords);
+        setGeoFetching(false);
+      },
+      (err) => {
+        if (err.code === 1) {
+          setGeoError(
+            "Location access denied. Please allow location access in your browser settings.",
+          );
+        } else if (err.code === 2) {
+          setGeoError("Location unavailable. Please try again.");
+        } else {
+          setGeoError("Could not get location. Please try again.");
+        }
+        setGeoFetching(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000 },
+    );
+  };
+
   // ── Step content ──────────────────────────────────────────────────────────
 
   // Incident type selector (shown at top of Step 1)
@@ -1338,13 +1374,46 @@ export default function AccidentReportForm() {
 
         <div className="space-y-1">
           <Label htmlFor="stopLocation">Stop Location</Label>
-          <Input
-            id="stopLocation"
-            value={stopLocation}
-            onChange={(e) => setStopLocation(e.target.value)}
-            placeholder="Where did the vehicle stop?"
-            data-ocid="details.stopLocation.input"
-          />
+          <div className="flex gap-2">
+            <Input
+              id="stopLocation"
+              value={stopLocation}
+              onChange={(e) => {
+                setStopLocation(e.target.value);
+                if (geoError) setGeoError("");
+              }}
+              placeholder={
+                isMalta
+                  ? "e.g. Sliema, jew koordinati GPS"
+                  : "e.g. GPS coordinates or street address"
+              }
+              data-ocid="details.stopLocation.input"
+              className="flex-1"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={fetchGeoLocation}
+              disabled={geoFetching}
+              data-ocid="details.geolocation.button"
+              title="Get GPS coordinates"
+            >
+              {geoFetching ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Crosshair className="w-4 h-4" />
+              )}
+            </Button>
+          </div>
+          {geoError && (
+            <p
+              className="text-xs text-destructive mt-1"
+              data-ocid="details.geolocation.error_state"
+            >
+              {geoError}
+            </p>
+          )}
         </div>
         <div className="space-y-1">
           <Label htmlFor="accidentMarker">Accident Marker / Location</Label>
