@@ -301,7 +301,19 @@ export type TranslationKey =
   | "review.not_run"
   | "review.none"
   | "review.colour"
-  | "review.year";
+  | "review.year"
+  // Chat assistant
+  | "chat.button_label"
+  | "chat.panel_title"
+  | "chat.aware_of_report"
+  | "chat.placeholder"
+  | "chat.send"
+  | "chat.prompt1"
+  | "chat.prompt2"
+  | "chat.prompt3"
+  | "chat.prompt4"
+  | "chat.error"
+  | "chat.thinking";
 
 type Translations = Record<Language, Record<TranslationKey, string>>;
 
@@ -585,6 +597,17 @@ const translations: Translations = {
     "review.none": "None",
     "review.colour": "Colour",
     "review.year": "Year",
+    "chat.button_label": "Ask Legal Assistant",
+    "chat.panel_title": "Legal Assistant",
+    "chat.aware_of_report": "Aware of report",
+    "chat.placeholder": "Ask a question...",
+    "chat.send": "Send",
+    "chat.prompt1": "What should I do right now?",
+    "chat.prompt2": "Who is at fault?",
+    "chat.prompt3": "How do I claim compensation?",
+    "chat.prompt4": "Help me fill in the form",
+    "chat.error": "Sorry, I could not get a response. Please try again.",
+    "chat.thinking": "Thinking...",
   },
 
   es: {
@@ -870,6 +893,17 @@ const translations: Translations = {
     "review.none": "Ninguno",
     "review.colour": "Color",
     "review.year": "Año",
+    "chat.button_label": "Preguntar al Asistente Legal",
+    "chat.panel_title": "Asistente Legal",
+    "chat.aware_of_report": "Consciente del informe",
+    "chat.placeholder": "Haz una pregunta...",
+    "chat.send": "Enviar",
+    "chat.prompt1": "¿Qué debo hacer ahora mismo?",
+    "chat.prompt2": "¿Quién tiene la culpa?",
+    "chat.prompt3": "¿Cómo reclamo una compensación?",
+    "chat.prompt4": "Ayúdame a rellenar el formulario",
+    "chat.error": "Lo siento, no pude obtener respuesta. Inténtalo de nuevo.",
+    "chat.thinking": "Pensando...",
   },
 
   pl: {
@@ -1151,6 +1185,18 @@ const translations: Translations = {
     "review.none": "Brak",
     "review.colour": "Kolor",
     "review.year": "Rok",
+    "chat.button_label": "Zapytaj Asystenta Prawnego",
+    "chat.panel_title": "Asystent Prawny",
+    "chat.aware_of_report": "Świadomy raportu",
+    "chat.placeholder": "Zadaj pytanie...",
+    "chat.send": "Wyślij",
+    "chat.prompt1": "Co powinienem teraz zrobić?",
+    "chat.prompt2": "Kto jest winny?",
+    "chat.prompt3": "Jak ubiegać się o odszkodowanie?",
+    "chat.prompt4": "Pomóż mi wypełnić formularz",
+    "chat.error":
+      "Przepraszam, nie udało się uzyskać odpowiedzi. Spróbuj ponownie.",
+    "chat.thinking": "Myślę...",
   },
 
   mt: {
@@ -1435,6 +1481,17 @@ const translations: Translations = {
     "review.none": "Ebda",
     "review.colour": "Kulur",
     "review.year": "Sena",
+    "chat.button_label": "Staqsi lill-Assistent Legali",
+    "chat.panel_title": "Assistent Legali",
+    "chat.aware_of_report": "Konxju tar-rapport",
+    "chat.placeholder": "Staqsi mistoqsija...",
+    "chat.send": "Ibgħat",
+    "chat.prompt1": "X'għandi nagħmel issa?",
+    "chat.prompt2": "Min hu ħati?",
+    "chat.prompt3": "Kif nitlob kumpens?",
+    "chat.prompt4": "Għinni nimla l-formola",
+    "chat.error": "Jiddispjaċini, ma stajtx nikseb risposta. Erġa' pprova.",
+    "chat.thinking": "Naħseb...",
   },
 };
 

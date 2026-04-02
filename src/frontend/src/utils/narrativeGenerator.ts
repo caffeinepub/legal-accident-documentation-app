@@ -164,7 +164,7 @@ IMPORTANT: Return your entire response as valid JSON with this exact structure:
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: "gpt-4o",
+      model: "anthropic/bedrock/claude-sonnet-4-6",
       messages: [{ role: "user", content: prompt }],
     }),
   });

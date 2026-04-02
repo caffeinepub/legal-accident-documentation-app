@@ -91,7 +91,7 @@ Use formal UK insurance/legal language in the description. The confidenceLevel s
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "gpt-4o",
+        model: "anthropic/bedrock/claude-sonnet-4-6",
         messages: [
           {
             role: "user",

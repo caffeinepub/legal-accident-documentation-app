@@ -27,6 +27,7 @@ import { useCountry } from "../contexts/CountryContext";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { LANGUAGES, type Language } from "../i18n/translations";
+import { ChatAssistant } from "./ChatAssistant";
 import CookieConsentBanner from "./CookieConsentBanner";
 
 const NAV_ITEMS = [
@@ -388,6 +389,7 @@ export default function Layout() {
         </div>
       </footer>
       <CookieConsentBanner />
+      <ChatAssistant />
     </div>
   );
 }
