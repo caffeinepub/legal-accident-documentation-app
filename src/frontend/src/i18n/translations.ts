@@ -313,7 +313,8 @@ export type TranslationKey =
   | "chat.prompt3"
   | "chat.prompt4"
   | "chat.error"
-  | "chat.thinking";
+  | "chat.thinking"
+  | "chat.new_chat";
 
 type Translations = Record<Language, Record<TranslationKey, string>>;
 
@@ -608,6 +609,7 @@ const translations: Translations = {
     "chat.prompt4": "Help me fill in the form",
     "chat.error": "Sorry, I could not get a response. Please try again.",
     "chat.thinking": "Thinking...",
+    "chat.new_chat": "New chat",
   },
 
   es: {
@@ -904,6 +906,7 @@ const translations: Translations = {
     "chat.prompt4": "Ayúdame a rellenar el formulario",
     "chat.error": "Lo siento, no pude obtener respuesta. Inténtalo de nuevo.",
     "chat.thinking": "Pensando...",
+    "chat.new_chat": "Nueva conversación",
   },
 
   pl: {
@@ -1197,6 +1200,7 @@ const translations: Translations = {
     "chat.error":
       "Przepraszam, nie udało się uzyskać odpowiedzi. Spróbuj ponownie.",
     "chat.thinking": "Myślę...",
+    "chat.new_chat": "Nowa rozmowa",
   },
 
   mt: {
@@ -1492,6 +1496,7 @@ const translations: Translations = {
     "chat.prompt4": "Għinni nimla l-formola",
     "chat.error": "Jiddispjaċini, ma stajtx nikseb risposta. Erġa' pprova.",
     "chat.thinking": "Naħseb...",
+    "chat.new_chat": "Konversazzjoni ġdida",
   },
 };
 

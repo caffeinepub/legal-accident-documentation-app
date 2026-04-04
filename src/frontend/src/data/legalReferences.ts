@@ -552,6 +552,20 @@ export const VIOLATION_LEGAL_REFERENCES: Record<string, LegalReference> = {
         legalPrinciple:
           "Causation must be established individually for each defendant. Where there are multiple potential causes of injury, a claimant must prove on the balance of probabilities that the defendant's specific breach caused or materially contributed to their loss. The mere existence of a breach is insufficient where multiple non-tortious causes could equally explain the damage.",
       },
+      {
+        caseName: "Baker v Willoughby [1970] AC 467",
+        factualSummary:
+          "The claimant's leg was injured in a road traffic accident caused by the defendant's negligence. Before the trial, the claimant was shot in the same leg during a robbery, and the leg was subsequently amputated. The defendant argued the supervening event extinguished their liability for the original injury.",
+        legalPrinciple:
+          "In road traffic cases, a tortfeasor cannot rely on a supervening event to reduce their liability for a pre-existing injury below what the claimant would have recovered absent that event. The original defendant remains liable for the loss of amenity attributable to the original negligence, even after the subsequent incident.",
+      },
+      {
+        caseName: "Page v Smith [1996] AC 155",
+        factualSummary:
+          "The claimant was involved in a minor road traffic accident caused by the defendant's negligence and suffered no physical injury, but the accident caused a recurrence of his chronic fatigue syndrome. The House of Lords considered whether psychiatric injury was recoverable as a primary victim.",
+        legalPrinciple:
+          "A claimant who is a primary victim of a road traffic accident (directly involved in the event) can recover for psychiatric injury even if no physical injury was suffered, provided that personal injury of some kind was reasonably foreseeable. The 'eggshell skull' rule applies: the defendant takes the claimant as they find them.",
+      },
     ],
   },
 
@@ -616,6 +630,21 @@ export const VIOLATION_LEGAL_REFERENCES: Record<string, LegalReference> = {
           "The plaintiff rode on the back of a traxcavator contrary to instructions, and was injured when another vehicle collided with it from behind. The Court of Appeal held that he was contributorily negligent even though the precise manner of injury was not the obvious risk of his conduct.",
         legalPrinciple:
           "A claimant is contributorily negligent if they unreasonably expose themselves to danger, even if the precise manner in which they are ultimately injured is not the most foreseeable consequence of their conduct. It is sufficient that their conduct was a contributory cause of the damage suffered.",
+      },
+      {
+        caseName: "Revill v Newbery [1996] QB 567",
+        factualSummary:
+          "The defendant shot and injured the claimant who had been attempting to break into his allotment shed. The Court of Appeal considered whether the claimant's criminal activity extinguished the duty of care and whether ex turpi causa applied.",
+        legalPrinciple:
+          "Even where a claimant is engaged in unlawful conduct, the defendant may still owe a duty of care. The court applies contributory negligence rather than completely denying recovery via ex turpi causa, unless the claimant's conduct is so closely connected with the defendant's act that it would be wrong to allow recovery. Applied in road traffic cases to assess the extent to which a claimant's own unlawful conduct reduces their damages.",
+      },
+      {
+        caseName:
+          "Reeves v Commissioner of Police of the Metropolis [2000] 1 AC 360",
+        factualSummary:
+          "The deceased was a known suicide risk in police custody who succeeded in taking his own life. The House of Lords considered whether the claimant's own deliberate act constituted a novus actus interveniens breaking the chain of causation, or whether it was contributory negligence to be apportioned.",
+        legalPrinciple:
+          "Where the defendant's duty of care exists precisely to guard against the claimant's own acts (including deliberate acts), those acts do not break the chain of causation but may constitute contributory negligence to be apportioned. Applied in road traffic cases to determine whether a claimant's voluntary assumption of risk or deliberate conduct reduces, but does not eliminate, their damages.",
       },
     ],
   },
@@ -712,6 +741,115 @@ export const VIOLATION_LEGAL_REFERENCES: Record<string, LegalReference> = {
       },
     ],
   },
+  hit_and_run: {
+    highwayCode: [
+      {
+        ruleNumber: "HC Rule 286",
+        description:
+          "If you are involved in a collision, you MUST stop. If you do not stop, you are committing a criminal offence regardless of whether you were at fault for the collision.",
+        isEnforceable: true,
+      },
+      {
+        ruleNumber: "HC Rule 287",
+        description:
+          "If another person is injured or their vehicle or property is damaged, you MUST give your name and address, the vehicle owner's name and address and the vehicle registration number to anyone who has reasonable grounds for requiring them.",
+        isEnforceable: true,
+      },
+      {
+        ruleNumber: "HC Rule 288",
+        description:
+          "If you do not give your details at the time of the accident, you MUST report the accident to the police as soon as reasonably practicable and in any case within 24 hours.",
+        isEnforceable: true,
+      },
+    ],
+    rta1988: [
+      {
+        sectionNumber: "s.170(2)",
+        description:
+          "Duty to stop and give details — a driver involved in any accident causing injury, death, or damage to another person, vehicle, or property must stop and provide their name, address, and vehicle registration.",
+      },
+      {
+        sectionNumber: "s.170(4)",
+        description:
+          "Duty to report — where details were not exchanged at the scene, the driver must report the accident to a constable or police station as soon as practicable and within 24 hours.",
+      },
+      {
+        sectionNumber: "s.170(7)",
+        description:
+          "Failure to comply with ss.170(2) or 170(4) is a criminal offence. Prosecution may be brought even where the driver was not at fault for the collision itself.",
+      },
+    ],
+    caseLaw: [
+      {
+        caseName: "DPP v Drury [1989] RTR 165",
+        factualSummary:
+          "The defendant left the scene of an accident without stopping to exchange details. The Divisional Court considered what constituted adequate compliance with the duty to stop under the Road Traffic Act.",
+        legalPrinciple:
+          "The duty to stop requires the driver to remain at the scene for a sufficient period to allow any person with reasonable grounds to obtain the driver's name, address, and vehicle registration. A momentary pause that does not afford this opportunity does not discharge the statutory obligation.",
+      },
+      {
+        caseName: "R v Sherwood [1995] RTR 60",
+        factualSummary:
+          "The defendant failed to stop after a collision and later reported the accident to the police. The court considered whether voluntary reporting after the 24-hour period constituted a defence.",
+        legalPrinciple:
+          "The duty to report to the police arises immediately if details were not exchanged at the scene. Late reporting does not constitute a defence to the primary offence under s.170, though it may be a mitigating factor in sentencing.",
+      },
+    ],
+  },
+  drunk_driving: {
+    highwayCode: [
+      {
+        ruleNumber: "HC Rule 95",
+        description:
+          "Do not drink and drive as it affects your ability to drive safely. It is illegal to drive with more than 80 milligrams of alcohol per 100 millilitres of blood, 35 micrograms per 100 millilitres of breath, or 107 milligrams per 100 millilitres of urine in England and Wales.",
+        isEnforceable: true,
+      },
+      {
+        ruleNumber: "HC Rule 96",
+        description:
+          "You MUST NOT drive under the influence of drugs or medicine. Check that any medicines you take will not affect your driving — consult your doctor or pharmacist if in doubt.",
+        isEnforceable: true,
+      },
+    ],
+    rta1988: [
+      {
+        sectionNumber: "s.4",
+        description:
+          "Driving or attempting to drive while unfit through drink or drugs — it is an offence to drive, attempt to drive, or be in charge of a motor vehicle on a road or other public place while unfit to drive through drink or drugs.",
+      },
+      {
+        sectionNumber: "s.5",
+        description:
+          "Driving or attempting to drive with excess alcohol — the legal limit in England and Wales is 80mg of alcohol per 100ml of blood. Scotland has a lower limit of 50mg per 100ml.",
+      },
+      {
+        sectionNumber: "s.5A",
+        description:
+          "Driving with a specified controlled drug above the specified limit — sets drug driving limits for 16 controlled substances. Zero tolerance for illegal drugs; medical limits for prescribed drugs.",
+      },
+      {
+        sectionNumber: "s.3A",
+        description:
+          "Causing death by careless driving when under the influence of drink or drugs — a more serious offence than careless driving alone, carrying a maximum sentence of 14 years' imprisonment.",
+      },
+    ],
+    caseLaw: [
+      {
+        caseName: "DPP v Butterworth [1994] 3 WLR 538",
+        factualSummary:
+          "The defendant argued that the evidential breath test procedure had not been properly followed, and that the results should therefore be excluded. The House of Lords considered the proper interpretation of the evidential testing provisions.",
+        legalPrinciple:
+          "Strict compliance with the prescribed breath test procedure is required. However, minor procedural errors that do not affect the reliability of the result do not automatically render the evidence inadmissible. Substantive compliance with the legislative scheme is the governing principle.",
+      },
+      {
+        caseName: "R v St-Hillaire [2020] EWCA Crim 1246",
+        factualSummary:
+          "The defendant caused a fatal accident while driving with excess alcohol. The Court of Appeal reviewed the application of sentencing guidelines for causing death by careless driving under the influence.",
+        legalPrinciple:
+          "Causing death by careless driving while over the prescribed alcohol limit is treated by sentencing courts as a very serious offence. The combination of impaired driving and a fatal outcome places the offence in the highest culpability category, with a starting point of 36 weeks' custody even for a first offence.",
+      },
+    ],
+  },
 };
 
 // General references that apply to all incidents regardless of violation type
@@ -756,6 +894,30 @@ export const GENERAL_LEGAL_REFERENCES: LegalReference = {
       sectionReference: "s.1–4",
       description:
         "Enables dependants of a person killed by negligence to claim financial dependency losses. The statutory bereavement award (2023 rate: £15,120) is payable to a spouse, civil partner, or parents of an unmarried minor. Relevant in all fatal road traffic collisions where a negligence claim arises.",
+    },
+    {
+      actName: "Limitation Act 1980",
+      sectionReference: "s.11 & s.2",
+      description:
+        "Personal injury claims must be brought within 3 years from the date of the accident or the date of knowledge of injury (s.11). Property damage claims have a 6-year limitation period from the date of the damage (s.2). These are strict time limits — claims issued after the relevant period are statute-barred unless the court exercises its discretion under s.33 to override the time limit.",
+    },
+    {
+      actName: "Road Traffic Offenders Act 1988",
+      sectionReference: "s.34 & Sch. 2",
+      description:
+        "Sets out the mandatory and discretionary disqualification and penalty points regime for road traffic offences. Accumulation of 12 or more penalty points within 3 years results in mandatory 'totting up' disqualification. Certain offences (dangerous driving, drink driving, causing death by dangerous driving) carry mandatory minimum disqualification periods.",
+    },
+    {
+      actName: "Whiplash Injury Regulations 2021 (WRP 2021)",
+      sectionReference: "Tariff Table",
+      description:
+        "Introduces fixed statutory tariff amounts for whiplash and minor psychological injuries in road traffic accidents from 31 May 2021. Tariffs range from £240 (up to 3 months) to £4,345 (19–24 months) for whiplash, with a 20% psychological injury uplift where applicable. Claims must be brought via the Official Injury Claim (OIC) portal and cannot exceed the tariff amounts for covered injury types.",
+    },
+    {
+      actName: "Criminal Justice Act 2003",
+      sectionReference: "s.143–144",
+      description:
+        "Provides the sentencing framework for road traffic offences including dangerous and careless driving causing death. Aggravating factors (excess speed, mobile phone use, alcohol/drugs, multiple victims) increase the culpability category and the sentence. The Act requires courts to give reasons for any departure from the relevant sentencing guidelines.",
     },
   ],
 };

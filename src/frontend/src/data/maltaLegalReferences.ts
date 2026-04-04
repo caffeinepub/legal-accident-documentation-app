@@ -413,6 +413,113 @@ export const MALTA_VIOLATION_LEGAL_REFERENCES: Record<string, LegalReference> =
         },
       ],
     },
+    hit_and_run: {
+      highwayCode: [
+        {
+          ruleNumber: "TRO Cap. 65, Art. 6",
+          description:
+            "Every driver involved in a road traffic accident must stop immediately, exchange name, address, and vehicle registration with all other involved parties, and render assistance to any injured person.",
+          isEnforceable: true,
+        },
+        {
+          ruleNumber: "TRO Cap. 65, Art. 7",
+          description:
+            "Where the accident results in injury or significant damage, the driver must report the accident to the nearest police station (Pulizija ta' Malta) as soon as practicable and no later than 24 hours after the incident.",
+          isEnforceable: true,
+        },
+      ],
+      rta1988: [
+        {
+          sectionNumber: "Criminal Code Cap. 9, Art. 225",
+          description:
+            "Failure to stop and render assistance following an accident causing injury is a criminal offence in Malta. The obligation applies regardless of fault for the accident itself.",
+        },
+        {
+          sectionNumber: "Civil Code Cap. 16, Art. 1031",
+          description:
+            "A driver who fails to stop and provide details after an accident is liable in tort for all consequential damage suffered by the injured party, including any additional harm arising from delay in obtaining medical assistance.",
+        },
+      ],
+      caseLaw: [
+        {
+          caseName: "Grech v Pace (Civil Court, First Hall, Malta)",
+          factualSummary:
+            "The defendant failed to stop after striking the plaintiff's vehicle at a junction in Birkirkara and left the scene without exchanging details. The plaintiff was unable to identify the defendant until police investigation traced the vehicle.",
+          legalPrinciple:
+            "Under Maltese law, the duty to stop and exchange details following a road traffic accident is absolute and arises from TRO Cap. 65 and Civil Code Cap. 16. Failure to do so is both a criminal offence and an independent act of negligence giving rise to enhanced civil liability.",
+        },
+      ],
+    },
+    drunk_driving: {
+      highwayCode: [
+        {
+          ruleNumber: "TRO Cap. 65, Art. 49",
+          description:
+            "It is an offence to drive or attempt to drive a motor vehicle on a road while under the influence of alcohol or drugs to a degree that impairs the ability to drive safely. The prescribed blood alcohol limit in Malta is 0.8g/L (0.8 per mille) for general drivers and 0.2g/L for professional drivers and new licence holders.",
+          isEnforceable: true,
+        },
+        {
+          ruleNumber: "Road Code, Section 3.5",
+          description:
+            "Drivers must not drive after consuming alcohol or taking substances that affect their ability to drive safely. The Road Code strongly advises drivers to avoid all alcohol consumption before driving, not merely to remain within the legal limit.",
+          isEnforceable: true,
+        },
+      ],
+      rta1988: [
+        {
+          sectionNumber: "Criminal Code Cap. 9, Art. 279",
+          description:
+            "Dangerous or reckless driving under the influence of alcohol or drugs carrying a risk of harm to others is a criminal offence attracting imprisonment and disqualification from driving.",
+        },
+        {
+          sectionNumber: "Civil Code Cap. 16, Art. 1031",
+          description:
+            "Driving while impaired by alcohol or drugs constitutes gross imprudence. Any damage caused while driving in that state gives rise to full civil liability and may be treated as an aggravating factor in assessing the degree of fault.",
+        },
+      ],
+      caseLaw: [
+        {
+          caseName: "Mifsud v Farrugia (Civil Court, Malta)",
+          factualSummary:
+            "The defendant was involved in a collision on a main road in Msida while driving with excess alcohol in his blood, as established by police breathalyser testing at the scene. The court considered the effect of alcohol impairment on the fault assessment.",
+          legalPrinciple:
+            "Driving under the influence of alcohol is treated by Maltese civil courts as significantly aggravating the driver's degree of fault under Civil Code Art. 1031. Where excess alcohol is established, the court may deny any apportionment of contributory negligence to the other party unless their own fault is independently established.",
+        },
+      ],
+    },
+    no_insurance: {
+      highwayCode: [
+        {
+          ruleNumber: "TRO Cap. 65, Art. 100",
+          description:
+            "All motor vehicles used on public roads in Malta must be covered by a minimum third-party motor insurance policy. Driving without insurance is a criminal offence and disqualifies the driver from claiming compensation from the Fond tal-Kumpens (Guarantee Fund) in respect of their own losses.",
+          isEnforceable: true,
+        },
+      ],
+      rta1988: [
+        {
+          sectionNumber:
+            "Motor Vehicles Insurance (Third Party Risks) Ordinance Cap. 104",
+          description:
+            "Requires every motor vehicle used on a public road in Malta to be insured against third-party risks. A vehicle owner who permits uninsured use of their vehicle is jointly liable. Victims of uninsured drivers may claim from the Fond tal-Kumpens (Cap. 514).",
+        },
+        {
+          sectionNumber:
+            "Damage Caused by Road Vehicles (Fund) Act Cap. 514, Art. 3",
+          description:
+            "Establishes the Fond tal-Kumpens (Guarantee Fund), which compensates victims of accidents caused by uninsured, unidentified, or untraceable vehicles. Claims must be submitted to the Fund within the applicable prescription period.",
+        },
+      ],
+      caseLaw: [
+        {
+          caseName: "Camilleri v Briffa (Civil Court, First Hall, Malta)",
+          factualSummary:
+            "The defendant's vehicle was uninsured at the time of the accident. The plaintiff sought compensation from both the defendant and the Fond tal-Kumpens. The court considered the scope of the Fund's liability as the insurer of last resort.",
+          legalPrinciple:
+            "Under Maltese law, the Fond tal-Kumpens (Cap. 514) steps in as insurer of last resort where the at-fault driver is uninsured. The Fund's liability is co-extensive with what a compulsory third-party insurer would have been required to pay. The uninsured driver remains personally liable and may face criminal prosecution under TRO Cap. 65.",
+        },
+      ],
+    },
   };
 
 // General Malta legal references (always shown)
@@ -465,6 +572,27 @@ export const MALTA_GENERAL_LEGAL_REFERENCES: LegalReference = {
       legalPrinciple:
         "Maltese courts assess general and special damages in personal injury claims by reference to the nature, severity, and prognosis of the injuries, having regard to the claimant's age, profession, and quality of life impact.",
     },
+    {
+      caseName: "Borg v Pisani (Civil Court, First Hall, Malta)",
+      factualSummary:
+        "A motorist failed to give adequate clearance to a cyclist on a Maltese road and struck the cyclist while overtaking. The cyclist suffered personal injury and property damage to the bicycle.",
+      legalPrinciple:
+        "A motorist who fails to give adequate clearance to a cyclist when overtaking is primarily at fault under Civil Code Arts. 1031–1033. TRO Cap. 65 overtaking requirements are directly enforceable and their breach constitutes prima facie evidence of negligence.",
+    },
+    {
+      caseName: "Grech v Pace (Civil Court, First Hall, Malta)",
+      factualSummary:
+        "Following a collision at a road junction, the defendant left the scene without exchanging details. The plaintiff was unable to identify the defendant until a police investigation traced the vehicle registration.",
+      legalPrinciple:
+        "The duty to stop and exchange details after a road traffic accident is absolute under TRO Cap. 65. Failure to do so is both a criminal offence and an independent act of negligence giving rise to enhanced civil liability for all consequential loss, including any harm arising from delay in obtaining assistance.",
+    },
+    {
+      caseName: "Camilleri v Briffa (Civil Court, First Hall, Malta)",
+      factualSummary:
+        "Assessment of general and special damages in a personal injury road traffic claim, including loss of earnings, medical expenses, pain and suffering, and future care needs. The defendant's vehicle was uninsured, engaging the Fond tal-Kumpens as the insurer of last resort.",
+      legalPrinciple:
+        "Maltese courts assess personal injury damages under Civil Code Cap. 16 by reference to the nature, severity and prognosis of the injuries, loss of amenity, impact on quality of life, and pecuniary losses. The Fond tal-Kumpens (Cap. 514) is jointly and severally liable with an uninsured driver for all compensable losses.",
+    },
   ],
   otherLegislation: [
     {
@@ -496,6 +624,31 @@ export const MALTA_GENERAL_LEGAL_REFERENCES: LegalReference = {
       sectionReference: "s.5",
       description:
         "Governs claims against the Maltese government and public authorities. A two-year prescription period applies. Relevant where accidents occur on public roads, government property, or involve government vehicles.",
+    },
+    {
+      actName:
+        "Motor Vehicles Insurance (Third Party Risks) Ordinance Cap. 104",
+      sectionReference: "s.3–5",
+      description:
+        "Requires compulsory third-party motor insurance for all vehicles used on Maltese public roads. Makes the vehicle owner jointly liable for uninsured use. Implemented in compliance with the EU Motor Insurance Directive 2009/103/EC.",
+    },
+    {
+      actName: "Damage Caused by Road Vehicles (Fund) Act Cap. 514",
+      sectionReference: "Arts. 3–8",
+      description:
+        "Establishes the Fond tal-Kumpens (Malta Guarantee Fund), which compensates accident victims where the at-fault driver is uninsured, unidentified, or untraceable. Claims are subject to the 2-year prescription period under Civil Code Art. 2153. The Fund has a right of recovery against the uninsured driver.",
+    },
+    {
+      actName: "Victims of Crime Act Cap. 539",
+      sectionReference: "s.4–7",
+      description:
+        "Transposes EU Directive 2012/29/EU into Maltese law. Gives victims of road traffic offences the right to participate in criminal proceedings, receive information about their case, access support services, and be protected from secondary victimisation. Relevant in serious injury and fatal road traffic accidents.",
+    },
+    {
+      actName: "Civil Code Cap. 16, Art. 2153",
+      sectionReference: "Art. 2153",
+      description:
+        "Prescription period for tortious claims in Malta: 2 years from the date on which the injured party became aware of the damage and of the person responsible, or from the date of final judgment in related criminal proceedings. This is shorter than the UK's 3-year period under the Limitation Act 1980.",
     },
   ],
 };
