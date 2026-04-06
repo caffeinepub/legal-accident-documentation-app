@@ -1,41 +1,55 @@
-# iamthe.law — Legal References Expansion & Chat Scroll Fix
+# iamthe.law — Stripe Monetisation (Freemium + Pro)
 
 ## Current State
 
-- `ChatAssistant.tsx`: The auto-scroll logic uses `scrollRef.current.scrollTop = scrollRef.current.scrollHeight` but `scrollRef` is attached to the outer `<ScrollArea>` wrapper component, not the inner scrollable viewport. Radix's ScrollArea wraps content in a `[data-radix-scroll-area-viewport]` inner div — setting scrollTop on the outer wrapper has no effect, so the chat never scrolls down to new messages.
-- `legalReferences.ts`: Has solid UK references for ~12 violation types plus general references. Case law depth is good but several major statutes and landmark cases are missing: Limitation Act 1980, WRP 2021 tariff detail, Road Traffic Offenders Act 1988, Theft Act 1968 (vehicle taking), Civil Evidence Act 1995, and deeper personal injury case law.
-- `maltaLegalReferences.ts`: Has 10 violation types plus general references. Missing several important Maltese law statutes: Motor Vehicles Insurance (Third Party Risks) Ordinance Cap. 104, Victims of Crime Act Cap. 539, Damage caused by Road Vehicle (Fund) Act Cap. 514 (Fond tal-Kumpens), and additional Maltese case law depth.
+The app is a fully-featured AI-powered legal accident documentation tool with UK and Malta jurisdiction support, multi-language (EN/ES/PL/MT), cycling accidents, fleet manager, legal outputs, chat assistant, and dangerous roads panels. All features are currently free and unrestricted.
+
+The backend (main.mo) uses authorization and blob-storage components. There is no subscription or payment logic yet.
+
+Frontend is a React/TypeScript SPA. Key state is stored in localStorage. Reports are saved to the backend canister.
 
 ## Requested Changes (Diff)
 
 ### Add
-- Fix chat scroll: query the inner Radix viewport div using `querySelector('[data-radix-scroll-area-viewport]')` and scroll that element instead
-- UK: Limitation Act 1980 (3-year personal injury / 6-year property damage) to `GENERAL_LEGAL_REFERENCES.otherLegislation`
-- UK: Road Traffic Offenders Act 1988 s.34 (penalty points / disqualification) to `GENERAL_LEGAL_REFERENCES.otherLegislation`
-- UK: Whiplash Injury Regulations 2021 (WRP tariff detail) to `GENERAL_LEGAL_REFERENCES.otherLegislation`
-- UK: New `hit_and_run` violation entry with HC Rule 286/287, RTA 1988 s.170, and case law
-- UK: New `drunk_driving` violation entry with RTA 1988 s.4/5, HC Rule 95, and DPP v Morgan, R v Woollin case law
-- UK: Add *Baker v Willoughby* [1970] AC 467 and *Page v Smith* [1996] AC 155 to `duty_of_care` section
-- UK: Add *Revill v Newbery* [1996] QB 567 to `contributory_negligence` section
-- Malta: Motor Vehicles Insurance (Third Party Risks) Ordinance Cap. 104 to `MALTA_GENERAL_LEGAL_REFERENCES.otherLegislation`
-- Malta: Damage Caused by Road Vehicles (Fund) Act Cap. 514 (Fond tal-Kumpens) to `MALTA_GENERAL_LEGAL_REFERENCES.otherLegislation`
-- Malta: Data Protection Act Cap. 586 reference in `MALTA_GENERAL_LEGAL_REFERENCES`
-- Malta: New violation entries: `drunk_driving`, `hit_and_run`, `no_insurance` with TRO Cap. 65 references and Maltese case law
-- Malta: Add *Grech v Pace* and *Mifsud v Farrugia* case law to general Malta references
-- Malta: Add *Camilleri v Briffa* (personal injury damages assessment) to general Malta references
-- Malta: Add Civil Code Art. 1045 (prescription for tortious claims — 2 years from date of knowledge) with clarifying detail
+- Stripe component integration for payment processing
+- `usePlan` hook (localStorage-based plan state: `free` | `pro`) that checks subscription status
+- Pricing page at `/pricing` — clearly shows Free vs Pro tiers with features listed
+- Upgrade modal/paywall that appears when a free-tier user tries to access a Pro-only feature
+- Pro badge in the nav header when user is subscribed
+- Stripe checkout flow for Pro monthly subscription (£9.99/month) and pay-per-export (£3.99 per verified export)
+- Feature gating for Pro-only features:
+  - PDF export with QR code, SHA-256 fingerprint, verified badge
+  - Demand letters & negotiation letter builder
+  - Malta jurisdiction access
+  - Fleet Manager dashboard
+  - Legal Outputs section (settlement estimator, legal pathway guide, dispute template)
+  - Reports beyond 3/month (free tier cap)
 
 ### Modify
-- `ChatAssistant.tsx`: Fix auto-scroll to target `[data-radix-scroll-area-viewport]` child of the ScrollArea, not the outer wrapper
-- Malta `GENERAL_LEGAL_REFERENCES`: Expand Civil Code Cap. 16 entry to cover Arts. 1031–1045 with prescription detail
-- Malta Speeding: Add `TRO Cap. 65, Art. 46` (construction and use of speed recording equipment)
-- UK `contributory_negligence`: Add *Reeves v Commissioner of Police* [2000] 1 AC 360 for detailed apportionment discussion
+- `ExportReportPanel.tsx` — gate PDF export behind Pro; show upgrade prompt for free users
+- `DemandLetterPanel.tsx` — gate behind Pro
+- `NegotiationLetterBuilder.tsx` — gate behind Pro
+- `FleetPage.tsx` — gate behind Pro
+- `LegalOutputsPage.tsx` — gate behind Pro
+- `CountryContext.tsx` — gate Malta jurisdiction behind Pro
+- `ReportsPage.tsx` — show free tier report count (3/month cap) and upgrade CTA when limit reached
+- `App.tsx` — add `/pricing` route and Pro badge in nav
+- `Layout.tsx` — show Pro badge in header when subscribed
 
 ### Remove
 - Nothing removed
 
 ## Implementation Plan
 
-1. **ChatAssistant.tsx** — Change scroll logic in the `useEffect([messages, loading])` hook: instead of `scrollRef.current.scrollTop = scrollRef.current.scrollHeight`, query `scrollRef.current.querySelector('[data-radix-scroll-area-viewport]')` and scroll that element.
-2. **legalReferences.ts** — Add: Limitation Act 1980 and Road Traffic Offenders Act 1988 and WRP 2021 entries to `GENERAL_LEGAL_REFERENCES.otherLegislation`; add `hit_and_run` and `drunk_driving` violation entries; expand `duty_of_care` case law with Baker v Willoughby and Page v Smith; expand `contributory_negligence` case law with Revill v Newbery and Reeves.
-3. **maltaLegalReferences.ts** — Add Cap. 104, Cap. 514 (Fond tal-Kumpens), and Cap. 539 to `MALTA_GENERAL_LEGAL_REFERENCES.otherLegislation`; add 3 new case law entries to general Malta references; add `drunk_driving`, `hit_and_run`, `no_insurance` violation entries.
+1. Select `stripe` Caffeine component
+2. Regenerate backend to include Stripe subscription support
+3. Create `usePlan` hook reading plan from localStorage + Stripe session
+4. Create `PricingPage.tsx` with Free/Pro tier cards, Stripe checkout buttons
+5. Create `PaywallModal.tsx` — reusable upgrade prompt with feature name + pricing
+6. Create `ProBadge.tsx` — small badge for nav header
+7. Gate ExportReportPanel PDF export (show blur + lock icon for free users)
+8. Gate DemandLetterPanel, NegotiationLetterBuilder, LegalOutputsPage, FleetPage
+9. Gate Malta jurisdiction toggle (show upgrade prompt if free user switches to Malta)
+10. Add report count enforcement (3/month cap) on ReportsPage and NewReportPage
+11. Add `/pricing` route in App.tsx
+12. Add Pro badge in Layout.tsx nav

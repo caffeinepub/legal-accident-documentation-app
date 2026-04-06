@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
+import { useNavigate } from "@tanstack/react-router";
 import {
   AlertTriangle,
   BookOpen,
@@ -45,6 +46,7 @@ import {
   buildMaltaLiabilityDisputeTemplate,
   formatEUR,
 } from "../data/maltaLegalOutputs";
+import { usePlan } from "../hooks/usePlan";
 
 // ─── Settlement Value Lookup ────────────────────────────────────────────
 type SeverityKey =
@@ -775,8 +777,54 @@ function LiabilityDisputeTemplate() {
 // ─── Page ────────────────────────────────────────────────────────────────────────────────────
 export default function LegalOutputsPage() {
   const { country } = useCountry();
+  const { isPro } = usePlan();
+  const navigate = useNavigate();
   return (
     <div className="space-y-8" data-ocid="legal_outputs.page">
+      {/* Pro paywall banner */}
+      {!isPro && (
+        <div
+          className="rounded-xl p-4 flex items-center justify-between gap-4 flex-wrap"
+          style={{
+            background:
+              "linear-gradient(135deg, oklch(0.97 0.06 85) 0%, oklch(0.95 0.10 60) 100%)",
+            border: "1px solid oklch(0.85 0.14 75)",
+          }}
+          data-ocid="legal_outputs.paywall.panel"
+        >
+          <div className="flex items-start gap-3">
+            <span className="text-2xl">👑</span>
+            <div>
+              <p
+                className="font-bold text-sm"
+                style={{ color: "oklch(0.35 0.12 60)" }}
+              >
+                Legal Outputs is a Pro feature
+              </p>
+              <p
+                className="text-xs mt-0.5"
+                style={{ color: "oklch(0.45 0.10 65)" }}
+              >
+                Upgrade to Pro to access settlement value estimators, legal
+                pathway guides, and dispute templates.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => navigate({ to: "/pricing" })}
+            className="shrink-0 px-4 py-2 rounded-lg text-sm font-bold transition-opacity hover:opacity-90"
+            style={{
+              background:
+                "linear-gradient(135deg, oklch(0.75 0.18 80) 0%, oklch(0.68 0.20 55) 100%)",
+              color: "oklch(0.15 0.05 60)",
+            }}
+            data-ocid="legal_outputs.paywall.primary_button"
+          >
+            Upgrade to Pro
+          </button>
+        </div>
+      )}
       {/* Header */}
       <div className="space-y-2">
         <div className="flex items-center gap-3">

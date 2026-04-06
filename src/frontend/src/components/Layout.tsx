@@ -26,9 +26,12 @@ import React, { useState } from "react";
 import { useCountry } from "../contexts/CountryContext";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useTheme } from "../contexts/ThemeContext";
+import { usePlan } from "../hooks/usePlan";
 import { LANGUAGES, type Language } from "../i18n/translations";
 import { ChatAssistant } from "./ChatAssistant";
 import CookieConsentBanner from "./CookieConsentBanner";
+import PaywallModal from "./PaywallModal";
+import ProBadge from "./ProBadge";
 
 const NAV_ITEMS = [
   {
@@ -93,6 +96,8 @@ export default function Layout() {
   const { theme, toggleTheme } = useTheme();
   const { language, setLanguage, t } = useLanguage();
   const { country, setCountry } = useCountry();
+  const { isPro } = usePlan();
+  const [showMaltaPaywall, setShowMaltaPaywall] = useState(false);
 
   const handleNav = (to: string) => {
     navigate({ to });
@@ -125,6 +130,11 @@ export default function Layout() {
             >
               iamthe.law
             </span>
+            {isPro && (
+              <span className="hidden sm:inline-flex ml-1">
+                <ProBadge />
+              </span>
+            )}
           </button>
 
           {/* Desktop nav */}
@@ -166,6 +176,22 @@ export default function Layout() {
               <AlertTriangle className="w-3.5 h-3.5" />
               {t("nav.dangerous_roads")}
             </Button>
+            {/* Pricing nav item */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate({ to: "/pricing" })}
+              className={[
+                "gap-1.5 px-3 relative",
+                location.pathname === "/pricing"
+                  ? "text-primary font-semibold after:absolute after:bottom-0 after:left-2 after:right-2 after:h-0.5 after:rounded-full after:bg-primary"
+                  : "text-muted-foreground hover:text-foreground",
+              ].join(" ")}
+              data-ocid="nav.pricing.link"
+            >
+              {isPro ? <ProBadge /> : null}
+              {!isPro && t("nav.pricing")}
+            </Button>
           </nav>
 
           {/* Right controls: lang + theme + mobile menu */}
@@ -173,13 +199,21 @@ export default function Layout() {
             {/* Country switcher */}
             <button
               type="button"
-              onClick={() => setCountry(country === "uk" ? "mt" : "uk")}
+              onClick={() => {
+                if (country === "uk" && !isPro) {
+                  setShowMaltaPaywall(true);
+                } else {
+                  setCountry(country === "uk" ? "mt" : "uk");
+                }
+              }}
               className="flex items-center gap-1 px-2 py-1 rounded-md border border-border text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
               aria-label="Switch jurisdiction"
               data-ocid="header.country.toggle"
               title={
                 country === "uk"
-                  ? "Switch to Malta jurisdiction"
+                  ? isPro
+                    ? "Switch to Malta jurisdiction"
+                    : "Malta jurisdiction requires Pro"
                   : "Switch to UK jurisdiction"
               }
             >
@@ -294,6 +328,21 @@ export default function Layout() {
                     <AlertTriangle className="w-4 h-4 shrink-0" />
                     {t("nav.dangerous_roads")}
                   </button>
+                  {/* Pricing mobile item */}
+                  <button
+                    type="button"
+                    onClick={() => handleNav("/pricing")}
+                    className={[
+                      "flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors text-left w-full",
+                      location.pathname === "/pricing"
+                        ? "bg-primary text-primary-foreground"
+                        : "text-foreground hover:bg-muted",
+                    ].join(" ")}
+                    data-ocid="nav.pricing.link"
+                  >
+                    {isPro ? <ProBadge /> : null}
+                    <span>{t("nav.pricing")}</span>
+                  </button>
                   {/* Mobile lang row */}
                   <div className="mt-3 pt-3 border-t border-border flex items-center gap-2 px-3">
                     <Globe className="w-4 h-4 text-muted-foreground" />
@@ -390,6 +439,11 @@ export default function Layout() {
       </footer>
       <CookieConsentBanner />
       <ChatAssistant />
+      <PaywallModal
+        isOpen={showMaltaPaywall}
+        onClose={() => setShowMaltaPaywall(false)}
+        featureName="Malta Jurisdiction (🇲🇹)"
+      />
     </div>
   );
 }

@@ -19,7 +19,9 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useCountry } from "../contexts/CountryContext";
+import { usePlan } from "../hooks/usePlan";
 import { formatClaimId } from "../utils/claimId";
+import PaywallModal from "./PaywallModal";
 
 interface NegotiationLetterBuilderProps {
   report: AccidentReport & { id?: bigint };
@@ -318,6 +320,8 @@ export default function NegotiationLetterBuilder({
   report,
   reportId,
 }: NegotiationLetterBuilderProps) {
+  const { isPro } = usePlan();
+  const [showPaywall, setShowPaywall] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [settlementAmount, setSettlementAmount] = useState("");
   const [letterText, setLetterText] = useState("");
@@ -367,134 +371,151 @@ export default function NegotiationLetterBuilder({
   };
 
   return (
-    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-      <Card className="border-emerald-200/60 dark:border-emerald-800/30">
-        <CardHeader className="py-3 px-4">
-          <CollapsibleTrigger asChild>
-            <button
-              type="button"
-              className="flex items-center justify-between w-full text-left group"
-            >
-              <div className="flex items-center gap-2">
-                <Handshake className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                <CardTitle className="text-sm font-semibold">
-                  {isMalta
-                    ? "Offerta ta' Ftehim — Without-Prejudice Settlement Letter"
-                    : "Without-Prejudice Negotiation Letter"}
-                </CardTitle>
-              </div>
-              <span className="text-muted-foreground group-hover:text-foreground transition-colors">
-                {isOpen ? (
-                  <ChevronUp className="h-4 w-4" />
-                ) : (
-                  <ChevronDown className="h-4 w-4" />
-                )}
-              </span>
-            </button>
-          </CollapsibleTrigger>
-        </CardHeader>
+    <>
+      <Collapsible
+        open={isOpen}
+        onOpenChange={(open) => {
+          if (open && !isPro) {
+            setShowPaywall(true);
+          } else {
+            setIsOpen(open);
+          }
+        }}
+      >
+        <Card className="border-emerald-200/60 dark:border-emerald-800/30">
+          <CardHeader className="py-3 px-4">
+            <CollapsibleTrigger asChild>
+              <button
+                type="button"
+                className="flex items-center justify-between w-full text-left group"
+              >
+                <div className="flex items-center gap-2">
+                  <Handshake className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                  <CardTitle className="text-sm font-semibold">
+                    {isMalta
+                      ? "Offerta ta' Ftehim — Without-Prejudice Settlement Letter"
+                      : "Without-Prejudice Negotiation Letter"}
+                  </CardTitle>
+                </div>
+                <span className="text-muted-foreground group-hover:text-foreground transition-colors">
+                  {isOpen ? (
+                    <ChevronUp className="h-4 w-4" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4" />
+                  )}
+                </span>
+              </button>
+            </CollapsibleTrigger>
+          </CardHeader>
 
-        <CollapsibleContent>
-          <CardContent className="pt-0 pb-4 px-4 space-y-3">
-            <p className="text-xs text-muted-foreground leading-relaxed bg-emerald-50/60 dark:bg-emerald-900/10 border border-emerald-200/60 dark:border-emerald-800/30 rounded-md px-3 py-2">
-              {isMalta ? (
+          <CollapsibleContent>
+            <CardContent className="pt-0 pb-4 px-4 space-y-3">
+              <p className="text-xs text-muted-foreground leading-relaxed bg-emerald-50/60 dark:bg-emerald-900/10 border border-emerald-200/60 dark:border-emerald-800/30 rounded-md px-3 py-2">
+                {isMalta ? (
+                  <>
+                    <strong>Abbozz ta&apos; offerta ta&apos; ftehim</strong> —
+                    auto-populated from report data. Marked{" "}
+                    <em>Mingħajr Preġudizzju</em> (Without Prejudice).
+                    References Maltese law:{" "}
+                    <em>Civil Code Cap. 16, Arts. 1031–1033</em> and{" "}
+                    <em>Camilleri v Mifsud</em>. Settlement offer is in EUR.
+                    Edit all details before use. Always seek legal advice from a
+                    Maltese advocate.
+                  </>
+                ) : (
+                  <>
+                    <strong>Calderbank offer template</strong> — auto-populated
+                    from report data. Marked Without Prejudice Save As To Costs.
+                    References <em>Donoghue v Stevenson</em> and{" "}
+                    <em>Caparo v Dickman</em> and the Law Reform (Contributory
+                    Negligence) Act 1945. Edit all details before use. Always
+                    seek independent legal advice.
+                  </>
+                )}
+              </p>
+
+              <div className="flex items-end gap-3">
+                <div className="flex-1 space-y-1.5">
+                  <Label
+                    htmlFor="settlement-offer"
+                    className="text-xs font-medium"
+                  >
+                    Settlement Offer Amount ({isMalta ? "€" : "£"})
+                  </Label>
+                  <Input
+                    id="settlement-offer"
+                    data-ocid="negotiation.input"
+                    type="number"
+                    min="0"
+                    step="100"
+                    placeholder="e.g. 5000"
+                    value={settlementAmount}
+                    onChange={(e) => setSettlementAmount(e.target.value)}
+                    className="text-sm"
+                  />
+                </div>
+                <Button
+                  data-ocid="negotiation.primary_button"
+                  onClick={handleGenerate}
+                  size="sm"
+                  className="gap-2 text-xs bg-emerald-700 hover:bg-emerald-800 text-white shrink-0"
+                >
+                  <Handshake className="h-3.5 w-3.5" />
+                  Generate Letter
+                </Button>
+              </div>
+
+              {generated && (
                 <>
-                  <strong>Abbozz ta&apos; offerta ta&apos; ftehim</strong> —
-                  auto-populated from report data. Marked{" "}
-                  <em>Mingħajr Preġudizzju</em> (Without Prejudice). References
-                  Maltese law: <em>Civil Code Cap. 16, Arts. 1031–1033</em> and{" "}
-                  <em>Camilleri v Mifsud</em>. Settlement offer is in EUR. Edit
-                  all details before use. Always seek legal advice from a
-                  Maltese advocate.
-                </>
-              ) : (
-                <>
-                  <strong>Calderbank offer template</strong> — auto-populated
-                  from report data. Marked Without Prejudice Save As To Costs.
-                  References <em>Donoghue v Stevenson</em> and{" "}
-                  <em>Caparo v Dickman</em> and the Law Reform (Contributory
-                  Negligence) Act 1945. Edit all details before use. Always seek
-                  independent legal advice.
+                  <Textarea
+                    data-ocid="negotiation.textarea"
+                    value={letterText}
+                    onChange={(e) => setLetterText(e.target.value)}
+                    className="font-mono text-xs leading-relaxed min-h-[520px] resize-y bg-card border-border"
+                    spellCheck
+                  />
+
+                  <div className="flex items-center gap-2 justify-end flex-wrap">
+                    <Button
+                      data-ocid="negotiation.secondary_button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleCopy}
+                      className="gap-2 text-xs"
+                    >
+                      {copied ? (
+                        <>
+                          <CheckCircle className="h-3.5 w-3.5 text-green-500" />
+                          Copied
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="h-3.5 w-3.5" />
+                          Copy to Clipboard
+                        </>
+                      )}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handlePrint}
+                      className="gap-2 text-xs"
+                    >
+                      <Printer className="h-3.5 w-3.5" />
+                      Print
+                    </Button>
+                  </div>
                 </>
               )}
-            </p>
-
-            <div className="flex items-end gap-3">
-              <div className="flex-1 space-y-1.5">
-                <Label
-                  htmlFor="settlement-offer"
-                  className="text-xs font-medium"
-                >
-                  Settlement Offer Amount ({isMalta ? "€" : "£"})
-                </Label>
-                <Input
-                  id="settlement-offer"
-                  data-ocid="negotiation.input"
-                  type="number"
-                  min="0"
-                  step="100"
-                  placeholder="e.g. 5000"
-                  value={settlementAmount}
-                  onChange={(e) => setSettlementAmount(e.target.value)}
-                  className="text-sm"
-                />
-              </div>
-              <Button
-                data-ocid="negotiation.primary_button"
-                onClick={handleGenerate}
-                size="sm"
-                className="gap-2 text-xs bg-emerald-700 hover:bg-emerald-800 text-white shrink-0"
-              >
-                <Handshake className="h-3.5 w-3.5" />
-                Generate Letter
-              </Button>
-            </div>
-
-            {generated && (
-              <>
-                <Textarea
-                  data-ocid="negotiation.textarea"
-                  value={letterText}
-                  onChange={(e) => setLetterText(e.target.value)}
-                  className="font-mono text-xs leading-relaxed min-h-[520px] resize-y bg-card border-border"
-                  spellCheck
-                />
-
-                <div className="flex items-center gap-2 justify-end flex-wrap">
-                  <Button
-                    data-ocid="negotiation.secondary_button"
-                    variant="outline"
-                    size="sm"
-                    onClick={handleCopy}
-                    className="gap-2 text-xs"
-                  >
-                    {copied ? (
-                      <>
-                        <CheckCircle className="h-3.5 w-3.5 text-green-500" />
-                        Copied
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="h-3.5 w-3.5" />
-                        Copy to Clipboard
-                      </>
-                    )}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handlePrint}
-                    className="gap-2 text-xs"
-                  >
-                    <Printer className="h-3.5 w-3.5" />
-                    Print
-                  </Button>
-                </div>
-              </>
-            )}
-          </CardContent>
-        </CollapsibleContent>
-      </Card>
-    </Collapsible>
+            </CardContent>
+          </CollapsibleContent>
+        </Card>
+      </Collapsible>
+      <PaywallModal
+        isOpen={showPaywall}
+        onClose={() => setShowPaywall(false)}
+        featureName="Negotiation Letter Builder"
+      />
+    </>
   );
 }

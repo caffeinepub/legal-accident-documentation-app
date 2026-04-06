@@ -19,7 +19,9 @@ import {
 import { useState } from "react";
 import { useCountry } from "../contexts/CountryContext";
 import { useLanguage } from "../contexts/LanguageContext";
+import { usePlan } from "../hooks/usePlan";
 import { formatClaimId } from "../utils/claimId";
+import PaywallModal from "./PaywallModal";
 import QRCodeDisplay from "./QRCodeDisplay";
 
 interface ExportReportPanelProps {
@@ -285,7 +287,9 @@ export default function ExportReportPanel({
   witnessSignatureDate,
 }: ExportReportPanelProps) {
   const [copied, setCopied] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
   const { country } = useCountry();
+  const { isPro } = usePlan();
   const isMalta = country === "mt";
   const { t } = useLanguage();
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -400,11 +404,12 @@ export default function ExportReportPanel({
             variant="outline"
             size="sm"
             className="gap-2 flex-1 sm:flex-none"
-            onClick={handlePrint}
+            onClick={() => (isPro ? handlePrint() : setShowPaywall(true))}
             data-ocid="export.secondary_button"
           >
             <Printer size={14} />
             {t("export.print")}
+            {!isPro && <span className="ml-1 text-[10px] opacity-60">Pro</span>}
           </Button>
         </div>
 
@@ -458,6 +463,12 @@ export default function ExportReportPanel({
           </CollapsibleContent>
         </Collapsible>
       </CardContent>
+
+      <PaywallModal
+        isOpen={showPaywall}
+        onClose={() => setShowPaywall(false)}
+        featureName="Print & PDF Export"
+      />
     </Card>
   );
 }

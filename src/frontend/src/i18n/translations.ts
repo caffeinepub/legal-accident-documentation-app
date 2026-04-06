@@ -314,7 +314,20 @@ export type TranslationKey =
   | "chat.prompt4"
   | "chat.error"
   | "chat.thinking"
-  | "chat.new_chat";
+  | "chat.new_chat"
+  // Pricing
+  | "pricing.title"
+  | "pricing.freeTier"
+  | "pricing.proTier"
+  | "pricing.upgrade"
+  | "pricing.perMonth"
+  | "pricing.perExport"
+  // Paywall
+  | "paywall.title"
+  | "paywall.description"
+  | "paywall.upgrade"
+  // Nav
+  | "nav.pricing";
 
 type Translations = Record<Language, Record<TranslationKey, string>>;
 
@@ -610,6 +623,16 @@ const translations: Translations = {
     "chat.error": "Sorry, I could not get a response. Please try again.",
     "chat.thinking": "Thinking...",
     "chat.new_chat": "New chat",
+    "pricing.title": "Choose Your Plan",
+    "pricing.freeTier": "Free",
+    "pricing.proTier": "Pro",
+    "pricing.upgrade": "Upgrade to Pro",
+    "pricing.perMonth": "/month",
+    "pricing.perExport": "Pay per Export",
+    "paywall.title": "Pro Feature",
+    "paywall.description": "requires a Pro subscription.",
+    "paywall.upgrade": "Upgrade to Pro",
+    "nav.pricing": "Pricing",
   },
 
   es: {
@@ -907,6 +930,16 @@ const translations: Translations = {
     "chat.error": "Lo siento, no pude obtener respuesta. Inténtalo de nuevo.",
     "chat.thinking": "Pensando...",
     "chat.new_chat": "Nueva conversación",
+    "pricing.title": "Elige tu Plan",
+    "pricing.freeTier": "Gratuito",
+    "pricing.proTier": "Pro",
+    "pricing.upgrade": "Actualizar a Pro",
+    "pricing.perMonth": "/mes",
+    "pricing.perExport": "Pago por Exportación",
+    "paywall.title": "Función Pro",
+    "paywall.description": "requiere una suscripción Pro.",
+    "paywall.upgrade": "Actualizar a Pro",
+    "nav.pricing": "Precios",
   },
 
   pl: {
@@ -1201,6 +1234,16 @@ const translations: Translations = {
       "Przepraszam, nie udało się uzyskać odpowiedzi. Spróbuj ponownie.",
     "chat.thinking": "Myślę...",
     "chat.new_chat": "Nowa rozmowa",
+    "pricing.title": "Wybierz Plan",
+    "pricing.freeTier": "Darmowy",
+    "pricing.proTier": "Pro",
+    "pricing.upgrade": "Ulepsz do Pro",
+    "pricing.perMonth": "/miesiąc",
+    "pricing.perExport": "Płatność za Eksport",
+    "paywall.title": "Funkcja Pro",
+    "paywall.description": "wymaga subskrypcji Pro.",
+    "paywall.upgrade": "Ulepsz do Pro",
+    "nav.pricing": "Cennik",
   },
 
   mt: {
@@ -1497,6 +1540,16 @@ const translations: Translations = {
     "chat.error": "Jiddispjaċini, ma stajtx nikseb risposta. Erġa' pprova.",
     "chat.thinking": "Naħseb...",
     "chat.new_chat": "Konversazzjoni ġdida",
+    "pricing.title": "Agħżel il-Pjan Tiegħek",
+    "pricing.freeTier": "Bla Ħlas",
+    "pricing.proTier": "Pro",
+    "pricing.upgrade": "Aġġorna għal Pro",
+    "pricing.perMonth": "/xahar",
+    "pricing.perExport": "Ħlas per Esportazzjoni",
+    "paywall.title": "Karatteristika Pro",
+    "paywall.description": "teħtieġ sottoskrozzjoni Pro.",
+    "paywall.upgrade": "Aġġorna għal Pro",
+    "nav.pricing": "Prezzijiet",
   },
 };
 

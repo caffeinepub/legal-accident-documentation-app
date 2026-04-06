@@ -18,6 +18,8 @@ import {
 import { useEffect, useState } from "react";
 import { useCountry } from "../contexts/CountryContext";
 import { buildMaltaDemandLetter } from "../data/maltaLegalOutputs";
+import { usePlan } from "../hooks/usePlan";
+import PaywallModal from "./PaywallModal";
 
 interface DemandLetterPanelProps {
   report: AccidentReport;
@@ -160,6 +162,8 @@ DISCLAIMER: This is a draft letter generated for documentation purposes only. It
 export default function DemandLetterPanel({ report }: DemandLetterPanelProps) {
   const { country } = useCountry();
   const isMalta = country === "mt";
+  const { isPro } = usePlan();
+  const [showPaywall, setShowPaywall] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [letterText, setLetterText] = useState("");
   const [copied, setCopied] = useState(false);
@@ -246,89 +250,117 @@ export default function DemandLetterPanel({ report }: DemandLetterPanelProps) {
   };
 
   return (
-    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-      <Card className="border-amber-200/60 dark:border-amber-800/30">
-        <CardHeader className="py-3 px-4">
-          <CollapsibleTrigger asChild>
-            <button
-              type="button"
-              className="flex items-center justify-between w-full text-left group"
-            >
-              <div className="flex items-center gap-2">
-                <FileText className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-                <CardTitle className="text-sm font-semibold">
-                  Formal Demand Letter (Draft)
-                </CardTitle>
+    <>
+      <Collapsible
+        open={isOpen}
+        onOpenChange={(open) => {
+          if (open && !isPro) {
+            setShowPaywall(true);
+          } else {
+            setIsOpen(open);
+          }
+        }}
+      >
+        <Card className="border-amber-200/60 dark:border-amber-800/30">
+          <CardHeader className="py-3 px-4">
+            <CollapsibleTrigger asChild>
+              <button
+                type="button"
+                className="flex items-center justify-between w-full text-left group"
+              >
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                  <CardTitle className="text-sm font-semibold">
+                    Formal Demand Letter (Draft)
+                    {!isPro && (
+                      <span
+                        className="ml-2 text-[10px] px-1.5 py-0.5 rounded font-bold tracking-wide"
+                        style={{
+                          background: "oklch(0.96 0.08 85)",
+                          color: "oklch(0.40 0.15 65)",
+                        }}
+                      >
+                        PRO
+                      </span>
+                    )}
+                  </CardTitle>
+                </div>
+                <span className="text-muted-foreground group-hover:text-foreground transition-colors">
+                  {isOpen ? (
+                    <ChevronUp className="h-4 w-4" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4" />
+                  )}
+                </span>
+              </button>
+            </CollapsibleTrigger>
+          </CardHeader>
+
+          <CollapsibleContent>
+            <CardContent className="pt-0 pb-4 px-4 space-y-3">
+              <p className="text-xs text-muted-foreground leading-relaxed bg-amber-50/60 dark:bg-amber-900/10 border border-amber-200/60 dark:border-amber-800/30 rounded-md px-3 py-2">
+                <strong>Auto-generated draft</strong> based on report data.
+                Review and edit all details before sending.{" "}
+                {isMalta ? (
+                  <>
+                    This letter follows Maltese civil law format (Civil Code
+                    Cap. 16, TRO Cap. 65). Review all details before use. Always
+                    seek advice from a qualified{" "}
+                    <strong>avukat (advocate)</strong>.
+                  </>
+                ) : (
+                  "This letter follows standard UK pre-action protocol formatting. Always seek qualified legal advice before issuing."
+                )}
+              </p>
+
+              <Textarea
+                data-ocid="demand_letter.textarea"
+                value={letterText}
+                onChange={(e) => setLetterText(e.target.value)}
+                className="font-mono text-xs leading-relaxed min-h-[480px] resize-y bg-card border-border"
+                spellCheck
+              />
+
+              <div className="flex items-center gap-2 justify-end flex-wrap">
+                <Button
+                  data-ocid="demand_letter.copy_button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCopy}
+                  className="gap-2 text-xs"
+                >
+                  {copied ? (
+                    <>
+                      <CheckCircle className="h-3.5 w-3.5 text-green-500" />
+                      Copied
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="h-3.5 w-3.5" />
+                      Copy to Clipboard
+                    </>
+                  )}
+                </Button>
+                <Button
+                  data-ocid="demand_letter.print_button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handlePrint}
+                  className="gap-2 text-xs"
+                >
+                  <Printer className="h-3.5 w-3.5" />
+                  Print
+                </Button>
               </div>
-              <span className="text-muted-foreground group-hover:text-foreground transition-colors">
-                {isOpen ? (
-                  <ChevronUp className="h-4 w-4" />
-                ) : (
-                  <ChevronDown className="h-4 w-4" />
-                )}
-              </span>
-            </button>
-          </CollapsibleTrigger>
-        </CardHeader>
-
-        <CollapsibleContent>
-          <CardContent className="pt-0 pb-4 px-4 space-y-3">
-            <p className="text-xs text-muted-foreground leading-relaxed bg-amber-50/60 dark:bg-amber-900/10 border border-amber-200/60 dark:border-amber-800/30 rounded-md px-3 py-2">
-              <strong>Auto-generated draft</strong> based on report data. Review
-              and edit all details before sending.{" "}
-              {isMalta ? (
-                <>
-                  This letter follows Maltese civil law format (Civil Code Cap.
-                  16, TRO Cap. 65). Review all details before use. Always seek
-                  advice from a qualified <strong>avukat (advocate)</strong>.
-                </>
-              ) : (
-                "This letter follows standard UK pre-action protocol formatting. Always seek qualified legal advice before issuing."
-              )}
-            </p>
-
-            <Textarea
-              data-ocid="demand_letter.textarea"
-              value={letterText}
-              onChange={(e) => setLetterText(e.target.value)}
-              className="font-mono text-xs leading-relaxed min-h-[480px] resize-y bg-card border-border"
-              spellCheck
-            />
-
-            <div className="flex items-center gap-2 justify-end flex-wrap">
-              <Button
-                data-ocid="demand_letter.copy_button"
-                variant="outline"
-                size="sm"
-                onClick={handleCopy}
-                className="gap-2 text-xs"
-              >
-                {copied ? (
-                  <>
-                    <CheckCircle className="h-3.5 w-3.5 text-green-500" />
-                    Copied
-                  </>
-                ) : (
-                  <>
-                    <Copy className="h-3.5 w-3.5" />
-                    Copy to Clipboard
-                  </>
-                )}
-              </Button>
-              <Button
-                data-ocid="demand_letter.print_button"
-                variant="outline"
-                size="sm"
-                onClick={handlePrint}
-                className="gap-2 text-xs"
-              >
-                <Printer className="h-3.5 w-3.5" />
-                Print
-              </Button>
-            </div>
-          </CardContent>
-        </CollapsibleContent>
-      </Card>
-    </Collapsible>
+            </CardContent>
+          </CollapsibleContent>
+        </Card>
+      </Collapsible>
+      <PaywallModal
+        isOpen={showPaywall}
+        onClose={() => setShowPaywall(false)}
+        featureName="Formal Demand Letter"
+      />
+    </>
   );
 }

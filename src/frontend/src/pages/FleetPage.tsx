@@ -57,6 +57,7 @@ import type React from "react";
 import { useEffect, useState } from "react";
 import { useCountry } from "../contexts/CountryContext";
 import { useLanguage } from "../contexts/LanguageContext";
+import { usePlan } from "../hooks/usePlan";
 import { useGetAllReports } from "../hooks/useQueries";
 import { formatClaimId } from "../utils/claimId";
 
@@ -311,6 +312,7 @@ export default function FleetPage() {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const { country } = useCountry();
+  const { isPro } = usePlan();
   const isMalta = country === "mt";
 
   const [vehicles, setVehicles] = useState<FleetVehicle[]>(() =>
@@ -504,6 +506,50 @@ export default function FleetPage() {
   // ── Render ───────────────────────────────────────────────────────────────────
   return (
     <div className="space-y-6">
+      {/* Pro paywall banner */}
+      {!isPro && (
+        <div
+          className="rounded-xl p-4 flex items-center justify-between gap-4 flex-wrap"
+          style={{
+            background:
+              "linear-gradient(135deg, oklch(0.97 0.06 85) 0%, oklch(0.95 0.10 60) 100%)",
+            border: "1px solid oklch(0.85 0.14 75)",
+          }}
+          data-ocid="fleet.paywall.panel"
+        >
+          <div className="flex items-start gap-3">
+            <span className="text-2xl">👑</span>
+            <div>
+              <p
+                className="font-bold text-sm"
+                style={{ color: "oklch(0.35 0.12 60)" }}
+              >
+                Fleet Manager is a Pro feature
+              </p>
+              <p
+                className="text-xs mt-0.5"
+                style={{ color: "oklch(0.45 0.10 65)" }}
+              >
+                Upgrade to Pro to manage vehicles, assign drivers, and track
+                fleet incidents with full legal reporting.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => navigate({ to: "/pricing" })}
+            className="shrink-0 px-4 py-2 rounded-lg text-sm font-bold transition-opacity hover:opacity-90"
+            style={{
+              background:
+                "linear-gradient(135deg, oklch(0.75 0.18 80) 0%, oklch(0.68 0.20 55) 100%)",
+              color: "oklch(0.15 0.05 60)",
+            }}
+            data-ocid="fleet.paywall.primary_button"
+          >
+            Upgrade to Pro
+          </button>
+        </div>
+      )}
       {/* Page header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-3">

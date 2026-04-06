@@ -17,6 +17,9 @@ import FleetPage from "./pages/FleetPage";
 import InsurerContactsPage from "./pages/InsurerContactsPage";
 import LegalOutputsPage from "./pages/LegalOutputsPage";
 import NewReportPage from "./pages/NewReportPage";
+import PaymentFailurePage from "./pages/PaymentFailurePage";
+import PaymentSuccessPage from "./pages/PaymentSuccessPage";
+import PricingPage from "./pages/PricingPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import ReportDetailPage from "./pages/ReportDetailPage";
 import ReportsPage from "./pages/ReportsPage";
@@ -92,6 +95,24 @@ const dangerousRoadsRoute = createRoute({
   component: DangerousRoadsPage,
 });
 
+const pricingRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/pricing",
+  component: PricingPage,
+});
+
+const paymentSuccessRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/payment-success",
+  component: PaymentSuccessPage,
+});
+
+const paymentFailureRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/payment-failure",
+  component: PaymentFailurePage,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   reportsRoute,
@@ -104,6 +125,9 @@ const routeTree = rootRoute.addChildren([
   privacyRoute,
   termsRoute,
   dangerousRoadsRoute,
+  pricingRoute,
+  paymentSuccessRoute,
+  paymentFailureRoute,
 ]);
 
 const router = createRouter({ routeTree });
