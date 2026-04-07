@@ -1,0 +1,211 @@
+// Version: 1.0.0
+type AIAnalysisResult__558870311 =
+  {
+    correlationSummary : Text;
+    dashCamAnalysis : Text;
+    evidenceGaps : [EvidenceGap__36970347];
+    inferredCrashType : Text;
+    narrativeText : Text;
+    photoAnalysis : Text;
+    severity : Text
+  };
+type AccidentNarrative__714362876 =
+  {evidenceGaps : [EvidenceGap__36970347]; narrativeText : Text};
+type AccidentReport__221101097 =
+  {
+    accidentMarker : Text;
+    accidentNarrative : ?AccidentNarrative__714362876;
+    aiAnalysisResult : ?AIAnalysisResult__558870311;
+    applicableRules : [HighwayCodeRule__681900432];
+    damageDescription : Text;
+    damageSeverity : ?DamageSeverity__452552092;
+    dashCamAnalysis : ?DashCamAnalysis__798380467;
+    dashCamFootage : [ExternalBlob__246066408];
+    faultAnalysis : ?FaultAnalysis__783883337;
+    faultLikelihoodAssessment : ?FaultLikelihoodAssessment__319018520;
+    faultReasoning : Text;
+    imageData : [Blob];
+    isAtFault : Bool;
+    isRedLightViolation : Bool;
+    otherVehicle : ?OtherVehicle__319111145;
+    owner : ?Principal;
+    party1Liability : ?Nat;
+    party2Liability : ?Nat;
+    photos : [PhotoMetadata__651974980];
+    stopLocation : Text;
+    surroundings : Surroundings__698168051;
+    timestamp : Int;
+    trafficSignalState : ?TrafficSignalState__1022706911;
+    trafficSigns : [TrafficSign__774392596];
+    vehicleInfo : VehicleInfo__632575867;
+    vehicleSpeed : Nat;
+    videos : [ExternalBlob__246066408];
+    violations : [Violation__1024222191];
+    witnessStatement : Text;
+    witnesses : [Witness__906883492]
+  };
+type DamageSeverity__452552092 =
+  {
+    heatMap : [VehicleZoneHeatMap__129572562];
+    priorityScore : Nat;
+    severityLabel : Text;
+    totalLossProbability : Nat;
+    vehicleZones : [VehicleZoneScore__465866479]
+  };
+type DashCamAnalysis__798380467 =
+  {
+    collisionDetected : Bool;
+    faultIndicators : Text;
+    roadConditions : Text;
+    timestamps : [Int];
+    vehicleSpeed : Nat
+  };
+type Data__791452850<K, V> =
+  {var count : Nat__490723111; kvs : [var ?(K, V)]};
+type EvidenceGap__36970347 =
+  {confidenceLevel : Nat; description : Text; evidenceType : Text};
+type ExternalBlob__246066408 = Blob;
+type FaultAnalysis__783883337 =
+  {
+    actualSpeed : ?Nat;
+    isAtFault : Bool;
+    reason : Text;
+    speedLimit : ?Nat;
+    violatedRules : [HighwayCodeRule__681900432];
+    weatherConditions : ?Text
+  };
+type FaultLikelihoodAssessment__319018520 =
+  {
+    confidenceLevel : Nat;
+    conflictingFactors : [Text];
+    partyAPercentage : Nat;
+    partyBPercentage : Nat;
+    reasoning : Text;
+    roadPositionImpact : Text;
+    supportingFactors : [Text]
+  };
+type HighwayCodeRule__681900432 =
+  {
+    applicableScenarios : [Text];
+    description : Text;
+    ruleNumber : Text;
+    title : Text
+  };
+type InjuryPhoto__134988003 =
+  {
+    blob : ExternalBlob__246066408;
+    bodyRegion : Text;
+    crashType : Text;
+    id : Nat;
+    reportId : Nat;
+    timestamp : Int
+  };
+type InsuranceExport__83619209 =
+  {
+    injuryPhotos : [InjuryPhoto__134988003];
+    owner : Principal;
+    reportId : Nat;
+    summary : Text
+  };
+type Internal__8484328<K, V> =
+  {children : [var ?Node__46230540<K, V>]; data : Data__791452850<K, V>};
+type Leaf__809889148<K, V> = {data : Data__791452850<K, V>};
+type Map__158565046<K, V> = Map__297112838<K, V>;
+type Map__297112838<K, V> =
+  {var root : Node__46230540<K, V>; var size : Nat__490723111};
+type Map__605269027<K, V> = Map__158565046<K, V>;
+type Nat__490723111 = Nat__920180692;
+type Nat__920180692 = Nat;
+type Node__46230540<K, V> =
+  {#internal : Internal__8484328<K, V>; #leaf : Leaf__809889148<K, V>};
+type OtherVehicle__319111145 =
+  {
+    claimReference : Text;
+    colour : Text;
+    email : Text;
+    insurancePolicyNumber : Text;
+    insurer : Text;
+    licencePlate : Text;
+    make : Text;
+    model : Text;
+    mot : Text;
+    ownerName : Text;
+    phone : Text;
+    registration : Text;
+    year : Nat
+  };
+type PhotoMetadata__651974980 =
+  {
+    contentType : Text;
+    description : Text;
+    filename : Text;
+    uploadTimestamp : Int
+  };
+type StoppingDistance__324770650 = {distance : Nat; speed : Nat};
+type Surroundings__698168051 =
+  {roadCondition : Text; visibility : Text; weather : Text};
+type TrafficSign__774392596 =
+  {
+    detectedInPhoto : Bool;
+    position : ?Text;
+    signType : Text;
+    timestamp : Int
+  };
+type TrafficSignalState__1022706911 =
+  {
+    color : Text;
+    position : Text;
+    proximityToAccident : Nat;
+    witnessTestimony : Text
+  };
+type UserProfile__491224006 =
+  {email : Text; licenseNumber : Text; name : Text; phoneNumber : Text};
+type UserRole__1054455867 = {#admin; #guest; #user};
+type VehicleInfo__632575867 =
+  {
+    colour : Text;
+    licencePlate : Text;
+    make : Text;
+    model : Text;
+    mot : Text;
+    registration : Text;
+    year : Nat
+  };
+type VehicleZoneHeatMap__129572562 =
+  {color : Text; severity : Nat; zone : Text};
+type VehicleZoneScore__465866479 =
+  {damageType : Text; description : Text; score : Nat; zone : Text};
+type Violation__1024222191 =
+  {description : Text; detectedAt : Int; violationType : Text};
+type Witness__906883492 =
+  {address : Text; email : Text; name : Text; phone : Text; statement : Text};
+actor {
+  stable accessControlState :
+    {
+      var adminAssigned : Bool;
+      userRoles : Map__605269027<Principal, UserRole__1054455867>
+    };
+  stable accidentReports :
+    {
+      var root : Node__46230540<Nat, AccidentReport__221101097>;
+      var size : Nat__490723111
+    };
+  stable exportableInjuries :
+    {
+      var root : Node__46230540<Nat, InsuranceExport__83619209>;
+      var size : Nat__490723111
+    };
+  stable injuryPhotos :
+    {
+      var root : Node__46230540<Nat, [InjuryPhoto__134988003]>;
+      var size : Nat__490723111
+    };
+  stable var nextInjuryPhotoId : Nat;
+  stable var nextReportId : Nat;
+  stable stoppingDistances : [StoppingDistance__324770650];
+  stable userProfiles :
+    {
+      var root : Node__46230540<Principal, UserProfile__491224006>;
+      var size : Nat__490723111
+    }
+};

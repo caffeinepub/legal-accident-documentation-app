@@ -1,7 +1,6 @@
 import type { AccidentReport } from "@/backend";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { MessageCircle, RefreshCw, Send, Sparkles, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
@@ -319,7 +318,7 @@ export function ChatAssistant() {
     useState<Partial<AccidentReport> | null>(null);
   const [claimId, setClaimId] = useState<string | null>(null);
 
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Load report context from localStorage on open
@@ -364,17 +363,12 @@ export function ChatAssistant() {
     localStorage.setItem("iamthelaw_chat_pulse_shown", "1");
   };
 
-  // Auto-scroll on new messages
-  // biome-ignore lint/correctness/useExhaustiveDependencies: scrollRef is stable
+  // Auto-scroll to bottom when messages change or loading state changes
+  // biome-ignore lint/correctness/useExhaustiveDependencies: intentional scroll trigger on messages/loading
   useEffect(() => {
-    if (scrollRef.current) {
-      const viewport = scrollRef.current.querySelector(
-        "[data-radix-scroll-area-viewport]",
-      );
-      if (viewport) {
-        viewport.scrollTop = viewport.scrollHeight;
-      }
-    }
+    requestAnimationFrame(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    });
   }, [messages, loading]);
 
   const startNewChat = () => {
@@ -518,10 +512,7 @@ export function ChatAssistant() {
               </div>
 
               {/* Messages */}
-              <ScrollArea
-                className="flex-1 px-4 py-3"
-                ref={scrollRef as React.Ref<HTMLDivElement>}
-              >
+              <div className="flex-1 overflow-y-auto px-4 py-3 min-h-0">
                 {messages.length === 0 && !loading && (
                   <div className="space-y-3">
                     <p className="text-xs text-muted-foreground text-center">
@@ -574,8 +565,9 @@ export function ChatAssistant() {
                       </div>
                     </div>
                   )}
+                  <div ref={messagesEndRef} />
                 </div>
-              </ScrollArea>
+              </div>
 
               {/* Input */}
               <div className="px-3 py-3 border-t border-border bg-card shrink-0">

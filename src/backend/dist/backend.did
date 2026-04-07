@@ -1,0 +1,298 @@
+type _ImmutableObjectStorageRefillResult = 
+ record {
+   success: opt bool;
+   topped_up_amount: opt nat;
+ };
+type _ImmutableObjectStorageRefillInformation = record {
+                                                  proposed_top_up_amount:
+                                                   opt nat;};
+type _ImmutableObjectStorageCreateCertificateResult = 
+ record {
+   blob_hash: text;
+   method: text;
+ };
+type Witness = 
+ record {
+   address: text;
+   email: text;
+   name: text;
+   phone: text;
+   statement: text;
+ };
+type Violation = 
+ record {
+   description: text;
+   detectedAt: int;
+   violationType: text;
+ };
+type VehicleZoneScore = 
+ record {
+   damageType: text;
+   description: text;
+   score: nat;
+   zone: text;
+ };
+type VehicleZoneHeatMap = 
+ record {
+   color: text;
+   severity: nat;
+   zone: text;
+ };
+type VehicleInfo = 
+ record {
+   colour: text;
+   licencePlate: text;
+   make: text;
+   model: text;
+   mot: text;
+   registration: text;
+   year: nat;
+ };
+type UserRole = 
+ variant {
+   admin;
+   guest;
+   user;
+ };
+type UserProfile = 
+ record {
+   email: text;
+   licenseNumber: text;
+   name: text;
+   phoneNumber: text;
+ };
+type TrafficSignalState = 
+ record {
+   color: text;
+   position: text;
+   proximityToAccident: nat;
+   witnessTestimony: text;
+ };
+type TrafficSign = 
+ record {
+   detectedInPhoto: bool;
+   position: opt text;
+   signType: text;
+   timestamp: int;
+ };
+type Surroundings = 
+ record {
+   roadCondition: text;
+   visibility: text;
+   weather: text;
+ };
+type RoadType = 
+ variant {
+   dualCarriageway: nat;
+   motorway: nat;
+   urban: nat;
+ };
+type PhotoMetadata = 
+ record {
+   contentType: text;
+   description: text;
+   filename: text;
+   uploadTimestamp: int;
+ };
+type OtherVehicle = 
+ record {
+   claimReference: text;
+   colour: text;
+   email: text;
+   insurancePolicyNumber: text;
+   insurer: text;
+   licencePlate: text;
+   make: text;
+   model: text;
+   mot: text;
+   ownerName: text;
+   phone: text;
+   registration: text;
+   year: nat;
+ };
+type InsuranceExport = 
+ record {
+   injuryPhotos: vec InjuryPhoto;
+   owner: principal;
+   reportId: nat;
+   summary: text;
+ };
+type InjuryPhoto = 
+ record {
+   "blob": ExternalBlob;
+   bodyRegion: text;
+   crashType: text;
+   id: nat;
+   reportId: nat;
+   timestamp: int;
+ };
+type HighwayCodeRule = 
+ record {
+   applicableScenarios: vec text;
+   description: text;
+   ruleNumber: text;
+   title: text;
+ };
+type FaultLikelihoodAssessment = 
+ record {
+   confidenceLevel: nat;
+   conflictingFactors: vec text;
+   partyAPercentage: nat;
+   partyBPercentage: nat;
+   reasoning: text;
+   roadPositionImpact: text;
+   supportingFactors: vec text;
+ };
+type FaultAnalysis = 
+ record {
+   actualSpeed: opt nat;
+   isAtFault: bool;
+   reason: text;
+   speedLimit: opt nat;
+   violatedRules: vec HighwayCodeRule;
+   weatherConditions: opt text;
+ };
+type ExternalBlob = blob;
+type EvidenceGap = 
+ record {
+   confidenceLevel: nat;
+   description: text;
+   evidenceType: text;
+ };
+type DashCamAnalysis = 
+ record {
+   collisionDetected: bool;
+   faultIndicators: text;
+   roadConditions: text;
+   timestamps: vec int;
+   vehicleSpeed: nat;
+ };
+type DamageSeverity = 
+ record {
+   heatMap: vec VehicleZoneHeatMap;
+   priorityScore: nat;
+   severityLabel: text;
+   totalLossProbability: nat;
+   vehicleZones: vec VehicleZoneScore;
+ };
+type AccidentReport = 
+ record {
+   accidentMarker: text;
+   accidentNarrative: opt AccidentNarrative;
+   aiAnalysisResult: opt AIAnalysisResult;
+   applicableRules: vec HighwayCodeRule;
+   damageDescription: text;
+   damageSeverity: opt DamageSeverity;
+   dashCamAnalysis: opt DashCamAnalysis;
+   dashCamFootage: vec ExternalBlob;
+   faultAnalysis: opt FaultAnalysis;
+   faultLikelihoodAssessment: opt FaultLikelihoodAssessment;
+   faultReasoning: text;
+   imageData: vec blob;
+   isAtFault: bool;
+   isRedLightViolation: bool;
+   otherVehicle: opt OtherVehicle;
+   owner: opt principal;
+   party1Liability: opt nat;
+   party2Liability: opt nat;
+   photos: vec PhotoMetadata;
+   stopLocation: text;
+   surroundings: Surroundings;
+   timestamp: int;
+   trafficSignalState: opt TrafficSignalState;
+   trafficSigns: vec TrafficSign;
+   vehicleInfo: VehicleInfo;
+   vehicleSpeed: nat;
+   videos: vec ExternalBlob;
+   violations: vec Violation;
+   witnessStatement: text;
+   witnesses: vec Witness;
+ };
+type AccidentNarrative = 
+ record {
+   evidenceGaps: vec EvidenceGap;
+   narrativeText: text;
+ };
+type AIAnalysisResult = 
+ record {
+   correlationSummary: text;
+   dashCamAnalysis: text;
+   evidenceGaps: vec EvidenceGap;
+   inferredCrashType: text;
+   narrativeText: text;
+   photoAnalysis: text;
+   severity: text;
+ };
+service : {
+  _immutableObjectStorageBlobsAreLive: (hashes: vec blob) -> (vec bool) query;
+  _immutableObjectStorageBlobsToDelete: () -> (vec blob) query;
+  _immutableObjectStorageConfirmBlobDeletion: (blobs: vec blob) -> ();
+  _immutableObjectStorageCreateCertificate: (blobHash: text) ->
+   (_ImmutableObjectStorageCreateCertificateResult);
+  _immutableObjectStorageRefillCashier: (refillInformation:
+   opt _ImmutableObjectStorageRefillInformation) ->
+   (_ImmutableObjectStorageRefillResult);
+  _immutableObjectStorageUpdateGatewayPrincipals: () -> ();
+  _initializeAccessControl: () -> ();
+  addInjuryPhotos: (reportId: nat, photoBlobs:
+   vec record {
+         ExternalBlob;
+         text;
+         text;
+       }) -> ();
+  assignCallerUserRole: (user: principal, role: UserRole) -> ();
+  createReport: (vehicleSpeed: nat, witnessStatement: text,
+   damageDescription: text, stopLocation: text, accidentMarker: text,
+   timestamp: int, roadType: RoadType, photos: vec PhotoMetadata, images:
+   vec blob, trafficSignalState: opt TrafficSignalState, trafficSigns:
+   vec TrafficSign, gpsLocation: text, surroundings: Surroundings,
+   vehicleInfo: VehicleInfo, otherVehicle: opt OtherVehicle, witnessDetails:
+   vec Witness, videoFiles: vec ExternalBlob, dashCamFootage:
+   vec ExternalBlob, accidentNarrative: opt AccidentNarrative,
+   damageSeverity: opt DamageSeverity, faultLikelihoodAssessment:
+   opt FaultLikelihoodAssessment, aiPhotoAnalysis: text, aiDashCamAnalyses:
+   text, evidenceGaps: vec EvidenceGap) -> (nat);
+  deleteInjuryPhotos: (reportId: nat) -> ();
+  getAIAnalysisResult: (reportId: nat) -> (opt AIAnalysisResult) query;
+  getAllPhotos: (reportId: nat) -> (opt vec PhotoMetadata) query;
+  getAllReports: () -> (vec record {
+                              nat;
+                              AccidentReport;
+                            }) query;
+  getAllThumbnails: () -> (vec record {
+                                 nat;
+                                 vec PhotoMetadata;
+                               }) query;
+  getCallerUserProfile: () -> (opt UserProfile) query;
+  getCallerUserRole: () -> (UserRole) query;
+  getComprehensiveAssessment: (reportId: nat) ->
+   (record {
+      accidentNarrative: opt AccidentNarrative;
+      damageSeverity: opt DamageSeverity;
+      faultLikelihoodAssessment: opt FaultLikelihoodAssessment;
+    }) query;
+  getDashCamAnalysis: (reportId: nat) -> (opt DashCamAnalysis) query;
+  getEvidenceGaps: (reportId: nat) -> (vec EvidenceGap) query;
+  getFirstPhoto: (reportId: nat) -> (opt PhotoMetadata) query;
+  getInjuryPhotos: (reportId: nat) -> (vec InjuryPhoto) query;
+  getInsuranceExport: (reportId: nat) -> (InsuranceExport) query;
+  getPersistentDashCamAnalysis: (reportId: nat) -> (text) query;
+  getPersistentPhotoAnalysis: (reportId: nat) -> (text) query;
+  getReport: (reportId: nat) -> (opt AccidentReport) query;
+  getUserProfile: (user: principal) -> (opt UserProfile) query;
+  isCallerAdmin: () -> (bool) query;
+  saveCallerUserProfile: (profile: UserProfile) -> ();
+  storeInjuryPhotos: (reportId: nat, summary: text) -> ();
+  updateAccidentAssessment: (reportId: nat, accidentNarrative:
+   opt AccidentNarrative, damageSeverity: opt DamageSeverity,
+   faultLikelihoodAssessment: opt FaultLikelihoodAssessment) -> ();
+  updateDashCamFootage: (reportId: nat, dashCamFootage: vec ExternalBlob) ->
+   ();
+  updateDashCamFootageImaging: (reportId: nat, dashCamFootage:
+   vec ExternalBlob) -> ();
+  updateEIPhotoAnalysis: (reportId: nat, aiPhotoAnalysis: text) -> ();
+  updateNewAIResults: (reportId: nat, aiDashCamAnalyses: text, evidenceGaps:
+   vec EvidenceGap) -> ();
+  uploadPhoto: (filename: text, contentType: text, description: text) ->
+   (PhotoMetadata);
+}

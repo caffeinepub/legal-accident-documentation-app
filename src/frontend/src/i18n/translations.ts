@@ -1398,7 +1398,7 @@ const translations: Translations = {
     "form.section.dashcam": "Footage tad-Dash Cam",
     "form.incident_type": "Tip ta' Inċident",
     "form.vehicle_incident": "Inċident ta' Vettura",
-    "form.cycling_incident": "Inċident ta' Rikkbu",
+    "form.cycling_incident": "Inċident ta' Rikkieb",
     "upload.dashcam.click":
       "Ikklikkja biex titla' footage tad-dash cam (MP4, MOV, AVI)",
     "upload.photos.click":
@@ -1497,7 +1497,7 @@ const translations: Translations = {
       "Daħħal id-dettalji tal-vettura tiegħek. Dawn se jintużaw biex jikkontestwalizzaw l-analiżi tal-AI.",
     "step.cycling_title": "Id-Dettalji Tiegħek",
     "step.cycling_desc":
-      "Ipprovdi dettalji dwar ir-rikkbu u t-tagħmir tas-sigurtà tiegħek. Dawn jaffettwaw il-piż tan-negliġenza kontributorja.",
+      "Ipprovdi dettalji dwar ir-rikkieb u t-tagħmir tas-sigurtà tiegħek. Dawn jaffettwaw il-piż tan-negliġenza kontributorja.",
     "step.details_title": "Dettalji tal-Inċident",
     "step.details_desc":
       "Iddeskrivi l-kundizzjonijiet u ċ-ċirkostanzi fil-ħin tal-inċident.",
@@ -1508,15 +1508,15 @@ const translations: Translations = {
     "claim.status_title": "Status tat-Talba",
     "vehicle.vrt_expiry": "Skadenza VRT (Test tal-Idoneità tal-Vettura)",
     "vehicle.mot_expiry": "Skadenza MOT",
-    "vehicle.bike_type": "Tip ta' Rikkbu",
-    "vehicle.select_bike_type": "Agħżel it-tip ta' rikkbu",
+    "vehicle.bike_type": "Tip ta' Rikkieb",
+    "vehicle.select_bike_type": "Agħżel it-tip ta' rikkieb",
     "accident.road_type": "Tip ta' Triq",
     "accident.police_ref": "Nru ta' Referenza tal-Pulizija",
     "accident.officer_name": "Isem tal-Uffiċjal",
     "accident.witness_statement": "Dikjarazzjoni tax-Xhud",
     "accident.road_condition": "Kundizzjoni tat-Triq",
     "accident.visibility": "Viżibbiltà",
-    "cycling.sub_scenario": "Xenarju tar-Rikkbu",
+    "cycling.sub_scenario": "Xenarju tar-Rikkieb",
     "cycling.vs_vehicle": "Rikkieb vs Vettura",
     "cycling.vs_pedestrian": "Rikkieb vs Pedistru",
     "cycling.solo": "Waħdu / Difett fit-Triq",

@@ -3,16 +3,16 @@ import Map "mo:core/Map";
 import Time "mo:core/Time";
 import Blob "mo:core/Blob";
 import Principal "mo:core/Principal";
-import Storage "blob-storage/Storage";
-import MixinStorage "blob-storage/Mixin";
-import AccessControl "authorization/access-control";
-import MixinAuthorization "authorization/MixinAuthorization";
+import Storage "mo:caffeineai-object-storage/Storage";
+import MixinObjectStorage "mo:caffeineai-object-storage/Mixin";
+import AccessControl "mo:caffeineai-authorization/access-control";
+import MixinAuthorization "mo:caffeineai-authorization/MixinAuthorization";
 
 
 // Enable data migration logic on upgrades
 
 actor {
-  include MixinStorage();
+  include MixinObjectStorage();
 
   // Enable access control system
   let accessControlState = AccessControl.initState();
