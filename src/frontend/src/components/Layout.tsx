@@ -30,7 +30,6 @@ import { usePlan } from "../hooks/usePlan";
 import { LANGUAGES, type Language } from "../i18n/translations";
 import { ChatAssistant } from "./ChatAssistant";
 import CookieConsentBanner from "./CookieConsentBanner";
-import PaywallModal from "./PaywallModal";
 import ProBadge from "./ProBadge";
 
 const NAV_ITEMS = [
@@ -97,7 +96,6 @@ export default function Layout() {
   const { language, setLanguage, t } = useLanguage();
   const { country, setCountry } = useCountry();
   const { isPro } = usePlan();
-  const [showMaltaPaywall, setShowMaltaPaywall] = useState(false);
 
   const handleNav = (to: string) => {
     navigate({ to });
@@ -200,20 +198,14 @@ export default function Layout() {
             <button
               type="button"
               onClick={() => {
-                if (country === "uk" && !isPro) {
-                  setShowMaltaPaywall(true);
-                } else {
-                  setCountry(country === "uk" ? "mt" : "uk");
-                }
+                setCountry(country === "uk" ? "mt" : "uk");
               }}
               className="flex items-center gap-1 px-2 py-1 rounded-md border border-border text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
               aria-label="Switch jurisdiction"
               data-ocid="header.country.toggle"
               title={
                 country === "uk"
-                  ? isPro
-                    ? "Switch to Malta jurisdiction"
-                    : "Malta jurisdiction requires Pro"
+                  ? "Switch to Malta jurisdiction"
                   : "Switch to UK jurisdiction"
               }
             >
@@ -439,11 +431,6 @@ export default function Layout() {
       </footer>
       <CookieConsentBanner />
       <ChatAssistant />
-      <PaywallModal
-        isOpen={showMaltaPaywall}
-        onClose={() => setShowMaltaPaywall(false)}
-        featureName="Malta Jurisdiction (🇲🇹)"
-      />
     </div>
   );
 }

@@ -19,10 +19,9 @@ interface PaywallModalProps {
 }
 
 const PRO_BENEFITS = [
-  "Unlimited reports per month",
-  "PDF export with QR code & tamper-proof fingerprint",
+  "Unlimited reports per month (free: 5/month)",
+  "Unlimited PDF exports with QR code & tamper-proof fingerprint",
   "Demand letters & negotiation letter builder",
-  "Malta jurisdiction (🇲🇹)",
   "Fleet Manager dashboard",
   "Legal Outputs (settlement estimator, pathway guide)",
   "Cycling accident flow",

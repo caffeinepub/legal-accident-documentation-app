@@ -281,6 +281,17 @@ function compileReport(
   return lines.join("\n");
 }
 
+const PDF_EXPORT_COUNT_KEY = "iamthelaw_pdf_export_count";
+
+function getPdfExportCount(): number {
+  return Number.parseInt(localStorage.getItem(PDF_EXPORT_COUNT_KEY) ?? "0", 10);
+}
+
+function incrementPdfExportCount(): void {
+  const current = getPdfExportCount();
+  localStorage.setItem(PDF_EXPORT_COUNT_KEY, String(current + 1));
+}
+
 export default function ExportReportPanel({
   reportId,
   report,
@@ -302,6 +313,9 @@ export default function ExportReportPanel({
     witnessSignatureDate,
     isMalta,
   );
+
+  const isFirstPdfAllowed = !isPro && getPdfExportCount() === 0;
+  const canPrint = isPro || isFirstPdfAllowed;
   const previewText = showFullPreview
     ? reportText
     : reportText.slice(0, PREVIEW_LENGTH) +
@@ -404,12 +418,24 @@ export default function ExportReportPanel({
             variant="outline"
             size="sm"
             className="gap-2 flex-1 sm:flex-none"
-            onClick={() => (isPro ? handlePrint() : setShowPaywall(true))}
+            onClick={() => {
+              if (canPrint) {
+                if (!isPro) incrementPdfExportCount();
+                handlePrint();
+              } else {
+                setShowPaywall(true);
+              }
+            }}
             data-ocid="export.secondary_button"
           >
             <Printer size={14} />
             {t("export.print")}
-            {!isPro && <span className="ml-1 text-[10px] opacity-60">Pro</span>}
+            {!isPro && !isFirstPdfAllowed && (
+              <span className="ml-1 text-[10px] opacity-60">Pro</span>
+            )}
+            {!isPro && isFirstPdfAllowed && (
+              <span className="ml-1 text-[10px] text-green-600">Free</span>
+            )}
           </Button>
         </div>
 

@@ -44,7 +44,7 @@ export default function NewReportPage() {
   const isMalta = country === "mt";
 
   const reportCount = getCurrentMonthReportCount();
-  const atReportLimit = !isPro && reportCount >= 3;
+  const atReportLimit = !isPro && reportCount >= 5;
 
   const dismissOnboarding = () => {
     localStorage.setItem("iatl_onboarded", "1");
@@ -176,10 +176,10 @@ export default function NewReportPage() {
           data-ocid="new_report.free_tier.panel"
         >
           <span>
-            <strong>{reportCount}/3 free reports</strong> used this month.
+            <strong>{reportCount}/5 free reports</strong> used this month.
             {atReportLimit
               ? " Upgrade to Pro for unlimited reports."
-              : " Free tier allows 3 reports/month."}
+              : " Free tier allows 5 reports/month."}
           </span>
           <button
             type="button"
@@ -218,7 +218,7 @@ export default function NewReportPage() {
             Monthly report limit reached
           </h3>
           <p className="text-sm mb-4" style={{ color: "oklch(0.45 0.10 65)" }}>
-            You've used all 3 free reports for this month. Upgrade to Pro for
+            You've used all 5 free reports for this month. Upgrade to Pro for
             unlimited reports.
           </p>
           <button
@@ -243,7 +243,7 @@ export default function NewReportPage() {
       <PaywallModal
         isOpen={showReportLimitPaywall}
         onClose={() => setShowReportLimitPaywall(false)}
-        featureName="More than 3 reports per month"
+        featureName="More than 5 reports per month"
       />
     </div>
   );

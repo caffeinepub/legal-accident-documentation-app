@@ -13,9 +13,10 @@ import { usePlan } from "../hooks/usePlan";
 
 const FREE_FEATURES = [
   "Basic accident documentation",
-  "Up to 3 reports per month",
+  "Up to 5 reports per month",
   "View reports in-app",
-  "UK jurisdiction only",
+  "UK & Malta jurisdiction (🇬🇧 🇲🇹)",
+  "PDF export for your first report",
   "Basic legal references",
   "AI photo analysis",
   "Fault assessment",
@@ -23,9 +24,9 @@ const FREE_FEATURES = [
 
 const PRO_FEATURES = [
   "Unlimited reports",
-  "PDF export with QR code & SHA-256 fingerprint",
+  "Unlimited PDF exports with QR code & SHA-256 fingerprint",
   "Demand letters & negotiation letter builder",
-  "Malta jurisdiction (🇲🇹)",
+  "Malta jurisdiction (🇬🇧 🇲🇹) — unlimited access",
   "Fleet Manager dashboard",
   "Legal Outputs (settlement estimator, legal pathway)",
   "Cycling accident flow with full legal references",
